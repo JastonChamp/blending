@@ -7,7 +7,8 @@ const cvcWords = [
 ];
 
 let spinning = false;
-document.querySelector('.wheel').addEventListener('click', () => {
+
+document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
     const randomIndex = Math.floor(Math.random() * cvcWords.length);
