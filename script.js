@@ -10,12 +10,18 @@ let spinning = false;
 document.querySelector('.wheel').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
-    setTimeout(() => {
-      spinning = false;
-      const randomIndex = Math.floor(Math.random() * cvcWords.length);
-      slots.forEach((slot, index) => {
-        slot.textContent = cvcWords[(index + randomIndex) % cvcWords.length];
-      });
-    }, 5000); // Set a delay for spinning
+    const randomIndex = Math.floor(Math.random() * cvcWords.length);
+    slots.forEach((slot, index) => {
+      const newIndex = (index + randomIndex) % cvcWords.length;
+      slot.style.transition = 'none';
+      setTimeout(() => {
+        slot.style.transition = 'transform 1s ease-in-out';
+        slot.style.transform = `rotateX(${newIndex * (360 / cvcWords.length)}deg)`;
+        slot.textContent = cvcWords[newIndex];
+        if (index === slots.length - 1) {
+          spinning = false;
+        }
+      }, 0);
+    });
   }
 });
