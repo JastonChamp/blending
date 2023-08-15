@@ -14,7 +14,7 @@ body {
 }
 
 .wheel {
-  width: 200px;
+  width: 400px;
   height: 200px;
   position: relative;
   transform-style: preserve-3d;
