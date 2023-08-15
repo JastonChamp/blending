@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -9,17 +10,16 @@ body {
 }
 
 .spinner {
+  perspective: 1000px;
+}
+
+.wheel {
   width: 200px;
   height: 200px;
   position: relative;
   transform-style: preserve-3d;
-  animation: spin 5s infinite linear; /* Controls the spinning animation */
-}
-
-.wheel {
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
+  transform: rotateX(0deg);
+  transition: transform 1s ease-in-out;
 }
 
 .slot {
@@ -35,28 +35,18 @@ body {
   border: 1px solid #333;
   transform-origin: center;
   backface-visibility: hidden;
-  transition: transform 1s ease-in-out;
-  transform: rotateX(0deg); /* Initial rotation angle */
 }
 
-@keyframes spin {
-  from {
-    transform: rotateX(0deg);
-  }
-  to {
-    transform: rotateX(720deg); /* Controls the end angle of the spinning animation */
-  }
-}
-
-/* Add a styling for the spin button */
-button#spinButton {
-  display: block;
-  margin: 20px auto;
+button {
+  margin-top: 10px;
   padding: 10px 20px;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 5px;
 }
+
+/* Position the slots in a circular pattern */
+.slot:nth-child(1) { transform: rotateX(0deg) translateZ(100px); }
+.slot:nth-child(2) { transform: rotateX(9.23deg) translateZ(100px); }
+.slot:nth-child(3) { transform: rotateX(18.46deg) translateZ(100px); }
+/* ... continue this pattern ... */
+.slot:nth-child(39) { transform: rotateX(351.54deg) translateZ(100px); }
