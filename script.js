@@ -6,6 +6,16 @@ const cvcWords = [
   'web', 'yak', 'zip', 'fog', 'leg', 'mop', 'sad', 'bed', /* Add more words */
 ];
 
-for (let i = 0; i < slots.length; i++) {
-  slots[i].textContent = cvcWords[i % cvcWords.length];
-}
+let spinning = false;
+document.querySelector('.wheel').addEventListener('click', () => {
+  if (!spinning) {
+    spinning = true;
+    setTimeout(() => {
+      spinning = false;
+      const randomIndex = Math.floor(Math.random() * cvcWords.length);
+      slots.forEach((slot, index) => {
+        slot.textContent = cvcWords[(index + randomIndex) % cvcWords.length];
+      });
+    }, 5000); // Set a delay for spinning
+  }
+});
