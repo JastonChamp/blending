@@ -4,12 +4,102 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CVC Words Spinner</title>
-<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+
+  .spinner {
+    perspective: 1200px;
+    width: 400px; /* Increased size */
+    height: 400px;
+    position: relative;
+    margin-bottom: 20px; /* Space for button */
+  }
+
+  .wheel {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(0deg);
+    transition: transform 1s ease-in-out;
+  }
+
+  .slot {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #fff;
+    border: 1px solid #333;
+    transform-origin: center;
+    backface-visibility: hidden;
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+ .slot:nth-child(1) { transform: rotateX(0deg) translateZ(200px); }
+.slot:nth-child(2) { transform: rotateX(9.23deg) translateZ(200px); }
+.slot:nth-child(3) { transform: rotateX(18.46deg) translateZ(200px); }
+.slot:nth-child(4) { transform: rotateX(27.69deg) translateZ(200px); }
+.slot:nth-child(5) { transform: rotateX(36.92deg) translateZ(200px); }
+.slot:nth-child(6) { transform: rotateX(46.15deg) translateZ(200px); }
+.slot:nth-child(7) { transform: rotateX(55.38deg) translateZ(200px); }
+.slot:nth-child(8) { transform: rotateX(64.62deg) translateZ(200px); }
+.slot:nth-child(9) { transform: rotateX(73.85deg) translateZ(200px); }
+.slot:nth-child(10) { transform: rotateX(83.08deg) translateZ(200px); }
+.slot:nth-child(11) { transform: rotateX(92.31deg) translateZ(200px); }
+.slot:nth-child(12) { transform: rotateX(101.54deg) translateZ(200px); }
+.slot:nth-child(13) { transform: rotateX(110.77deg) translateZ(200px); }
+.slot:nth-child(14) { transform: rotateX(120deg) translateZ(200px); }
+.slot:nth-child(15) { transform: rotateX(129.23deg) translateZ(200px); }
+.slot:nth-child(16) { transform: rotateX(138.46deg) translateZ(200px); }
+.slot:nth-child(17) { transform: rotateX(147.69deg) translateZ(200px); }
+.slot:nth-child(18) { transform: rotateX(156.92deg) translateZ(200px); }
+.slot:nth-child(19) { transform: rotateX(166.15deg) translateZ(200px); }
+.slot:nth-child(20) { transform: rotateX(175.38deg) translateZ(200px); }
+.slot:nth-child(21) { transform: rotateX(184.62deg) translateZ(200px); }
+.slot:nth-child(22) { transform: rotateX(193.85deg) translateZ(200px); }
+.slot:nth-child(23) { transform: rotateX(203.08deg) translateZ(200px); }
+.slot:nth-child(24) { transform: rotateX(212.31deg) translateZ(200px); }
+.slot:nth-child(25) { transform: rotateX(221.54deg) translateZ(200px); }
+.slot:nth-child(26) { transform: rotateX(230.77deg) translateZ(200px); }
+.slot:nth-child(27) { transform: rotateX(240deg) translateZ(200px); }
+.slot:nth-child(28) { transform: rotateX(249.23deg) translateZ(200px); }
+.slot:nth-child(29) { transform: rotateX(258.46deg) translateZ(200px); }
+.slot:nth-child(30) { transform: rotateX(267.69deg) translateZ(200px); }
+.slot:nth-child(31) { transform: rotateX(276.92deg) translateZ(200px); }
+.slot:nth-child(32) { transform: rotateX(286.15deg) translateZ(200px); }
+.slot:nth-child(33) { transform: rotateX(295.38deg) translateZ(200px); }
+.slot:nth-child(34) { transform: rotateX(304.62deg) translateZ(200px); }
+.slot:nth-child(35) { transform: rotateX(313.85deg) translateZ(200px); }
+.slot:nth-child(36) { transform: rotateX(323.08deg) translateZ(200px); }
+.slot:nth-child(37) { transform: rotateX(332.31deg) translateZ(200px); }
+.slot:nth-child(38) { transform: rotateX(342.31deg) translateZ(200px); }
+.slot:nth-child(39) { transform: rotateX(351.54deg) translateZ(200px); }
+</style>
 </head>
 <body>
 <div class="spinner">
   <div class="wheel">
-    <div class="slot">hop</div>
+     <div class="slot">hop</div>
     <div class="slot">nut</div>
     <div class="slot">bed</div>
     <div class="slot">cat</div>
@@ -47,10 +137,9 @@
     <div class="slot">mop</div>
     <div class="slot">sad</div>
     <div class="slot">bed</div>
-    <!-- ... Add the remaining CVC words here ... -->
   </div>
 </div>
-  <button id="spinButton">Spin</button>
+<button id="spinButton">Spin</button>
 <script src="script.js"></script>
 </body>
 </html>
