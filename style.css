@@ -10,7 +10,7 @@ body {
 }
 
 .spinner {
-  perspective: 500px;
+  perspective: 2000px;
   width: 400px;
   height: 400px;
   position: relative;
