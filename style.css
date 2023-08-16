@@ -10,7 +10,7 @@ body {
 }
 
 .spinner {
-  perspective: 2000px;
+  perspective: 1000px;
   width: 400px;
   height: 400px;
   position: relative;
@@ -49,7 +49,7 @@ button {
   cursor: pointer;
 }
 
-/* Position the slots in a circular pattern */ {
+/* Position the slots in a circular pattern */ 
 .slot:nth-child(1) { transform: rotateX(0deg) translateZ(100px); }
 .slot:nth-child(2) { transform: rotateX(9.23deg) translateZ(100px); }
 .slot:nth-child(3) { transform: rotateX(18.46deg) translateZ(100px); }
@@ -88,4 +88,4 @@ button {
 .slot:nth-child(36) { transform: rotateX(323.08deg) translateZ(100px); }
 .slot:nth-child(37) { transform: rotateX(332.31deg) translateZ(100px); }
 .slot:nth-child(38) { transform: rotateX(342.31deg) translateZ(100px); }
-}
+
