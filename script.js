@@ -19,12 +19,17 @@ let currentDegree = 0;
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
-    const randomDegree = Math.floor(Math.random() * 360) + 360 * 5; // 5 full spins
-    const totalDegree = currentDegree + randomDegree;
-    wheel.style.transform = `rotateX(${totalDegree}deg)`;
-    currentDegree = totalDegree % 360;
+    const slotsCount = slots.length; // Number of slots
+    const randomSlot = Math.floor(Math.random() * slotsCount);
+    const fullSpins = 5; // Number of full spins
+    const totalDegree = (360 * fullSpins) + (randomSlot * 360 / slotsCount);
+    const finalDegree = currentDegree + totalDegree;
+    wheel.style.transform = `rotateX(${finalDegree}deg)`;
+    currentDegree = finalDegree % 360;
     setTimeout(() => {
       spinning = false;
     }, 1000); // 1s is the duration of the rotation transition
   }
+});
+
 });
