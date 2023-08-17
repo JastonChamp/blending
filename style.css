@@ -1,6 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -9,17 +10,20 @@ body {
 }
 
 .spinner {
-  width: 200px;
-  height: 200px;
+  perspective: 1000px;
+  width: 400px;
+  height: 400px;
   position: relative;
-  transform-style: preserve-3d;
-  animation: spin 5s infinite linear;
+  margin-bottom: 20px; /* Add margin for button space */
 }
 
 .wheel {
   width: 100%;
   height: 100%;
+  position: relative;
   transform-style: preserve-3d;
+  transform: rotateX(0deg);
+  transition: transform 1s ease-in-out;
 }
 
 .slot {
@@ -29,20 +33,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
+  font-size: 24px; /* Adjusted the font size */
   font-weight: bold;
+  color: #333; /* Added text color */
   background-color: #fff;
   border: 1px solid #333;
-  transform-origin: center;
+  transform-origin: 50% 50% -100px; /* Existing value */
   backface-visibility: hidden;
-  transition: transform 1s ease-in-out;
+  z-index: 1; /* Added z-index */
 }
 
-@keyframes spin {
-  from {
-    transform: rotateX(0deg);
-  }
-  to {
-    transform: rotateX(720deg);
-  }
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
 }
+
+/* Position the slots in a circular pattern (no changes) */
+.slot
