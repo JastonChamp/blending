@@ -17,9 +17,8 @@
   }
 
   .spinner {
-    perspective: 1000px;
-    width: 400px; /* Increased size */
-    height: 400px;
+    width: 200px; /* Increased size */
+    height: 200px;
     position: relative;
     margin-bottom: 20px; /* Space for button */
   }
@@ -29,8 +28,8 @@
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transform: rotateX(0deg);
-    transition: transform 1s ease-in-out;
+     transform-style: preserve-3d;
+  animation: spin 5s infinite linear;
   }
 
   .slot {
