@@ -33,13 +33,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
+  font-size: 24px; /* Adjusted the font size */
   font-weight: bold;
+  color: #333; /* Added text color */
   background-color: #fff;
   border: 1px solid #333;
-  transform-origin: center;
-  transform-origin: 50% 50% -100px;
+  transform-origin: 50% 50% -100px; /* Existing value */
   backface-visibility: hidden;
+  z-index: 1; /* Added z-index */
 }
 
 button {
