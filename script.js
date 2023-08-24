@@ -7,10 +7,12 @@ const cvcWords = [
 ];
 
 // Insert the CVC words into the slots
-const slots = document.querySelectorAll('.slot');
-slots.forEach((slot, index) => {
-  const wordIndex = index % cvcWords.length;
-  slot.textContent = cvcWords[wordIndex];
+cvcWords.forEach((word, index) => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.textContent = word;
+  slot.style.transform = `rotateX(${index * 9.23}deg) translateZ(100px)`;
+  wheel.appendChild(slot);
 });
 
 let spinning = false;
@@ -19,7 +21,7 @@ let currentDegree = 0;
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
-    const slotsCount = slots.length; // Number of slots
+    const slotsCount = cvcWords.length; // Number of slots
     const randomSlot = Math.floor(Math.random() * slotsCount);
     const fullSpins = 5; // Number of full spins
     const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
