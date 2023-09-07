@@ -10,9 +10,10 @@ cvcWords.forEach((word, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
   slot.textContent = word;
-  slot.style.transform = `rotateX(${index * (360 / cvcWords.length)}deg) translateZ(200px)`;  /* Adjusted transform */
+  slot.style.transform = `rotateX(${index * (360 / cvcWords.length)}deg) translateZ(200px)`;
   wheel.appendChild(slot);
 });
+
 
 let spinning = false;
 let currentDegree = 0;
