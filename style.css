@@ -45,12 +45,13 @@ body {
 
 
 }
-
 button {
   margin-top: 10px;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  z-index: 2; /* Added z-index */
-  position: relative; /* Added position */
+  z-index: 9999;  /* Increased z-index */
+  position: relative;  /* Ensure position is set */
 }
+
+
