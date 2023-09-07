@@ -21,11 +21,6 @@ let spinning = false;
 let currentDegree = 0;
 
 
-
-
-
-let currentDegree = 0;
-
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
@@ -42,6 +37,8 @@ document.getElementById('spinButton').addEventListener('click', () => {
     }, 1000);
   }
 });
+
+
 
 
 
