@@ -39,8 +39,11 @@ body {
   color: #333;
   background-color: #fff;
   border: 1px solid #333;
-  transform-origin: 50% 50% -100px;
-  backface-visibility: hidden;
+  transform-origin: 50% 50% 0;  /* Modified transform-origin */
+  backface-visibility: visible;  /* Modified backface-visibility */
+}
+
+
 }
 
 button {
