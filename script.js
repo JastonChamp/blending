@@ -5,13 +5,15 @@ const cvcWords = [
   'fan', 'jug', 'kid', 'lid', 'mat', 'pig', 'rat', 'sun', 'tap', 'vet',
   'web', 'yak', 'zip', 'fog', 'leg', 'mop', 'sad', 'bed'
 ];
+
 cvcWords.forEach((word, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
   slot.textContent = word;
-  slot.style.transform = `rotate(${index * (360 / cvcWords.length)}deg) translateZ(200px)`;  /* Modified transform */
+  slot.style.transform = `rotateX(${index * (360 / cvcWords.length)}deg) translateZ(200px)`;  /* Adjusted transform */
   wheel.appendChild(slot);
 });
+
 let spinning = false;
 let currentDegree = 0;
 
