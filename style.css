@@ -39,10 +39,9 @@ body {
   color: #333;
   background-color: #fff;
   border: 1px solid #333;
-  transform-origin: center center 200px;  /* Adjusted transform-origin */
-  backface-visibility: hidden;  /* Keep it as hidden */
+ backface-visibility: hidden; 
+  transform-origin: 50% 50% 200px; 
 }
-
 
 button {
   margin-top: 50px;  /* Increased margin to move the button below the spinner */
