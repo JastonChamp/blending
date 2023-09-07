@@ -20,6 +20,7 @@ cvcWords.forEach((word, index) => {
 let spinning = false;
 let currentDegree = 0;
 
+
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
@@ -27,11 +28,13 @@ document.getElementById('spinButton').addEventListener('click', () => {
     const randomSlot = Math.floor(Math.random() * slotsCount);
     const fullSpins = 5; // Number of full spins
     const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
-    const finalDegree = currentDegree + totalDegree;
-    wheel.style.transform = `rotateX(${finalDegree}deg)`;
+    const finalDegree = currentDegree + totalDegree - (currentDegree % (360 / slotsCount)); // Adjusted to stop at a centered position
+    wheel.style.transform = `rotateY(${finalDegree}deg)`;
     currentDegree = finalDegree % 360;
     setTimeout(() => {
       spinning = false;
     }, 1000); // 1s is the duration of the rotation transition
   }
 });
+
+
