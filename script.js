@@ -6,15 +6,15 @@ const cvcWords = [
   'web', 'yak', 'zip', 'fog', 'leg', 'mop', 'sad', 'bed'
 ];
 
-
 cvcWords.forEach((word, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
   slot.textContent = word;
   const angle = index * (360 / cvcWords.length);
-  slot.style.transform = `rotateX(${angle}deg) translateZ(400px)`;  /* Adjusted translateZ value */
+  slot.style.transform = `rotateY(${angle}deg) translateZ(200px) rotateY(-${angle}deg)`;  /* Adjusted rotateY and translateZ */
   wheel.appendChild(slot);
 });
+
 
 
 let spinning = false;
