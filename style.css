@@ -26,8 +26,6 @@ body {
   transition: transform 1s ease-in-out;
 }
 
-/* ... (existing styles) */
-
 .slot {
   position: absolute;
   width: 100%;
@@ -41,8 +39,9 @@ body {
   background-color: #fff;
   border: 1px solid #333;
   transform-origin: 50% 50% 200px;
-  backface-visibility: visible;
+  backface-visibility: hidden;  /* Changed to hidden */
 }
+
 
 button {
   margin-top: 50px;  /* Increased margin to move the button below the spinner */
