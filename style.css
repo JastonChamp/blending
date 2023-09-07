@@ -15,6 +15,7 @@ body {
   height: 400px;
   position: relative;
   margin-bottom: 20px;
+  z-index: 1; /* Added z-index */
 }
 
 .wheel {
@@ -47,5 +48,6 @@ button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+  z-index: 2; /* Added z-index */
+  position: relative; /* Added position */
 }
-``
