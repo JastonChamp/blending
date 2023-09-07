@@ -21,6 +21,7 @@ let spinning = false;
 let currentDegree = 0;
 
 
+
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
@@ -28,13 +29,15 @@ document.getElementById('spinButton').addEventListener('click', () => {
     const randomSlot = Math.floor(Math.random() * slotsCount);
     const fullSpins = 5; // Number of full spins
     const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
-    const finalDegree = currentDegree + totalDegree - (currentDegree % (360 / slotsCount)); // Adjusted to stop at a centered position
-    wheel.style.transform = `rotateY(${finalDegree}deg)`;
-    currentDegree = finalDegree % 360;
+    const finalDegree = currentDegree + totalDegree;
+    const adjustment = finalDegree % (360 / slotsCount); // Calculate the adjustment needed to center the slot
+    wheel.style.transform = `rotateY(${finalDegree - adjustment}deg)`; // Apply the adjustment
+    currentDegree = (finalDegree - adjustment) % 360;
     setTimeout(() => {
       spinning = false;
     }, 1000); // 1s is the duration of the rotation transition
   }
 });
+
 
 
