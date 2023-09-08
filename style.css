@@ -18,14 +18,12 @@ body {
 .slot {
   width: 100px;
   height: 100px;
-  display: flex;
   justify-content: center;
   align-items: center;
   border: 1px solid black;
-  background-color: white;  
+  background-color: white;
   display: none;  // Initialize to hide all slots
 }
-
 
 button {
   margin-top: 20px;
