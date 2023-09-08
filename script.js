@@ -4,49 +4,40 @@ const cvcWords = [
   'jam', 'net', 'map', 'pig', 'tub', 'cup', 'van', 'wax', 'win', 'box'
 ];
 
-// Load spin sound
-const spinSound = new Audio('spin-sound.mp3');  // Replace 'spin-sound.mp3' with the path to your audio file
-
 cvcWords.forEach((word, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
   slot.textContent = word;
-  slot.style.display = 'none';  // Initialize to hide all slots
+  slot.style.display = 'none';
   wheel.appendChild(slot);
 });
 
-// Show the first word initially
 const slots = document.querySelectorAll('.slot');
 slots[0].style.display = 'flex';
 
 let currentSlot = 0;
 
 document.getElementById('spinButton').addEventListener('click', () => {
-  // Play spin sound
-  spinSound.play();
-
-  // Shuffle effect
   let shuffleCount = 0;
+  let lastRandom = 0;
+
   const shuffleEffect = setInterval(() => {
+    slots[lastRandom].style.display = 'none';
     const randomSlot = Math.floor(Math.random() * cvcWords.length);
-    slots[randomSlot].style.backgroundColor = 'yellow';
-    setTimeout(() => {
-      slots[randomSlot].style.backgroundColor = 'white';
-    }, 100);
+    slots[randomSlot].style.display = 'flex';
+    lastRandom = randomSlot;
     shuffleCount++;
     if (shuffleCount > 20) {
       clearInterval(shuffleEffect);
+      slots[lastRandom].style.display = 'none';
+      slots[currentSlot].style.display = 'flex';
     }
   }, 100);
 
-  // Actual spin logic
   setTimeout(() => {
-    slots[currentSlot].style.display = 'none';  // Hide the current slot
-
-    // Randomly select a new slot
     const randomSlot = Math.floor(Math.random() * cvcWords.length);
-    slots[randomSlot].style.display = 'flex';  // Show the new slot
-
-    currentSlot = randomSlot;  // Update the current slot
-  }, 2500);  // Wait for 2.5 seconds to complete the shuffle effect
+    slots[currentSlot].style.display = 'none';
+    slots[randomSlot].style.display = 'flex';
+    currentSlot = randomSlot;
+  }, 2500);
 });
