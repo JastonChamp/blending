@@ -11,10 +11,9 @@ cvcWords.forEach((word, index) => {
   slot.className = 'slot';
   slot.textContent = word;
   const angle = index * (360 / cvcWords.length);
-  slot.style.transform = `rotateY(${angle}deg) translateZ(200px) rotateY(-${angle}deg)`;  /* Adjusted rotateY and translateZ */
+  slot.style.transform = `rotateY(${angle}deg) translateZ(200px) rotateY(-${angle}deg)`;
   wheel.appendChild(slot);
 });
-
 
 
 let spinning = false;
@@ -38,7 +37,6 @@ document.getElementById('spinButton').addEventListener('click', () => {
     }, 1000);
   }
 });
-
 
 
 
