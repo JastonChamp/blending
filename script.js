@@ -11,14 +11,15 @@ cvcWords.forEach((word, index) => {
   wheel.appendChild(slot);
 });
 
+let currentSlot = 0;
+
 document.getElementById('spinButton').addEventListener('click', () => {
   const slots = document.querySelectorAll('.slot');
-  const randomIndex = Math.floor(Math.random() * slots.length);
-  slots.forEach((slot, index) => {
-    if (index === randomIndex) {
-      slot.style.backgroundColor = 'yellow';
-    } else {
-      slot.style.backgroundColor = 'white';
-    }
-  });
+  slots[currentSlot].style.backgroundColor = 'white'; // Reset the background color of the current slot
+
+  // Randomly select a new slot
+  const randomSlot = Math.floor(Math.random() * cvcWords.length);
+  slots[randomSlot].style.backgroundColor = 'yellow'; // Highlight the new slot
+
+  currentSlot = randomSlot; // Update the current slot
 });
