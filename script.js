@@ -22,6 +22,8 @@ let currentDegree = 0;
 
 
 
+let currentDegree = 0;
+
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
@@ -31,7 +33,7 @@ document.getElementById('spinButton').addEventListener('click', () => {
     const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
     const finalDegree = currentDegree + totalDegree;
     wheel.style.transform = `rotateY(${finalDegree}deg)`;
-    currentDegree += totalDegree;
+    currentDegree = finalDegree;  // Update the currentDegree
     setTimeout(() => {
       spinning = false;
     }, 1000);
