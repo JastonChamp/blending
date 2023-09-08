@@ -22,7 +22,9 @@ body {
   justify-content: center;
   align-items: center;
   border: 1px solid black;
+  background-color: white;  // Initialize background color to white
 }
+
 
 button {
   margin-top: 20px;
