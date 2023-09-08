@@ -26,4 +26,5 @@ body {
   font-size: 72px;  
 button {
   margin-top: 20px;
+  transition: all 0.5s ease-in-out;
 }
