@@ -10,46 +10,27 @@ cvcWords.forEach((word, index) => {
   const slot = document.createElement('div');
   slot.className = 'slot';
   slot.textContent = word;
-  const angle = index * (360 / cvcWords.length);
-  slot.style.transform = `rotateY(${angle}deg) translateZ(200px)`;
+  slot.style.zIndex = 0;  // Initialize z-index to 0 for all slots
   wheel.appendChild(slot);
 });
 
 let spinning = false;
-let currentDegree = 0;
-
-
-
-
 let currentSlot = 0;
 
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
     const slots = document.querySelectorAll('.slot');
-    slots[currentSlot].style.zIndex = 0; 
+    slots[currentSlot].style.zIndex = 0;  // Reset the z-index of the current slot
 
     // Randomly select a new slot
     const randomSlot = Math.floor(Math.random() * cvcWords.length);
-    slots[randomSlot].style.zIndex = 1; 
+    slots[randomSlot].style.zIndex = 1;  // Bring the new slot to the front
 
-    currentSlot = randomSlot; // Update the current slot
+    currentSlot = randomSlot;  // Update the current slot
 
     setTimeout(() => {
       spinning = false;
     }, 1000);
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
