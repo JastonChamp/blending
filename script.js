@@ -21,23 +21,31 @@ let currentDegree = 0;
 
 
 
-let currentDegree = 0;
+let currentSlot = 0;
 
 document.getElementById('spinButton').addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
-    const slotsCount = cvcWords.length;
-    const randomSlot = Math.floor(Math.random() * slotsCount);
-    const fullSpins = 5;
-    const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
-    const finalDegree = currentDegree + totalDegree;
-    wheel.style.transform = `rotateY(${finalDegree}deg)`;
-    currentDegree = finalDegree;
+    const slots = document.querySelectorAll('.slot');
+    slots[currentSlot].style.zIndex = 0; 
+
+    // Randomly select a new slot
+    const randomSlot = Math.floor(Math.random() * cvcWords.length);
+    slots[randomSlot].style.zIndex = 1; 
+
+    currentSlot = randomSlot; // Update the current slot
+
     setTimeout(() => {
       spinning = false;
     }, 1000);
   }
 });
+
+
+
+
+
+
 
 
 
