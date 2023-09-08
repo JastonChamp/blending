@@ -15,11 +15,10 @@ let currentSlot = 0;
 
 document.getElementById('spinButton').addEventListener('click', () => {
   const slots = document.querySelectorAll('.slot');
-  slots[currentSlot].style.backgroundColor = 'white'; // Reset the background color of the current slot
+  slots[currentSlot].style.display = 'none';
 
-  // Randomly select a new slot
   const randomSlot = Math.floor(Math.random() * cvcWords.length);
-  slots[randomSlot].style.backgroundColor = 'yellow'; // Highlight the new slot
+  slots[randomSlot].style.display = 'flex'; 
 
-  currentSlot = randomSlot; // Update the current slot
+  currentSlot = randomSlot; 
 });
