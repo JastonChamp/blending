@@ -11,10 +11,9 @@ cvcWords.forEach((word, index) => {
   slot.className = 'slot';
   slot.textContent = word;
   const angle = index * (360 / cvcWords.length);
-  slot.style.transform = `rotateY(${angle}deg) translateZ(200px) rotateY(-${angle}deg)`;
+  slot.style.transform = `rotateY(${angle}deg) translateZ(200px)`;
   wheel.appendChild(slot);
 });
-
 
 let spinning = false;
 let currentDegree = 0;
@@ -33,7 +32,7 @@ document.getElementById('spinButton').addEventListener('click', () => {
     const totalDegree = (360 * fullSpins) + (randomSlot * (360 / slotsCount));
     const finalDegree = currentDegree + totalDegree;
     wheel.style.transform = `rotateY(${finalDegree}deg)`;
-    currentDegree = finalDegree;  // Update the currentDegree
+    currentDegree = finalDegree;
     setTimeout(() => {
       spinning = false;
     }, 1000);
