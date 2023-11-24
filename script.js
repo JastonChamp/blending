@@ -1,5 +1,7 @@
-const wheel = document.querySelector('.wheel');
-const words = [
+document.addEventListener('DOMContentLoaded', () => {
+    const wheel = document.querySelector('.wheel');
+    const words = [
+        // ... all your words
     'hop', 'nut', 'bed', 'cat', 'dog', 'pen', 'run', 'bug', 'fox', 'hat',
     'jam', 'net', 'map', 'pig', 'tub', 'cup', 'van', 'wax', 'win', 'box',
     'bat', 'bet', 'bit', 'bot', 'but', 'cut', 'dot', 'fit', 'gut', 'hit',
@@ -19,53 +21,53 @@ const words = [
     'bash', 'dish', 'fish', 'rush', 'wish',
     'chat', 'rich', 'much', 'chip', 'inch',
     'bang', 'king', 'long', 'ring', 'sing'
-];
+ ];
 
-cvcWords.forEach((word, index) => {
-  const slot = document.createElement('div');
-  slot.className = 'slot';
-  
-  // Change color of vowel letters
-  let coloredWord = '';
-  for (let letter of word) {
-    if ('aeiou'.includes(letter)) {
-      coloredWord += `<span class="vowel">${letter}</span>`;
-    } else {
-      coloredWord += letter;
-    }
-  }
-  
-  slot.innerHTML = coloredWord;  // Use innerHTML to insert HTML content
-  slot.style.display = 'none';
-  wheel.appendChild(slot);
-});
+    words.forEach((word, index) => {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
 
-const slots = document.querySelectorAll('.slot');
-slots[0].style.display = 'flex';
+        let coloredWord = '';
+        for (let letter of word) {
+            if ('aeiou'.includes(letter)) {
+                coloredWord += `<span class="vowel">${letter}</span>`;
+            } else {
+                coloredWord += letter;
+            }
+        }
 
-let currentSlot = 0;
+        slot.innerHTML = coloredWord;
+        slot.style.display = 'none';
+        wheel.appendChild(slot);
+    });
 
-document.getElementById('spinButton').addEventListener('click', () => {
-  let shuffleCount = 0;
-  let lastRandom = 0;
+    const slots = document.querySelectorAll('.slot');
+    slots[0].style.display = 'flex';
 
-  const shuffleEffect = setInterval(() => {
-    slots[lastRandom].style.display = 'none';
-    const randomSlot = Math.floor(Math.random() * cvcWords.length);
-    slots[randomSlot].style.display = 'flex';
-    lastRandom = randomSlot;
-    shuffleCount++;
-    if (shuffleCount > 20) {
-      clearInterval(shuffleEffect);
-      slots[lastRandom].style.display = 'none';
-      slots[currentSlot].style.display = 'flex';
-    }
-  }, 100);
+    let currentSlot = 0;
 
-  setTimeout(() => {
-    const randomSlot = Math.floor(Math.random() * cvcWords.length);
-    slots[currentSlot].style.display = 'none';
-    slots[randomSlot].style.display = 'flex';
-    currentSlot = randomSlot;
-  }, 2500);
+    document.getElementById('spinButton').addEventListener('click', () => {
+        let shuffleCount = 0;
+        let lastRandom = 0;
+
+        const shuffleEffect = setInterval(() => {
+            slots[lastRandom].style.display = 'none';
+            const randomSlot = Math.floor(Math.random() * words.length);
+            slots[randomSlot].style.display = 'flex';
+            lastRandom = randomSlot;
+            shuffleCount++;
+            if (shuffleCount > 20) {
+                clearInterval(shuffleEffect);
+                slots[lastRandom].style.display = 'none';
+                slots[currentSlot].style.display = 'flex';
+            }
+        }, 100);
+
+        setTimeout(() => {
+            const randomSlot = Math.floor(Math.random() * words.length);
+            slots[currentSlot].style.display = 'none';
+            slots[randomSlot].style.display = 'flex';
+            currentSlot = randomSlot;
+        }, 2500);
+    });
 });
