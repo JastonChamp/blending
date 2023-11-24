@@ -14,7 +14,11 @@ const words = [
     'wood', 'wool', 'broom', 'mood', 'roof',
     'boost', 'tooth', 'shoot',
     'hoop', 'zoo', 'noon', 'booth', 'hoof',
-    'loop', 'woof', 'spook', 'coo', 'rook', 'hook', 'took'
+    'loop', 'woof', 'spook', 'coo', 'rook', 'hook', 'took',
+    'bath', 'math', 'moth', 'path', 'with',
+    'bash', 'dish', 'fish', 'rush', 'wish',
+    'chat', 'rich', 'much', 'chip', 'inch',
+    'bang', 'king', 'long', 'ring', 'sing'
 ];
 
 cvcWords.forEach((word, index) => {
