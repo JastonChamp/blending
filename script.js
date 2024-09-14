@@ -1,7 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const wheel = document.querySelector('.wheel');
-    const words = [
-        // ... all your words
+const wheel = document.querySelector('.wheel');
+let cvcWords = [
     'hop', 'nut', 'bed', 'cat', 'dog', 'pen', 'run', 'bug', 'fox', 'hat',
     'jam', 'net', 'map', 'pig', 'tub', 'cup', 'van', 'wax', 'win', 'box',
     'bat', 'bet', 'bit', 'bot', 'but', 'cut', 'dot', 'fit', 'gut', 'hit',
@@ -11,63 +9,97 @@ document.addEventListener('DOMContentLoaded', () => {
     'pod', 'pop', 'rim', 'rip', 'rot', 'sob', 'sum', 'sun', 'tap', 'ten',
     'tip', 'tug', 'vet', 'wed', 'wig', 'win', 'yam', 'yen', 'yip',
     'bud', 'bun', 'bus', 'cob', 'cod', 'cog', 'con', 'cop', 'cub', 'dud',
-    'dug', 'fun', 'gum', 'gun', 'hug', 'hum', 'hut', 'jog', 'jug', 'mud',
-    'moon', 'book', 'tool', 'room', 'foot', 'cook', 'pool', 'cool', 'fool',
-    'wood', 'wool', 'broom', 'mood', 'roof',
-    'boost', 'tooth', 'shoot',
-    'hoop', 'zoo', 'noon', 'booth', 'hoof',
-    'loop', 'woof', 'spook', 'coo', 'rook', 'hook', 'took',
-    'bath', 'math', 'moth', 'path', 'with',
-    'bash', 'dish', 'fish', 'rush', 'wish',
-    'chat', 'rich', 'much', 'chip', 'inch',
-    'bang', 'king', 'long', 'ring', 'sing'
- ];
+    'dug', 'fun', 'gum', 'gun', 'hug', 'hum', 'hut', 'jog', 'jug', 'mud'
+];
 
-    words.forEach((word, index) => {
+// Load audio dynamically based on word (for future audio integration)
+function playAudioForWord(word) {
+    console.log(`Audio for ${word} would play here.`);
+}
+
+// Render the CVC words with colored vowels
+function renderSlots() {
+    wheel.innerHTML = ''; // Clear existing words
+    cvcWords.forEach((word) => {
         const slot = document.createElement('div');
         slot.className = 'slot';
-
+        
+        // Change color of vowel letters
         let coloredWord = '';
         for (let letter of word) {
             if ('aeiou'.includes(letter)) {
-                coloredWord += `<span class="vowel">${letter}</span>`;
+                coloredWord += `<span class="vowel letter">${letter}</span>`;
             } else {
-                coloredWord += letter;
+                coloredWord += `<span class="letter">${letter}</span>`;
             }
         }
-
-        slot.innerHTML = coloredWord;
+        
+        slot.innerHTML = coloredWord;  // Use innerHTML to insert HTML content
         slot.style.display = 'none';
         wheel.appendChild(slot);
     });
+}
 
-    const slots = document.querySelectorAll('.slot');
-    slots[0].style.display = 'flex';
+renderSlots();
 
-    let currentSlot = 0;
+const slots = document.querySelectorAll('.slot');
+let currentSlot = 0;
+slots[currentSlot].style.display = 'flex';
 
-    document.getElementById('spinButton').addEventListener('click', () => {
-        let shuffleCount = 0;
-        let lastRandom = 0;
+// Spin button event listener
+document.getElementById('spinButton').addEventListener('click', () => {
+    let shuffleCount = 0;
+    let lastRandom = 0;
 
-        const shuffleEffect = setInterval(() => {
+    wheel.classList.add('active');  // Add subtle scaling/rotation effect
+
+    const shuffleEffect = setInterval(() => {
+        slots[lastRandom].style.display = 'none';
+        const randomSlot = Math.floor(Math.random() * cvcWords.length);
+        slots[randomSlot].style.display = 'flex';
+        lastRandom = randomSlot;
+        shuffleCount++;
+        if (shuffleCount > 20) {
+            clearInterval(shuffleEffect);
             slots[lastRandom].style.display = 'none';
-            const randomSlot = Math.floor(Math.random() * words.length);
-            slots[randomSlot].style.display = 'flex';
-            lastRandom = randomSlot;
-            shuffleCount++;
-            if (shuffleCount > 20) {
-                clearInterval(shuffleEffect);
-                slots[lastRandom].style.display = 'none';
-                slots[currentSlot].style.display = 'flex';
-            }
-        }, 100);
+            slots[currentSlot].style.display = 'flex';
+        }
+    }, 100);
 
+    setTimeout(() => {
+        const randomSlot = Math.floor(Math.random() * cvcWords.length);
+        slots[currentSlot].style.display = 'none';
+        slots[randomSlot].style.display = 'flex';
+        currentSlot = randomSlot;
+
+        // Play audio for current word (optional)
+        playAudioForWord(cvcWords[currentSlot]);
+
+        // Trigger pulse effect when letters are being revealed
+        pulseWheel();
+        
+        wheel.classList.remove('active');  // Reset the scaling effect after spin
+    }, 2500);
+});
+
+// Function to reveal letters one by one
+function revealLetters(slot) {
+    const letters = slot.querySelectorAll('.letter');
+    letters.forEach((letter, index) => {
+        letter.style.opacity = 0; // Hide letters initially
         setTimeout(() => {
-            const randomSlot = Math.floor(Math.random() * words.length);
-            slots[currentSlot].style.display = 'none';
-            slots[randomSlot].style.display = 'flex';
-            currentSlot = randomSlot;
-        }, 2500);
+            letter.style.opacity = 1; // Reveal one by one
+        }, index * 500); // Adjust delay between letters
     });
+}
+
+// Custom word input functionality
+document.getElementById('addWordButton').addEventListener('click', () => {
+    const customWord = document.getElementById('customWordInput').value.trim().toLowerCase();
+    if (customWord.length === 3 && /^[a-z]+$/.test(customWord)) {
+        cvcWords.push(customWord);
+        renderSlots();
+    } else {
+        alert('Please enter a valid 3-letter word.');
+    }
 });
