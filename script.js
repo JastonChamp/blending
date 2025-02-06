@@ -16,6 +16,15 @@ const sightWords = [
 const cvcNouns = ['cat', 'dog', 'man', 'kid', 'pen', 'bug', 'pig', 'bat'];
 const cvcVerbs = ['run', 'dig', 'sit', 'bit', 'hug', 'cut', 'nap', 'fit', 'hid'];
 
+// Phonetic mapping for simple decodable sounds (for CVC words)
+const phoneticMap = {
+  a: "ah", b: "buh", c: "kuh", d: "duh", e: "eh", f: "fuh",
+  g: "guh", h: "huh", i: "ih", j: "juh", k: "kuh", l: "luh",
+  m: "muh", n: "nuh", o: "oh", p: "puh", q: "kwuh", r: "ruh",
+  s: "suh", t: "tuh", u: "uh", v: "vuh", w: "wuh", x: "eks",
+  y: "yuh", z: "zuh"
+};
+
 // Game state variables
 let currentSightIndex = 0;   // Index in sightWords array
 let currentSentenceIndex = 0; // Sentence number (0 to 2) for the current sight word
@@ -36,6 +45,9 @@ const backBtn = document.getElementById('backBtn');
 function generateSentences(sightWord) {
   const sentences = [];
   for (let i = 0; i < 3; i++) {
+    // Randomly choose between two simple templates:
+    // Template A: [sightWord] [CVC noun] [CVC verb]
+    // Template B: [sightWord] [CVC verb] [CVC noun]
     const useTemplateA = Math.random() > 0.5;
     const noun = cvcNouns[Math.floor(Math.random() * cvcNouns.length)];
     const verb = cvcVerbs[Math.floor(Math.random() * cvcVerbs.length)];
@@ -46,8 +58,8 @@ function generateSentences(sightWord) {
 }
 
 /**
- * Uses the Web Speech API to spell out a given text letter by letter.
- * @param {string} text - The text to spell out.
+ * Uses the Web Speech API to speak a given text.
+ * @param {string} text - The text to speak.
  */
 function speak(text) {
   if ('speechSynthesis' in window) {
@@ -56,6 +68,19 @@ function speak(text) {
   } else {
     console.warn("Speech Synthesis not supported.");
   }
+}
+
+/**
+ * Converts a word into its phonetic sound-out form using the phoneticMap.
+ * @param {string} word - The word to convert.
+ * @returns {string} A string of phonetic sounds separated by spaces.
+ */
+function phoneticSound(word) {
+  return word
+    .toLowerCase()
+    .split('')
+    .map(letter => phoneticMap[letter] || letter)
+    .join(' ');
 }
 
 /**
@@ -73,7 +98,7 @@ function displayCurrent() {
   
   renderSentence(sentencesForCurrentWord[currentSentenceIndex]);
   
-  // Disable back button at very start.
+  // Disable back button at the very start.
   backBtn.disabled = (currentSightIndex === 0 && currentSentenceIndex === 0);
 }
 
@@ -91,10 +116,14 @@ function renderSentence(sentenceWords) {
       span.classList.add('sight');
     }
     span.textContent = word;
-    // When tapped, spell out the word letter by letter.
+    // When tapped, if the word is a sight word speak it normally,
+    // otherwise, speak the word’s phonetic sounds.
     span.addEventListener('click', () => {
-      const letters = word.split('').join(' ');
-      speak(letters);
+      if (word === sightWords[currentSightIndex]) {
+        speak(word);
+      } else {
+        speak(phoneticSound(word));
+      }
     });
     sentenceDisplay.appendChild(span);
   });
@@ -112,7 +141,7 @@ function showReward() {
 
 // Event Listeners
 
-// Tap the sight word to hear it.
+// Tapping the sight word speaks it normally (non-decodable).
 sightWordDisplay.addEventListener('click', () => {
   speak(sightWords[currentSightIndex]);
 });
@@ -131,7 +160,7 @@ nextBtn.addEventListener('click', () => {
     sentencesForCurrentWord = [];
     if (currentSightIndex >= sightWords.length) {
       alert("Congratulations! You've completed all sight words.");
-      currentSightIndex = 0; // Optionally reset or navigate to a final screen.
+      currentSightIndex = 0; // Reset game or navigate to a final screen.
     }
   }
   displayCurrent();
