@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"> <!-- Corrected the stylesheet name -->
-    <title>Spinner</title>
+  <meta charset="UTF-8">
+  <title>Sight Word Decoding Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="spinner">
-        <div class="wheel">
-            <!-- Slots will be populated with JavaScript -->
-        </div>
+  <div id="game-container">
+    <!-- Sight Word Display -->
+    <div id="sightWordDisplay" title="Tap to hear the word"></div>
+    
+    <!-- Sentence Display -->
+    <div id="sentenceDisplay"></div>
+    
+    <!-- Reward Icon (star animation) -->
+    <div id="reward">⭐</div>
+    
+    <!-- Navigation Controls -->
+    <div id="controls">
+      <button id="backBtn">Back</button>
+      <button id="starBtn">Star</button>
+      <button id="nextBtn">Next</button>
     </div>
-    <button id="spinButton">Spin</button>
-    <script src="script.js"></script>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
