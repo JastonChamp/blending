@@ -182,6 +182,7 @@ body[data-theme="high-contrast"] .word-display-container {
 .word-display .diphthong { color: #8e44ad; }
 .word-display .soft { color: #3498db; }
 .word-display .consonant { color: #00b894; }
+.word-display .double { color: #00b894; }
 .word-display .long-vowel {
   color: #ff7675;
   font-style: italic;
