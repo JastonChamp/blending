@@ -278,23 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /** Parse Word into Units */
   function parseWord(word) {
     const units = [];
-    if (state.wordType === 'silentE') {
-      const vowelMatch = word.match(/[aeiou]/i);
-      if (vowelMatch && word.endsWith('e')) {
-        const vowelIndex = vowelMatch.index;
-        for (let i = 0; i < word.length; i++) {
-          const letter = word[i].toLowerCase();
-          if (i === vowelIndex) {
-            units.push({ text: letter, isLongVowel: true });
-          } else if (i === word.length - 1 && letter === 'e') {
-            units.push({ text: letter, isSilent: true });
-          } else {
-            units.push({ text: letter, isVowel: /[aeiou]/.test(letter) });
-          }
-        }
-        return units;
-      }
-    }
     let i = 0;
     while (i < word.length) {
       let unitAdded = false;
@@ -318,7 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (!unitAdded) {
         const letter = word[i].toLowerCase();
-        const unit = { text: letter, isVowel: /[aeiou]/.test(letter) };
+        let unit = { text: letter, isVowel: /[aeiou]/.test(letter) };
+        if (!unit.isVowel && i + 1 < word.length && word[i + 1].toLowerCase() === letter) {
+          unit.text += letter;
+          unit.isDouble = true;
+          i++;
+        }
         if (['c', 'g'].includes(letter) && i + 1 < word.length) {
           const next = word[i + 1].toLowerCase();
           if (['e', 'i', 'y'].includes(next)) {
@@ -327,6 +315,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         units.push(unit);
         i++;
+      }
+    }
+    // Detect silent e and long vowel
+    if (units.length >= 3) {
+      const last = units.length - 1;
+      const secondLast = last - 1;
+      const thirdLast = last - 2;
+      if (units[last].text === 'e' && !units[secondLast].isVowel && units[thirdLast].isVowel) {
+        units[thirdLast].isLongVowel = true;
+        units[last].isSilent = true;
       }
     }
     return units;
@@ -398,6 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (unit.isLongVowel) span.classList.add('long-vowel');
       if (unit.isSilent) span.classList.add('silent');
       if (unit.isSoft) span.classList.add('soft');
+      if (unit.isDouble) span.classList.add('double');
+      if (!unit.isVowel && !unit.isDigraph && !unit.isDiphthong) span.classList.add('consonant');
       span.style.animationDelay = `${i * 0.4}s`;
       els.wordBox.appendChild(span);
     });
@@ -411,6 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sound = unit.text;
       } else if (unit.isSoft) {
         sound = `soft_${unit.text}`;
+      } else if (unit.isDouble) {
+        sound = unit.text[0];
       } else {
         sound = unit.text;
       }
@@ -496,6 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sound = unit.text;
       } else if (unit.isSoft) {
         sound = `soft_${unit.text}`;
+      } else if (unit.isDouble) {
+        sound = unit.text[0];
       } else {
         sound = unit.text;
       }
