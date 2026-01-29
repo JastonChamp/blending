@@ -1,9 +1,7 @@
 const DEBUG = false;
 const debugLog = (...args) => { if (DEBUG) console.log(...args); };
-
 document.addEventListener('DOMContentLoaded', () => {
   debugLog('DOM fully loaded and parsed');
-
   /** Word Groups with Expanded Lists */
   const wordGroups = {
   cvc: {
@@ -50,15 +48,30 @@ document.addEventListener('DOMContentLoaded', () => {
   },
   silentE: {
     a: ['spade', 'mate', 'game', 'bake', 'gave', 'rake', 'cake', 'lake', 'made', 'name', 'pale', 'sale', 'take', 'wave', 'base', 'case', 'date', 'fate', 'gate', 'hate'],
-    e: ['theme', 'these', 'eve', 'cede', 'gene', 'mete', 'scene', 'pete', 'steve'],
+    e: ['theme', 'these', 'eve', 'mete', 'pete', 'steve'],
     i: ['bike', 'kite', 'lime', 'mine', 'pine', 'time', 'dive', 'five', 'hive', 'bite', 'site'],
     o: ['home', 'nose', 'rope', 'note', 'cone', 'hope', 'robe', 'stone', 'bone', 'dome', 'pole', 'vote'],
     u: ['cube', 'tune', 'mule', 'rude', 'cute', 'dune', 'june', 'lute', 'mute', 'rule', 'tube']
+  },
+  softCAndG: {
+    soft_c: ['cede', 'scene'],
+    soft_g: ['gene']
+  },
+  diphthongs: {
+    oy: ['boy', 'toy', 'joy', 'coy', 'soy', 'ploy', 'troy'],
+    ar: ['car', 'bar', 'far', 'jar', 'tar', 'star', 'scar', 'park', 'dark', 'mark'],
+    air: ['air', 'fair', 'hair', 'pair', 'stair', 'chair', 'lair'],
+    ow: ['cow', 'now', 'how', 'bow', 'vow', 'brow', 'chow'],
+    er: ['her', 'per', 'term', 'fern', 'germ', 'herd', 'verb'],
+    ear: ['ear', 'dear', 'fear', 'hear', 'near', 'tear', 'year', 'clear']
   }
 };
   /** Digraphs for Parsing */
-  const digraphs = ['sh', 'th', 'ch', 'ng'];
-
+  const consonantDigraphs = ['sh', 'th', 'ch', 'ng'];
+  const vowelPatterns = {
+    trigraphs: ['air', 'ear'],
+    digraphs: ['oy', 'ar', 'ow', 'er']
+  };
   /** Game State */
   const state = {
     score: 0,
@@ -74,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     celebrationMode: false,
     badges: new Map()
   };
-
   /** DOM Elements */
   const els = {
     spinButton: document.querySelector('#spinButton'),
@@ -108,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     badges: document.querySelector('#badges'),
     fullscreenButton: document.querySelector('#fullscreenButton')
   };
-
   /** Compliments and Badges */
   const compliments = ['Great Job!', 'Awesome!', 'You’re a Star!', 'Well Done!', 'Fantastic!'];
   const badgeNames = {
@@ -118,9 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ccvcc: 'CCVCC Master',
     digraphs: 'Digraph Ace',
     extended: 'Word Wizard',
-    silentE: 'Silent E Expert'
+    silentE: 'Silent E Expert',
+    softCAndG: 'Soft Sounds Specialist',
+    diphthongs: 'Diphthong Dynamo'
   };
-
   /** Speech Synthesis Initialization */
   async function initSpeech() {
     return new Promise(resolve => {
@@ -134,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
       checkVoices();
     });
   }
-
   /**
    * Helper: Select the preferred female voice.
    * Checks for an en-GB voice with specific female keywords,
@@ -157,12 +168,11 @@ document.addEventListener('DOMContentLoaded', () => {
       preferredVoice = voices.find(v => v.lang.startsWith('en'));
     }
     if (!preferredVoice && voices.length > 0) {
-      preferredVoice = voices[0]; // Fallback to first available voice␊
+      preferredVoice = voices[0]; // Fallback to first available voice
     }
     debugLog('Selected voice:', preferredVoice ? `${preferredVoice.name} (${preferredVoice.lang})` : 'None');
     return preferredVoice;
   }
-
   /**
    * Speak a word using speech synthesis.
    * For the letter 'a', uses "uh" (schwa sound) as a more casual, unstressed variant.
@@ -170,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   function speakWord(text) {
     if (!state.soundsEnabled) return Promise.resolve();
-
     let utteranceText = text.toLowerCase() === 'a' ? 'uh' : text;
     const utterance = new SpeechSynthesisUtterance(utteranceText);
     utterance.lang = 'en-GB';
@@ -182,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     utterance.pitch = 1.3;
     utterance.rate = 0.7;
-
     return new Promise(resolve => {
       utterance.onend = resolve;
       utterance.onerror = (event) => {
@@ -195,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 100);
     });
   }
-
   /** Play Sound Effect */
   function playSound(sound) {
     if (!state.soundsEnabled) return Promise.resolve();
@@ -209,14 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-
   /** Utility Functions */
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   const announce = text => {
     els.screenReaderAnnounce.textContent = text;
     setTimeout(() => els.screenReaderAnnounce.textContent = '', 1000);
   };
-
   /** Update Score */
   function updateScore(points = 10) {
     state.score += points;
@@ -225,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
     els.scoreIncrement.classList.add('show');
     setTimeout(() => els.scoreIncrement.classList.remove('show'), 800);
   }
-
   /** Update Progress */
   function updateProgress() {
     state.revealedWords = state.usedWords.size;
@@ -239,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
       earnBadge(state.wordType);
     }
   }
-
   /** Show Compliment */
   function showCompliment() {
     const compliment = compliments[Math.floor(Math.random() * compliments.length)];
@@ -249,7 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.celebrationMode ? launchFireworks() : launchConfetti();
     setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
   }
-
   /** Launch Confetti */
   function launchConfetti() {
     for (let i = 0; i < 20; i++) {
@@ -261,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => confetti.remove(), 3000);
     }
   }
-
   /** Launch Fireworks */
   function launchFireworks() {
     for (let i = 0; i < 15; i++) {
@@ -274,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => firework.remove(), 1500);
     }
   }
-
   /** Parse Word into Units */
   function parseWord(word) {
     const units = [];
@@ -297,19 +297,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     let i = 0;
     while (i < word.length) {
-      const nextTwo = word.slice(i, i + 2).toLowerCase();
-      if (i < word.length - 1 && digraphs.includes(nextTwo)) {
-        units.push({ text: nextTwo, isDigraph: true });
-        i += 2;
-      } else {
+      let unitAdded = false;
+      const nextThree = word.slice(i, i + 3).toLowerCase();
+      if (vowelPatterns.trigraphs.includes(nextThree)) {
+        units.push({ text: nextThree, isDiphthong: true, isVowel: true });
+        i += 3;
+        unitAdded = true;
+      }
+      if (!unitAdded) {
+        const nextTwo = word.slice(i, i + 2).toLowerCase();
+        if (vowelPatterns.digraphs.includes(nextTwo)) {
+          units.push({ text: nextTwo, isDiphthong: true, isVowel: true });
+          i += 2;
+          unitAdded = true;
+        } else if (consonantDigraphs.includes(nextTwo)) {
+          units.push({ text: nextTwo, isDigraph: true });
+          i += 2;
+          unitAdded = true;
+        }
+      }
+      if (!unitAdded) {
         const letter = word[i].toLowerCase();
-        units.push({ text: letter, isVowel: /[aeiou]/.test(letter) });
+        const unit = { text: letter, isVowel: /[aeiou]/.test(letter) };
+        if (['c', 'g'].includes(letter) && i + 1 < word.length) {
+          const next = word[i + 1].toLowerCase();
+          if (['e', 'i', 'y'].includes(next)) {
+            unit.isSoft = true;
+          }
+        }
+        units.push(unit);
         i++;
       }
     }
     return units;
   }
-
   /** Save Preferences */
   function savePreferences() {
     localStorage.setItem('wordSpinnerPrefs', JSON.stringify({
@@ -318,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
       badges: Object.fromEntries(state.badges)
     }));
   }
-
   /** Load Preferences */
   function loadPreferences() {
     const prefs = JSON.parse(localStorage.getItem('wordSpinnerPrefs')) || {};
@@ -340,7 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
     els.toggleAudioButton.textContent = state.soundsEnabled ? '🔇 Sounds Off' : '🔊 Sounds On';
     els.celebrationModeCheckbox.checked = state.celebrationMode;
   }
-
   /** Update Badges Display */
   function updateBadges() {
     if (!els.badges) return;
@@ -352,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
       els.badges.appendChild(badge);
     });
   }
-
   /** Earn a Badge */
   function earnBadge(wordType) {
     if (!state.badges.has(wordType)) {
@@ -363,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
       savePreferences();
     }
   }
-
   /**
    * Reveal Word with Sounds and Visuals.
    * Calls speakWord(word) without awaiting it to avoid blocking.
@@ -377,19 +394,28 @@ document.addEventListener('DOMContentLoaded', () => {
       span.classList.add('letter');
       if (unit.isVowel) span.classList.add('vowel');
       if (unit.isDigraph) span.classList.add('digraph');
+      if (unit.isDiphthong) span.classList.add('diphthong');
       if (unit.isLongVowel) span.classList.add('long-vowel');
       if (unit.isSilent) span.classList.add('silent');
+      if (unit.isSoft) span.classList.add('soft');
       span.style.animationDelay = `${i * 0.4}s`;
       els.wordBox.appendChild(span);
     });
-
     for (const unit of units) {
       await delay(400);
       if (unit.isSilent) continue;
-      const sound = unit.isLongVowel ? `long_${unit.text}` : unit.text;
+      let sound;
+      if (unit.isLongVowel) {
+        sound = `long_${unit.text}`;
+      } else if (unit.isDiphthong) {
+        sound = unit.text;
+      } else if (unit.isSoft) {
+        sound = `soft_${unit.text}`;
+      } else {
+        sound = unit.text;
+      }
       await playSound(sound);
     }
-
     els.blendingTimerContainer.style.display = 'block';
     els.blendingTimer.style.transition = `width ${state.blendingTime / 1000}s linear`;
     els.blendingTimer.style.width = '100%';
@@ -397,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
     announce('Blend the letters aloud!');
     await delay(state.blendingTime);
     els.blendingTimerContainer.style.display = 'none';
-
     if (state.soundsEnabled) {
       speakWord(word).catch(e => console.error('Failed to speak word:', e));
     }
@@ -412,14 +437,12 @@ document.addEventListener('DOMContentLoaded', () => {
     els.hintButton.hidden = false;
     els.repeatButton.disabled = false;
   }
-
   /** Get Available Words */
   function getAvailableWords() {
     const group = wordGroups[state.wordType];
     if (state.vowelFilter === 'all') return Object.values(group).flat();
     return group[state.vowelFilter] || [];
   }
-
   /** Get Random Word */
   function getRandomWord() {
     const words = getAvailableWords().filter(w => !state.usedWords.has(w));
@@ -429,7 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return words[Math.floor(Math.random() * words.length)];
   }
-
   /** Reset Game */
   function resetGame() {
     state.usedWords.clear();
@@ -443,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateProgress();
     savePreferences();
   }
-
   /** Spin to Reveal a New Word */
   async function spin() {
     els.spinButton.disabled = true;
@@ -451,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
     await revealWord(state.currentWord);
     els.spinButton.disabled = false;
   }
-
   /** Repeat Current Word */
   async function repeat() {
     if (!state.currentWord) return;
@@ -459,13 +479,31 @@ document.addEventListener('DOMContentLoaded', () => {
     await revealWord(state.currentWord, true);
     els.repeatButton.disabled = false;
   }
-
   /** Play Hint Sound */
   async function hint() {
     if (!state.currentWord) return;
-    await playSound(state.currentWord);
+    const units = parseWord(state.currentWord);
+    const spans = els.wordBox.querySelectorAll('.letter');
+    for (let idx = 0; idx < units.length; idx++) {
+      const unit = units[idx];
+      if (unit.isSilent) continue;
+      const span = spans[idx];
+      span.classList.add('highlight');
+      let sound;
+      if (unit.isLongVowel) {
+        sound = `long_${unit.text}`;
+      } else if (unit.isDiphthong) {
+        sound = unit.text;
+      } else if (unit.isSoft) {
+        sound = `soft_${unit.text}`;
+      } else {
+        sound = unit.text;
+      }
+      await playSound(sound);
+      await delay(400);
+      span.classList.remove('highlight');
+    }
   }
-
   /** Event Listeners */
   els.spinButton.addEventListener('click', spin);
   els.repeatButton.addEventListener('click', repeat);
@@ -530,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.exitFullscreen().catch(console.warn);
     }
   });
-
   /** Initialization */
   (async () => {
     await initSpeech();
@@ -540,4 +577,3 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('hasSeenTutorial')) els.tutorialModal.showModal();
   })();
 });
-
