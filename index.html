@@ -17,13 +17,11 @@
         <p>Spin, Blend, and Shine! 🌟</p>
       </div>
     </header>
-
     <main class="container">
       <section class="core-controls" aria-label="Game Controls">
         <div class="score-section">
           <p id="scoreText">Score: <span id="scoreValue" aria-live="polite">0</span></p>
         </div>
-
         <div class="game-area">
           <div class="word-display-container">
             <div class="word-display" id="wordBox" aria-live="polite"></div>
@@ -41,8 +39,7 @@
             </button>
           </div>
         </div>
-
-        
+       
           <div class="progress-container">
             <div class="progress-icon" id="progressIcon" aria-hidden="true">🚀</div>
             <div id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
@@ -50,25 +47,19 @@
             </div>
             <p id="progressText" aria-live="polite">0 / 0 Words</p>
           </div>
-
           <div id="badges" class="badges"></div>
-
         <div id="complimentBox" class="compliment-box" aria-live="assertive"></div>
-
         <div id="blendingTimerContainer" role="timer" aria-label="Blending timer">
           <p class="timer-label" aria-live="polite">Blend now! ⏳</p>
           <div id="blendingTimer" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-
         <div id="screenReaderAnnounce" class="sr-only" aria-live="assertive"></div>
       </section>
-
       <section class="settings-toggle">
         <button id="toggleSettingsButton" aria-expanded="false" aria-controls="advancedSettings">
           ⚙️ Customize
         </button>
       </section>
-
       <section id="advancedSettings" class="advanced-settings" hidden>
         <h2 class="sr-only">Game Settings</h2>
         <div class="controls-section">
@@ -83,6 +74,8 @@
                 <option value="digraphs">Digraphs</option>
                 <option value="extended">Extended Words</option>
                 <option value="silentE">Silent E Words</option>
+                <option value="softCAndG">Soft C & G Words</option>
+                <option value="diphthongs">Diphthongs</option>
               </select>
             </div>
             <div>
@@ -126,12 +119,10 @@
           </div>
         </div>
       </section>
-
       <footer>
         <p class="note">Tip: Say the word aloud to blend it!</p>
       </footer>
     </main>
-
     <div id="confettiContainer" aria-hidden="true"></div>
     <div id="scoreIncrement" class="score-increment" aria-hidden="true"></div>
     <dialog id="tutorialModal" class="modal">
@@ -143,7 +134,6 @@
       </div>
     </dialog>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
