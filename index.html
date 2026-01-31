@@ -21,6 +21,10 @@
       <section class="core-controls" aria-label="Game Controls">
         <div class="score-section">
           <p id="scoreText">Score: <span id="scoreValue" aria-live="polite">0</span></p>
+          <div id="streakSection" class="streak-section" aria-live="polite">
+            <span class="streak-flame">&#x1F525;</span>
+            <span id="streakCount">0</span> in a row!
+          </div>
         </div>
         <div class="game-area">
           <div class="word-display-container">
@@ -37,6 +41,11 @@
             <button id="hintButton" aria-label="Get a hint" accesskey="h" hidden>
               <span class="icon" aria-hidden="true">💡</span> Hint
             </button>
+          </div>
+          <div class="keyboard-hints" aria-hidden="true">
+            <span class="kbd-hint"><kbd class="kbd">S</kbd> Spin</span>
+            <span class="kbd-hint"><kbd class="kbd">R</kbd> Repeat</span>
+            <span class="kbd-hint"><kbd class="kbd">H</kbd> Hint</span>
           </div>
         </div>
         <div class="progress-container">
@@ -59,7 +68,7 @@
           ⚙️ Customize
         </button>
       </section>
-      <section id="advancedSettings" class="advanced-settings" hidden>
+      <section id="advancedSettings" class="advanced-settings">
         <h2 class="sr-only">Game Settings</h2>
         <div class="controls-section">
           <div class="select-controls">
@@ -77,6 +86,7 @@
                 <option value="diphthongs">Diphthongs</option>
                 <option value="longVowels">Long Vowel Words (Advanced)</option>
               </select>
+              <div id="wordTypeDesc" class="word-type-desc">e.g. cat, dog, sun</div>
             </div>
             <div>
               <label for="vowelSelector">Focus Vowel:</label>
@@ -114,8 +124,9 @@
             </label>
           </div>
           <div class="settings-buttons">
-            <button id="toggleAudioButton" aria-label="Toggle sounds">🔇 Sounds Off</button>
+            <button id="toggleAudioButton" aria-label="Toggle sounds">🔊 Sound On</button>
             <button id="fullscreenButton" aria-label="Toggle fullscreen">⛶ Fullscreen</button>
+            <button id="resetProgressButton" aria-label="Reset all progress">🗑 Reset Progress</button>
           </div>
         </div>
       </section>
