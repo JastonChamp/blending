@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fullscreenButton: document.querySelector('#fullscreenButton')
   };
 
-  const compliments = ['Great Job!', 'Awesome!', 'You’re a Star!', 'Well Done!', 'Fantastic!'];
+  const compliments = ['Great Job!', 'Awesome!', "You're a Star!", 'Well Done!', 'Fantastic!'];
   const badgeNames = {
     cvc: 'CVC Star', ccvc: 'CCVC Hero', cvcc: 'CVCC Champ', ccvcc: 'CCVCC Master',
     digraphs: 'Digraph Ace', extended: 'Word Wizard', silentE: 'Silent E Expert',
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
     els.vowelSelector.value = state.vowelFilter;
     els.themeSelector.value = state.theme;
     els.blendingTimeDisplay.textContent = state.blendingTime / 1000;
-    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔇 Sounds Off' : '🔊 Sounds On';
+    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔊 Sounds On' : '🔇 Sounds Off';
     els.celebrationModeCheckbox.checked = state.celebrationMode;
   }
 
@@ -567,7 +567,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const group = wordGroups[state.wordType];
     if (!group) return [];
     if (state.vowelFilter === 'all') return Object.values(group).flat();
-    return group[state.vowelFilter] || [];
+    // softCAndG and diphthongs use non-vowel keys; ignore vowel filter for them
+    if (!group[state.vowelFilter]) return Object.values(group).flat();
+    return group[state.vowelFilter];
   }
 
   function getRandomWord() {
@@ -654,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.toggleAudioButton.addEventListener('click', () => {
     state.soundsEnabled = !state.soundsEnabled;
-    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔇 Sounds Off' : '🔊 Sounds On';
+    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔊 Sounds On' : '🔇 Sounds Off';
     savePreferences();
   });
 
@@ -681,11 +683,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.toggleSettingsButton.addEventListener('click', (event) => {
     event.preventDefault();
-    const isVisible = els.advancedSettings.style.display === 'block';
-    els.advancedSettings.style.display = isVisible ? 'none' : 'block';
+    const isVisible = !els.advancedSettings.hidden;
+    els.advancedSettings.hidden = isVisible;
+    els.advancedSettings.style.display = isVisible ? '' : 'block';
     els.toggleSettingsButton.textContent = isVisible ? '⚙️ Customize' : 'Hide Settings';
     els.toggleSettingsButton.setAttribute('aria-expanded', !isVisible);
-    els.advancedSettings.setAttribute('aria-hidden', isVisible);
   });
 
   els.startTutorial.addEventListener('click', () => {
