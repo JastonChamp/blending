@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     ccvc: {
-      a: ['brag', 'clap', 'crab', 'drag', 'flag', 'flap', 'glad', 'grab', 'plan', 'slam', 'snap', 'trap', 'flat', 'chat', 'blab', 'clam', 'drab', 'slap', 'stab', 'tram', 'bran'],
-      e: ['bled', 'bred', 'fled', 'fret', 'glen', 'pled', 'sled', 'stem', 'step', 'trek', 'prep', 'flex', 'smell', 'blend', 'crest', 'dress', 'press', 'spell', 'swell'],
-      i: ['brim', 'clip', 'crib', 'drip', 'flip', 'grin', 'grip', 'skip', 'slim', 'snip', 'spin', 'trip', 'skin', 'swim', 'blip', 'chip', 'slip', 'strip', 'trick'],
-      o: ['blot', 'clog', 'crop', 'drop', 'flop', 'frog', 'glob', 'plot', 'prop', 'shop', 'slot', 'stop', 'trot', 'clot', 'spot', 'snot'],
+      a: ['brag', 'clap', 'crab', 'drag', 'flag', 'flap', 'glad', 'grab', 'plan', 'slam', 'snap', 'trap', 'flat', 'blab', 'clam', 'drab', 'slap', 'stab', 'tram', 'bran'],
+      e: ['bled', 'bred', 'fled', 'fret', 'glen', 'pled', 'sled', 'stem', 'step', 'trek', 'prep', 'flex', 'smell', 'crest', 'spell', 'swell'],
+      i: ['brim', 'clip', 'crib', 'drip', 'flip', 'grin', 'grip', 'skip', 'slim', 'snip', 'spin', 'trip', 'skin', 'swim', 'blip', 'slip', 'strip', 'trick'],
+      o: ['blot', 'clog', 'crop', 'drop', 'flop', 'frog', 'glob', 'plot', 'prop', 'slot', 'stop', 'trot', 'clot', 'spot', 'snot'],
       u: ['club', 'drum', 'grub', 'plug', 'slug', 'snug', 'spun', 'stub', 'stun', 'flub', 'glut', 'plum', 'scum', 'shut', 'flux', 'shun']
     },
 
@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ccvcc: {
       a: ['brand', 'clamp', 'cramp', 'drank', 'flank', 'frank', 'plank', 'prank', 'stamp', 'stand', 'bland', 'tramp'],
-      e: ['blend', 'fleck', 'flesh', 'spend', 'strep', 'swept', 'trend', 'bless', 'crept', 'dress', 'fresh', 'press', 'slept', 'smelt', 'spent'],
-      i: ['blink', 'clink', 'crisp', 'drink', 'flint', 'print', 'slink', 'stink', 'twist', 'brisk', 'cling', 'fling', 'shift', 'swift', 'drift', 'grill'],
+      e: ['blend', 'fleck', 'flesh', 'spend', 'strep', 'swept', 'trend', 'bless', 'crept', 'dress', 'press', 'slept', 'smelt', 'spent'],
+      i: ['blink', 'clink', 'crisp', 'drink', 'flint', 'print', 'slink', 'stink', 'twist', 'brisk', 'cling', 'fling', 'swift', 'drift', 'grill'],
       o: ['blond', 'chomp', 'frost', 'prompt', 'stomp', 'strong', 'throb', 'clonk', 'floss', 'gloss', 'gross', 'prong', 'scoff'],
-      u: ['blunt', 'brunt', 'clump', 'crust', 'drunk', 'flung', 'grunt', 'plump', 'stump', 'trunk', 'brush', 'crush', 'flush', 'shrug']
+      u: ['blunt', 'brunt', 'clump', 'crust', 'drunk', 'flung', 'grunt', 'plump', 'stump', 'trunk']
     },
 
     digraphs: {
@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     softCAndG: {
-      soft_c: ['cede', 'scene'],
-      soft_g: ['gene']
+      soft_c: ['ice', 'rice', 'nice', 'dice', 'mice', 'face', 'race', 'lace', 'pace', 'place', 'space', 'price', 'slice', 'dance', 'fence', 'prince', 'since', 'cell', 'cent', 'city'],
+      soft_g: ['age', 'cage', 'page', 'stage', 'huge', 'gem', 'gene', 'giant', 'magic', 'bridge', 'badge', 'edge', 'fudge', 'hedge', 'judge', 'nudge', 'range', 'change', 'strange', 'gentle', 'gently', 'manage', 'managed', 'imagine', 'magical', 'original', 'orange', 'danger', 'postage', 'giraffe']
     },
 
     diphthongs: {
@@ -116,21 +116,19 @@ document.addEventListener('DOMContentLoaded', () => {
         'both','nose','only',"don't",'close','spoke',
 
         // image 6 (oo set)
-        'food','soon','bedroom','receive','special',
-        'mood','swoop','move','place','especially',
-        'room','cool','movie','face','office',
-        'suit','truth','soup','decided','distance',
-        'through','true','flew','exciting','receipt',
+        'food','soon','bedroom',
+        'mood','swoop','move',
+        'room','cool','movie',
+        'suit','truth','soup',
+        'through','true','flew',
         'cockatoo','kangaroo','grew','chew','blew'
       ],
 
-      // Long U + soft g set (from image 5)
+      // Long U set (from image 5)
       u: [
         'pure','tune','tuneful','regular','eventually','excuse',
         'value','use','continue','useful','continued','refused',
-        'tube','view','few','youth','beautiful','youthful',
-        'page','magic','imagine','giant','stage','manage',
-        'gently','gentle','magical','original','postage','managed'
+        'tube','view','few','youth','beautiful','youthful'
       ]
     }
   };
