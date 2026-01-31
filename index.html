@@ -7,7 +7,7 @@
   <title>Word Spinner - Phonics Fun</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Comic+Neue:wght@400;700&display=swap">
 </head>
 <body>
   <div class="app-wrapper">
@@ -26,6 +26,14 @@
           <div class="word-display-container">
             <div class="word-display" id="wordBox" aria-live="polite"></div>
             <div class="mascot" aria-hidden="true">🦜</div>
+          </div>
+          <div class="color-key" aria-label="Letter colour guide">
+            <span class="key-item"><span class="key-swatch key-vowel"></span> Vowel</span>
+            <span class="key-item"><span class="key-swatch key-consonant"></span> Consonant</span>
+            <span class="key-item"><span class="key-swatch key-digraph"></span> Digraph</span>
+            <span class="key-item"><span class="key-swatch key-diphthong"></span> Diphthong</span>
+            <span class="key-item"><span class="key-swatch key-soft"></span> Soft C/G</span>
+            <span class="key-item"><span class="key-swatch key-silent"></span> Silent</span>
           </div>
           <div class="action-buttons">
             <button id="spinButton" aria-label="Spin for a new word" accesskey="s">
@@ -127,10 +135,17 @@
     <div id="scoreIncrement" class="score-increment" aria-hidden="true"></div>
     <dialog id="tutorialModal" class="modal">
       <div class="modal-content">
+        <div class="modal-emoji" aria-hidden="true">🦜</div>
         <h2>Welcome to Word Spinner!</h2>
-        <p>Spin to hear letter sounds and blend them into words!</p>
-        <button id="startTutorial" aria-label="Start tutorial">Start</button>
-        <button id="skipTutorial" aria-label="Skip tutorial">Skip</button>
+        <p>Press <strong>Spin</strong> to see a word appear letter by letter.</p>
+        <p>Listen to each sound, then blend them together!</p>
+        <div class="modal-shortcuts">
+          <kbd>S</kbd> Spin &nbsp; <kbd>R</kbd> Repeat &nbsp; <kbd>H</kbd> Hint
+        </div>
+        <div class="modal-buttons">
+          <button id="startTutorial" aria-label="Start playing">Let's Go!</button>
+          <button id="skipTutorial" class="modal-skip" aria-label="Skip tutorial">Skip</button>
+        </div>
       </div>
     </dialog>
   </div>
