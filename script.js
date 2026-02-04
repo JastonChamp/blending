@@ -138,39 +138,1424 @@ document.addEventListener('DOMContentLoaded', () => {
   // Digraph/trigraph detection sets
   const consonantDigraphs = ['sh', 'th', 'ch', 'ng'];
   const vowelPatterns = { trigraphs: ['air', 'ear'], digraphs: ['oy', 'ar', 'ow', 'er'] };
-  const longVowelDigraphs = ['ay','ai','ea','ee','ie','oa','ow','ue','oo','ew','ui','igh','ei','ey'];
 
-  // ✅ OO words (from your 6th image) — always get diacritic "oo"
-  const ooWords = new Set([
-    'food','soon','bedroom','mood','swoop','room','cool','movie',
-    'suit','truth','soup','through','true','flew','cockatoo','kangaroo',
-    'grew','chew','blew'
-  ]);
+  // Fallback placeholders (wordRenderMap takes priority for complex words)
+  const longVowelDigraphs = ['ai', 'ay', 'ea', 'ee', 'ie', 'oa', 'oe', 'ue'];
+  const silentLetterOverrides = {};
+  const longVowelWordInfo = {};
 
-  // ✅ Words where chart shows grey “silent” letters (y is grey in those)
-  const silentLetterOverrides = {
-    grey: ['y'],
-    they: ['y'],
-    stay: ['y'],
-    stayed: ['y'],
-    played: ['y'],
-    holiday: ['y'],
-    holidays: ['y'],
-    maybe: ['y']
+  // ============================================================
+  // COMPREHENSIVE WORD RENDERING DATA
+  // Each entry: array of { text, type, diacritic?, sound? }
+  // Types: 'vowel', 'consonant', 'digraph', 'silent', 'long-vowel'
+  // ============================================================
+  const wordRenderMap = {
+    // ==================== LONG A WORDS ====================
+    'spade': [
+      { text: 'sp', type: 'consonant', sound: 'sp' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' }
+    ],
+    'mate': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'game': [
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'afraid': [
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'fr', type: 'consonant', sound: 'fr' },
+      { text: 'ai', type: 'long-vowel', sound: 'long_a' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'bake': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'gave': [
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'way': [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+    'grey': [
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'e', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent', diacritic: 'ā' }
+    ],
+    'rake': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'great': [
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'holiday': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+    'gayle': [
+      { text: 'G', type: 'consonant', sound: 'g' },
+      { text: 'ay', type: 'long-vowel', sound: 'long_a' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'may': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+    'clay': [
+      { text: 'cl', type: 'consonant', sound: 'cl' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+    'wake': [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'weight': [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'ei', type: 'long-vowel', sound: 'long_a', diacritic: 'ā' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'baked': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'holidays': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' },
+      { text: 's', type: 'consonant', sound: 's' }
+    ],
+    'played': [
+      { text: 'pl', type: 'consonant', sound: 'pl' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'amazed': [
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'z', type: 'consonant', sound: 'z' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'stayed': [
+      { text: 'st', type: 'consonant', sound: 'st' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'stay': [
+      { text: 'st', type: 'consonant', sound: 'st' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+    'against': [
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'ai', type: 'long-vowel', sound: 'long_a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'they': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'e', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' }
+    ],
+
+    // ==================== LONG E WORDS ====================
+    'people': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'eo', type: 'long-vowel', sound: 'long_e' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'need': [
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'eagle': [
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'funny': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'vowel', sound: 'u' },
+      { text: 'nn', type: 'consonant', sound: 'n' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'meet': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'breeze': [
+      { text: 'br', type: 'consonant', sound: 'br' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' },
+      { text: 'z', type: 'consonant', sound: 'z' },
+      { text: 'e', type: 'silent' }
+    ],
+    'maybe': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'y', type: 'silent' },
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' }
+    ],
+    'breathe': [
+      { text: 'br', type: 'consonant', sound: 'br' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'e', type: 'silent' }
+    ],
+    'puppy': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'u', type: 'vowel', sound: 'u' },
+      { text: 'pp', type: 'consonant', sound: 'p' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'lazy': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'z', type: 'consonant', sound: 'z' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'leaf': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'f', type: 'consonant', sound: 'f' }
+    ],
+    'tree': [
+      { text: 'tr', type: 'consonant', sound: 'tr' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' }
+    ],
+    'meat': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'grumpy': [
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'u', type: 'vowel', sound: 'u' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'peek': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' },
+      { text: 'k', type: 'consonant', sound: 'k' }
+    ],
+    'released': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'speaking': [
+      { text: 'sp', type: 'consonant', sound: 'sp' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'ng', type: 'digraph', sound: 'ng' }
+    ],
+    'revealed': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'happy': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'pp', type: 'consonant', sound: 'p' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'valley': [
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'll', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'y', type: 'silent', diacritic: 'ē' }
+    ],
+    'seat': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'thief': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'ie', type: 'long-vowel', sound: 'long_e' },
+      { text: 'f', type: 'consonant', sound: 'f' }
+    ],
+    'create': [
+      { text: 'cr', type: 'consonant', sound: 'cr' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'believe': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'ie', type: 'long-vowel', sound: 'long_e' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'seized': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'ei', type: 'long-vowel', sound: 'long_e' },
+      { text: 'z', type: 'consonant', sound: 'z' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'green': [
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'three': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'ee', type: 'long-vowel', sound: 'long_e' }
+    ],
+    'clean': [
+      { text: 'cl', type: 'consonant', sound: 'cl' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'hungry': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'u', type: 'vowel', sound: 'u' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'gleam': [
+      { text: 'gl', type: 'consonant', sound: 'gl' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'm', type: 'consonant', sound: 'm' }
+    ],
+
+    // ==================== LONG I WORDS ====================
+    'find': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'right': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'flight': [
+      { text: 'fl', type: 'consonant', sound: 'fl' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'skies': [
+      { text: 'sk', type: 'consonant', sound: 'sk' },
+      { text: 'ie', type: 'long-vowel', sound: 'long_i' },
+      { text: 's', type: 'consonant', sound: 's' }
+    ],
+    'sight': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'five': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'try': [
+      { text: 'tr', type: 'consonant', sound: 'tr' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' }
+    ],
+    'height': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'ei', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'finally': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'll', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'dive': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'kind': [
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'why': [
+      { text: 'wh', type: 'digraph', sound: 'wh' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' }
+    ],
+    'fly': [
+      { text: 'fl', type: 'consonant', sound: 'fl' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' }
+    ],
+    'myself': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'f', type: 'consonant', sound: 'f' }
+    ],
+    'direct': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'light': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'by': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' }
+    ],
+    'flies': [
+      { text: 'fl', type: 'consonant', sound: 'fl' },
+      { text: 'ie', type: 'long-vowel', sound: 'long_i' },
+      { text: 's', type: 'consonant', sound: 's' }
+    ],
+    'wild': [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'directly': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'quite': [
+      { text: 'qu', type: 'consonant', sound: 'qu' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'night': [
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'my': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'y', type: 'long-vowel', sound: 'long_i', diacritic: 'ī' }
+    ],
+    'ride': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' }
+    ],
+    'realise': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'live': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'white': [
+      { text: 'wh', type: 'digraph', sound: 'wh' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'realised': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'ea', type: 'long-vowel', sound: 'long_e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'mild': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'delighted': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'gh', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+
+    // ==================== LONG O WORDS ====================
+    'go': [
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'so': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'ago': [
+      { text: 'a', type: 'vowel', sound: 'a', diacritic: 'ū' },
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'joan': [
+      { text: 'J', type: 'consonant', sound: 'j' },
+      { text: 'oa', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'know': [
+      { text: 'k', type: 'silent' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'road': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'oa', type: 'long-vowel', sound: 'long_o' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'owen': [
+      { text: 'O', type: 'long-vowel', sound: 'long_o' },
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'low': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'envelope': [
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'e', type: 'silent' }
+    ],
+    "won't": [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: "n'", type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'show': [
+      { text: 'sh', type: 'digraph', sound: 'sh' },
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' }
+    ],
+    'cove': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'drove': [
+      { text: 'dr', type: 'consonant', sound: 'dr' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'home': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'propose': [
+      { text: 'pr', type: 'consonant', sound: 'pr' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'wrote': [
+      { text: 'wr', type: 'consonant', sound: 'r' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'own': [
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'rowan': [
+      { text: 'R', type: 'consonant', sound: 'r' },
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'though': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'u', type: 'silent' },
+      { text: 'gh', type: 'silent' }
+    ],
+    'hoped': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'floated': [
+      { text: 'fl', type: 'consonant', sound: 'fl' },
+      { text: 'oa', type: 'long-vowel', sound: 'long_o' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'note': [
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'owned': [
+      { text: 'ow', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'hope': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'e', type: 'silent' }
+    ],
+    'both': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'th', type: 'digraph', sound: 'th' }
+    ],
+    'nose': [
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'only': [
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    "don't": [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: "n'", type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'close': [
+      { text: 'cl', type: 'consonant', sound: 'cl' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'spoke': [
+      { text: 'sp', type: 'consonant', sound: 'sp' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+
+    // ==================== OO WORDS ====================
+    'food': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'soon': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'n', type: 'consonant', sound: 'n' }
+    ],
+    'bedroom': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'm', type: 'consonant', sound: 'm' }
+    ],
+    'receive': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'ei', type: 'long-vowel', sound: 'long_e' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'special': [
+      { text: 'sp', type: 'consonant', sound: 'sp' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 'sh', diacritic: 'sh' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'mood': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'swoop': [
+      { text: 'sw', type: 'consonant', sound: 'sw' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'p', type: 'consonant', sound: 'p' }
+    ],
+    'move': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'o', type: 'long-vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'place': [
+      { text: 'pl', type: 'consonant', sound: 'pl' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'especially': [
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'sp', type: 'consonant', sound: 'sp' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 'sh', diacritic: 'sh' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'll', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'room': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'm', type: 'consonant', sound: 'm' }
+    ],
+    'cool': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'movie': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'o', type: 'long-vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'ie', type: 'long-vowel', sound: 'long_e' }
+    ],
+    'face': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'office': [
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'ff', type: 'consonant', sound: 'f' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'suit': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'ui', type: 'long-vowel', sound: 'oo' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'truth': [
+      { text: 'tr', type: 'consonant', sound: 'tr' },
+      { text: 'u', type: 'long-vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'th', type: 'digraph', sound: 'th' }
+    ],
+    'soup': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'ou', type: 'long-vowel', sound: 'oo' },
+      { text: 'p', type: 'consonant', sound: 'p' }
+    ],
+    'decided': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'distance': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'through': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'ou', type: 'long-vowel', sound: 'oo' },
+      { text: 'gh', type: 'silent' }
+    ],
+    'true': [
+      { text: 'tr', type: 'consonant', sound: 'tr' },
+      { text: 'ue', type: 'long-vowel', sound: 'oo' }
+    ],
+    'flew': [
+      { text: 'fl', type: 'consonant', sound: 'fl' },
+      { text: 'ew', type: 'long-vowel', sound: 'oo' }
+    ],
+    'exciting': [
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'x', type: 'consonant', sound: 'x' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'ng', type: 'digraph', sound: 'ng' }
+    ],
+    'receipt': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'c', type: 'consonant', sound: 's', diacritic: 's' },
+      { text: 'ei', type: 'long-vowel', sound: 'long_e' },
+      { text: 'p', type: 'silent' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'cockatoo': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'ck', type: 'consonant', sound: 'k' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' }
+    ],
+    'kangaroo': [
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'oo', type: 'long-vowel', sound: 'oo' }
+    ],
+    'grew': [
+      { text: 'gr', type: 'consonant', sound: 'gr' },
+      { text: 'ew', type: 'long-vowel', sound: 'oo' }
+    ],
+    'chew': [
+      { text: 'ch', type: 'digraph', sound: 'ch' },
+      { text: 'ew', type: 'long-vowel', sound: 'oo' }
+    ],
+    'blew': [
+      { text: 'bl', type: 'consonant', sound: 'bl' },
+      { text: 'ew', type: 'long-vowel', sound: 'oo' }
+    ],
+
+    // ==================== LONG U + SOFT G WORDS ====================
+    'pure': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'silent' }
+    ],
+    'tune': [
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'tuneful': [
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' },
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'regular': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u', diacritic: 'ū' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'r', type: 'consonant', sound: 'r' }
+    ],
+    'eventually': [
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'u', type: 'vowel', sound: 'u' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'll', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'silent' }
+    ],
+    'excuse': [
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'x', type: 'consonant', sound: 'x' },
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'value': [
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'e', type: 'silent' }
+    ],
+    'use': [
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'continue': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'e', type: 'silent' }
+    ],
+    'useful': [
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' },
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'continued': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'refused': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+    'tube': [
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'silent' }
+    ],
+    'view': [
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'iew', type: 'long-vowel', sound: 'long_u', diacritic: 'ū' }
+    ],
+    'few': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'ew', type: 'long-vowel', sound: 'long_u', diacritic: 'ū' }
+    ],
+    'youth': [
+      { text: 'y', type: 'consonant', sound: 'y' },
+      { text: 'ou', type: 'long-vowel', sound: 'oo' },
+      { text: 'th', type: 'digraph', sound: 'th' }
+    ],
+    'beautiful': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'eau', type: 'long-vowel', sound: 'long_u' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'youthful': [
+      { text: 'y', type: 'consonant', sound: 'y' },
+      { text: 'ou', type: 'long-vowel', sound: 'oo' },
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'u', type: 'vowel', sound: 'oo', diacritic: 'oo' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    // Soft G words with 'j' diacritic
+    'page': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'silent' }
+    ],
+    'magic': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'c', type: 'consonant', sound: 'k' }
+    ],
+    'imagine': [
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'giant': [
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' }
+    ],
+    'stage': [
+      { text: 'st', type: 'consonant', sound: 'st' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'silent' }
+    ],
+    'manage': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'silent' }
+    ],
+    'gently': [
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'y', type: 'long-vowel', sound: 'long_e', diacritic: 'ē' }
+    ],
+    'gentle': [
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'vowel', sound: 'e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'magical': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'original': [
+      { text: 'o', type: 'vowel', sound: 'o' },
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'i', type: 'vowel', sound: 'i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'l', type: 'consonant', sound: 'l' }
+    ],
+    'postage': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'silent' }
+    ],
+    'managed': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'a', type: 'vowel', sound: 'a' },
+      { text: 'g', type: 'consonant', sound: 'j', diacritic: 'j' },
+      { text: 'e', type: 'silent' },
+      { text: 'd', type: 'consonant', sound: 'd' }
+    ],
+
+    // ==================== SILENT E WORDS ====================
+    // (These use the simple silent-e pattern)
+    'cake': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'lake': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'made': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' }
+    ],
+    'name': [
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'pale': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'sale': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'take': [
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'wave': [
+      { text: 'w', type: 'consonant', sound: 'w' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'base': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'case': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'date': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'fate': [
+      { text: 'f', type: 'consonant', sound: 'f' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'gate': [
+      { text: 'g', type: 'consonant', sound: 'g' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'hate': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'a', type: 'long-vowel', sound: 'long_a' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'theme': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'these': [
+      { text: 'th', type: 'digraph', sound: 'th' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'e', type: 'silent' }
+    ],
+    'eve': [
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'bike': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'e', type: 'silent' }
+    ],
+    'kite': [
+      { text: 'k', type: 'consonant', sound: 'k' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'lime': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'mine': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'pine': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'time': [
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'hive': [
+      { text: 'h', type: 'consonant', sound: 'h' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'e', type: 'silent' }
+    ],
+    'bite': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'site': [
+      { text: 's', type: 'consonant', sound: 's' },
+      { text: 'i', type: 'long-vowel', sound: 'long_i' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'rope': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'e', type: 'silent' }
+    ],
+    'cone': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'robe': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'silent' }
+    ],
+    'stone': [
+      { text: 'st', type: 'consonant', sound: 'st' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'bone': [
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'dome': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'e', type: 'silent' }
+    ],
+    'pole': [
+      { text: 'p', type: 'consonant', sound: 'p' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'vote': [
+      { text: 'v', type: 'consonant', sound: 'v' },
+      { text: 'o', type: 'long-vowel', sound: 'long_o' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'cube': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'b', type: 'consonant', sound: 'b' },
+      { text: 'e', type: 'silent' }
+    ],
+    'mule': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+    'rude': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' }
+    ],
+    'cute': [
+      { text: 'c', type: 'consonant', sound: 'k' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'dune': [
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'june': [
+      { text: 'j', type: 'consonant', sound: 'j' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'lute': [
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'mute': [
+      { text: 'm', type: 'consonant', sound: 'm' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 't', type: 'consonant', sound: 't' },
+      { text: 'e', type: 'silent' }
+    ],
+    'rule': [
+      { text: 'r', type: 'consonant', sound: 'r' },
+      { text: 'u', type: 'long-vowel', sound: 'long_u' },
+      { text: 'l', type: 'consonant', sound: 'l' },
+      { text: 'e', type: 'silent' }
+    ],
+
+    // ==================== SOFT C AND G ====================
+    'cede': [
+      { text: 'c', type: 'consonant', sound: 'soft_c' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'd', type: 'consonant', sound: 'd' },
+      { text: 'e', type: 'silent' }
+    ],
+    'scene': [
+      { text: 'sc', type: 'consonant', sound: 'soft_c' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ],
+    'gene': [
+      { text: 'g', type: 'consonant', sound: 'soft_g' },
+      { text: 'e', type: 'long-vowel', sound: 'long_e' },
+      { text: 'n', type: 'consonant', sound: 'n' },
+      { text: 'e', type: 'silent' }
+    ]
   };
-
-  // ✅ Build a lookup so EVERY long-vowel word has a mark
-  const longVowelWordInfo = (() => {
-    const info = {};
-    for (const [bucket, arr] of Object.entries(wordGroups.longVowels)) {
-      for (const w of arr) {
-        const lw = w.toLowerCase();
-        info[lw] = { mark: bucket }; // default mark by list: a/e/i/o/u
-        if (ooWords.has(lw)) info[lw].mark = 'oo'; // override
-      }
-    }
-    return info;
-  })();
 
   const state = {
     score: 0, revealedWords: 0, totalWords: 0, usedWords: new Set(),
@@ -213,7 +1598,10 @@ document.addEventListener('DOMContentLoaded', () => {
     streakSection: document.querySelector('#streakSection'),
     streakCount: document.querySelector('#streakCount'),
     wordTypeDesc: document.querySelector('#wordTypeDesc'),
-    resetProgressButton: document.querySelector('#resetProgressButton')
+    resetProgressButton: document.querySelector('#resetProgressButton'),
+    skipButton: document.querySelector('#skipButton'),
+    toggleLegend: document.querySelector('#toggleLegend'),
+    legendContent: document.querySelector('.legend-content')
   };
 
   const wordTypeDescriptions = {
@@ -370,9 +1758,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // ✅ PARSER — now supports -igh / -eigh with silent GH,
   // and auto-diacritics for every long-vowel word
   function parseWord(word) {
+    const lower = word.toLowerCase();
+
+    // Check explicit rendering data first (for complex words with diacritics)
+    if (wordRenderMap[lower]) {
+      return wordRenderMap[lower].map(unit => ({
+        text: unit.text,
+        isVowel: unit.type === 'vowel' || unit.type === 'long-vowel' || unit.type === 'diphthong',
+        isLongVowel: unit.type === 'long-vowel',
+        isDigraph: unit.type === 'digraph',
+        isSilent: unit.type === 'silent',
+        isDiphthong: unit.type === 'diphthong',
+        isSoft: unit.type === 'soft',
+        diacritic: unit.diacritic || null,
+        sound: unit.sound || null
+      }));
+    }
+
+    // Fall back to algorithmic parsing for simple words (CVC, CCVC, etc.)
     const units = [];
     let i = 0;
-    const lower = word.toLowerCase();
 
     while (i < word.length) {
       let unitAdded = false;
@@ -583,13 +1988,17 @@ document.addEventListener('DOMContentLoaded', () => {
       await delay(400);
       if (unit.isSilent) continue;
 
-      let sound = unit.text.toLowerCase();
-
-      // If you have long vowel audio files named long_<unit>, keep this:
-      if (unit.isLongVowel) sound = `long_${sound}`;
-      else if (unit.isDiphthong) sound = sound;
-      else if (unit.isSoft) sound = `soft_${sound}`;
-      else if (unit.isDouble) sound = sound[0];
+      // Use explicit sound mapping from wordRenderMap if available
+      let sound;
+      if (unit.sound) {
+        sound = unit.sound;
+      } else {
+        // Fallback to algorithmic sound mapping for simple words
+        sound = unit.text.toLowerCase();
+        if (unit.isLongVowel) sound = `long_${sound}`;
+        else if (unit.isSoft) sound = `soft_${sound}`;
+        else if (unit.isDouble) sound = sound[0];
+      }
 
       await playSound(sound);
     }
@@ -615,6 +2024,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     els.hintButton.hidden = false;
+    els.skipButton.hidden = false;
     els.repeatButton.disabled = false;
   }
 
@@ -643,6 +2053,7 @@ document.addEventListener('DOMContentLoaded', () => {
     els.scoreValue.textContent = '0';
     els.repeatButton.disabled = true;
     els.hintButton.hidden = true;
+    els.skipButton.hidden = true;
     state.totalWords = getAvailableWords().length;
     updateProgress();
     showPlaceholder();
@@ -688,10 +2099,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function skip() {
+    if (!state.currentWord) return;
+    resetStreak();
+    els.skipButton.hidden = true;
+    els.hintButton.hidden = true;
+    els.repeatButton.disabled = true;
+    showPlaceholder();
+    announce('Word skipped. Press Spin for a new word.');
+  }
+
   // Event listeners
   els.spinButton.addEventListener('click', spin);
   els.repeatButton.addEventListener('click', repeat);
   els.hintButton.addEventListener('click', hint);
+  els.skipButton.addEventListener('click', skip);
+
+  els.toggleLegend.addEventListener('click', () => {
+    const isHidden = els.legendContent.hidden;
+    els.legendContent.hidden = !isHidden;
+    els.toggleLegend.setAttribute('aria-expanded', isHidden);
+    els.toggleLegend.textContent = isHidden ? '📖 Hide Guide' : '📖 Color Guide';
+  });
 
   els.wordTypeSelector.addEventListener('change', () => {
     state.wordType = els.wordTypeSelector.value;
