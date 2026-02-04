@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     score: 0, revealedWords: 0, totalWords: 0, usedWords: new Set(),
     currentWord: '', blendingTime: 3000, soundsEnabled: true,
     wordType: 'cvc', vowelFilter: 'all', theme: 'default',
-    celebrationMode: false, badges: new Map()
+    celebrationMode: false, badges: new Map(), streak: 0
   };
 
   const els = {
@@ -209,7 +209,24 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleSettingsButton: document.querySelector('#toggleSettingsButton'),
     advancedSettings: document.querySelector('#advancedSettings'),
     badges: document.querySelector('#badges'),
-    fullscreenButton: document.querySelector('#fullscreenButton')
+    fullscreenButton: document.querySelector('#fullscreenButton'),
+    streakSection: document.querySelector('#streakSection'),
+    streakCount: document.querySelector('#streakCount'),
+    wordTypeDesc: document.querySelector('#wordTypeDesc'),
+    resetProgressButton: document.querySelector('#resetProgressButton')
+  };
+
+  const wordTypeDescriptions = {
+    cvc: 'e.g. cat, dog, sun',
+    ccvc: 'e.g. flag, grab, spin',
+    cvcc: 'e.g. hand, lamp, milk',
+    ccvcc: 'e.g. brand, drink, frost',
+    digraphs: 'e.g. chat, shop, thin',
+    extended: 'e.g. jumping, blocking',
+    silentE: 'e.g. cake, bike, home',
+    softCAndG: 'e.g. cede, gene, scene',
+    diphthongs: 'e.g. boy, car, cow',
+    longVowels: 'e.g. find, road, tree'
   };
 
   const compliments = ['Great Job!', 'Awesome!', 'You’re a Star!', 'Well Done!', 'Fantastic!'];
@@ -316,12 +333,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function updateStreak() {
+    state.streak++;
+    els.streakCount.textContent = state.streak;
+    if (state.streak >= 2) {
+      els.streakSection.classList.add('visible');
+    }
+  }
+
+  function resetStreak() {
+    state.streak = 0;
+    els.streakCount.textContent = '0';
+    els.streakSection.classList.remove('visible');
+  }
+
+  function showPlaceholder() {
+    els.wordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">🎡</span><span>Press Spin to start!</span></div>';
+  }
+
+  function updateWordTypeDesc() {
+    if (els.wordTypeDesc) {
+      els.wordTypeDesc.textContent = wordTypeDescriptions[state.wordType] || '';
+    }
+  }
+
   function showCompliment() {
     const compliment = compliments[Math.floor(Math.random() * compliments.length)];
     els.complimentBox.textContent = compliment;
     els.complimentBox.classList.add('show');
     if (state.soundsEnabled) speakWord(compliment);
     state.celebrationMode ? launchFireworks() : launchConfetti();
+    updateStreak();
     setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
   }
 
@@ -472,8 +514,21 @@ document.addEventListener('DOMContentLoaded', () => {
     els.vowelSelector.value = state.vowelFilter;
     els.themeSelector.value = state.theme;
     els.blendingTimeDisplay.textContent = state.blendingTime / 1000;
-    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔇 Sounds Off' : '🔊 Sounds On';
+    updateAudioButton();
     els.celebrationModeCheckbox.checked = state.celebrationMode;
+    updateWordTypeDesc();
+  }
+
+  function updateAudioButton() {
+    if (state.soundsEnabled) {
+      els.toggleAudioButton.textContent = '🔊 Sound On';
+      els.toggleAudioButton.classList.remove('audio-toggle-off');
+      els.toggleAudioButton.classList.add('audio-toggle-on');
+    } else {
+      els.toggleAudioButton.textContent = '🔇 Sound Off';
+      els.toggleAudioButton.classList.remove('audio-toggle-on');
+      els.toggleAudioButton.classList.add('audio-toggle-off');
+    }
   }
 
   function updateBadges() {
@@ -590,6 +645,8 @@ document.addEventListener('DOMContentLoaded', () => {
     els.hintButton.hidden = true;
     state.totalWords = getAvailableWords().length;
     updateProgress();
+    showPlaceholder();
+    resetStreak();
     savePreferences();
   }
 
@@ -638,6 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.wordTypeSelector.addEventListener('change', () => {
     state.wordType = els.wordTypeSelector.value;
+    updateWordTypeDesc();
     resetGame();
   });
 
@@ -654,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.toggleAudioButton.addEventListener('click', () => {
     state.soundsEnabled = !state.soundsEnabled;
-    els.toggleAudioButton.textContent = state.soundsEnabled ? '🔇 Sounds Off' : '🔊 Sounds On';
+    updateAudioButton();
     savePreferences();
   });
 
@@ -681,9 +739,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   els.toggleSettingsButton.addEventListener('click', (event) => {
     event.preventDefault();
-    const isVisible = els.advancedSettings.style.display === 'block';
-    els.advancedSettings.style.display = isVisible ? 'none' : 'block';
-    els.toggleSettingsButton.textContent = isVisible ? '⚙️ Customize' : 'Hide Settings';
+    const isVisible = els.advancedSettings.classList.contains('open');
+    els.advancedSettings.classList.toggle('open');
+    els.toggleSettingsButton.textContent = isVisible ? '⚙️ Customize' : '⚙️ Hide Settings';
     els.toggleSettingsButton.setAttribute('aria-expanded', !isVisible);
     els.advancedSettings.setAttribute('aria-hidden', isVisible);
   });
@@ -702,6 +760,24 @@ document.addEventListener('DOMContentLoaded', () => {
   els.fullscreenButton.addEventListener('click', () => {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(console.warn);
     else document.exitFullscreen().catch(console.warn);
+  });
+
+  els.resetProgressButton.addEventListener('click', () => {
+    if (confirm('Reset all progress? This will clear your score, badges, and word history.')) {
+      state.badges.clear();
+      resetStreak();
+      resetGame();
+      updateBadges();
+      announce('Progress has been reset');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+    const key = e.key.toLowerCase();
+    if (key === 's' && !els.spinButton.disabled) spin();
+    else if (key === 'r' && !els.repeatButton.disabled) repeat();
+    else if (key === 'h' && !els.hintButton.hidden) hint();
   });
 
   (async () => {
