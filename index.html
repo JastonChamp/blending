@@ -41,6 +41,9 @@
             <button id="hintButton" aria-label="Get a hint" accesskey="h" hidden>
               <span class="icon" aria-hidden="true">💡</span> Hint
             </button>
+            <button id="skipButton" aria-label="Skip this word" hidden>
+              <span class="icon" aria-hidden="true">⏭️</span> Skip
+            </button>
           </div>
           <div class="keyboard-hints" aria-hidden="true">
             <span class="kbd-hint"><kbd class="kbd">S</kbd> Spin</span>
@@ -56,6 +59,15 @@
           <p id="progressText" aria-live="polite">0 / 0 Words</p>
         </div>
         <div id="badges" class="badges"></div>
+        <div id="colorLegend" class="color-legend" aria-label="Letter color guide">
+          <button id="toggleLegend" class="legend-toggle" aria-expanded="false">📖 Color Guide</button>
+          <div class="legend-content" hidden>
+            <span class="legend-item"><span class="legend-color vowel"></span> Vowel</span>
+            <span class="legend-item"><span class="legend-color digraph"></span> Digraph</span>
+            <span class="legend-item"><span class="legend-color silent"></span> Silent</span>
+            <span class="legend-item"><span class="legend-color diphthong"></span> Diphthong</span>
+          </div>
+        </div>
         <div id="complimentBox" class="compliment-box" aria-live="assertive"></div>
         <div id="blendingTimerContainer" role="timer" aria-label="Blending timer">
           <p class="timer-label" aria-live="polite">Blend now! ⏳</p>
@@ -139,9 +151,29 @@
     <dialog id="tutorialModal" class="modal">
       <div class="modal-content">
         <h2>Welcome to Word Spinner!</h2>
-        <p>Spin to hear letter sounds and blend them into words!</p>
-        <button id="startTutorial" aria-label="Start tutorial">Start</button>
-        <button id="skipTutorial" aria-label="Skip tutorial">Skip</button>
+        <div class="tutorial-steps">
+          <div class="tutorial-step">
+            <span class="step-icon">🎡</span>
+            <p><strong>Spin</strong> to get a new word</p>
+          </div>
+          <div class="tutorial-step">
+            <span class="step-icon">👂</span>
+            <p><strong>Listen</strong> to each letter sound</p>
+          </div>
+          <div class="tutorial-step">
+            <span class="step-icon">🗣️</span>
+            <p><strong>Blend</strong> the sounds together aloud</p>
+          </div>
+          <div class="tutorial-step">
+            <span class="step-icon">⭐</span>
+            <p><strong>Earn</strong> points and badges!</p>
+          </div>
+        </div>
+        <p class="tutorial-tip">Tip: Use <kbd>S</kbd> <kbd>R</kbd> <kbd>H</kbd> keys for shortcuts!</p>
+        <div class="modal-buttons">
+          <button id="startTutorial" aria-label="Start playing">Let's Play!</button>
+          <button id="skipTutorial" aria-label="Skip tutorial" class="secondary">Skip</button>
+        </div>
       </div>
     </dialog>
   </div>

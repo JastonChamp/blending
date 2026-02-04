@@ -213,7 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
     streakSection: document.querySelector('#streakSection'),
     streakCount: document.querySelector('#streakCount'),
     wordTypeDesc: document.querySelector('#wordTypeDesc'),
-    resetProgressButton: document.querySelector('#resetProgressButton')
+    resetProgressButton: document.querySelector('#resetProgressButton'),
+    skipButton: document.querySelector('#skipButton'),
+    toggleLegend: document.querySelector('#toggleLegend'),
+    legendContent: document.querySelector('.legend-content')
   };
 
   const wordTypeDescriptions = {
@@ -615,6 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     els.hintButton.hidden = false;
+    els.skipButton.hidden = false;
     els.repeatButton.disabled = false;
   }
 
@@ -643,6 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     els.scoreValue.textContent = '0';
     els.repeatButton.disabled = true;
     els.hintButton.hidden = true;
+    els.skipButton.hidden = true;
     state.totalWords = getAvailableWords().length;
     updateProgress();
     showPlaceholder();
@@ -688,10 +693,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function skip() {
+    if (!state.currentWord) return;
+    resetStreak();
+    els.skipButton.hidden = true;
+    els.hintButton.hidden = true;
+    els.repeatButton.disabled = true;
+    showPlaceholder();
+    announce('Word skipped. Press Spin for a new word.');
+  }
+
   // Event listeners
   els.spinButton.addEventListener('click', spin);
   els.repeatButton.addEventListener('click', repeat);
   els.hintButton.addEventListener('click', hint);
+  els.skipButton.addEventListener('click', skip);
+
+  els.toggleLegend.addEventListener('click', () => {
+    const isHidden = els.legendContent.hidden;
+    els.legendContent.hidden = !isHidden;
+    els.toggleLegend.setAttribute('aria-expanded', isHidden);
+    els.toggleLegend.textContent = isHidden ? '📖 Hide Guide' : '📖 Color Guide';
+  });
 
   els.wordTypeSelector.addEventListener('change', () => {
     state.wordType = els.wordTypeSelector.value;

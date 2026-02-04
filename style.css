@@ -881,3 +881,174 @@ body[data-theme="high-contrast"] .kbd { background: #fff; border-color: #000; co
   .compliment-box { font-size: 1.5rem; }
   .streak-section { font-size: 1.1rem; }
 }
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .mascot, .progress-icon, .word-placeholder .placeholder-icon {
+    animation: none !important;
+  }
+}
+
+/* Color Legend */
+.color-legend {
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.legend-toggle {
+  background: transparent;
+  border: 1px solid #dfe4ea;
+  color: #636e72;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.legend-toggle:hover {
+  background: #f1f2f6;
+  transform: none;
+  box-shadow: none;
+}
+
+body[data-theme="space"] .legend-toggle {
+  border-color: #4a90e2;
+  color: #b2bec3;
+}
+body[data-theme="space"] .legend-toggle:hover {
+  background: #16213e;
+}
+body[data-theme="high-contrast"] .legend-toggle {
+  border-color: #000;
+  color: #000;
+}
+
+.legend-content {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 0.5rem;
+}
+
+body[data-theme="space"] .legend-content {
+  background: rgba(22, 33, 62, 0.9);
+}
+
+.legend-content[hidden] {
+  display: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #636e72;
+}
+
+body[data-theme="space"] .legend-item { color: #b2bec3; }
+body[data-theme="high-contrast"] .legend-item { color: #000; }
+
+.legend-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.2rem;
+  display: inline-block;
+}
+
+.legend-color.vowel { background: #ff7675; }
+.legend-color.digraph { background: #2ecc71; }
+.legend-color.silent { background: #bdbdbd; }
+.legend-color.diphthong { background: #8e44ad; }
+
+/* Skip Button */
+#skipButton {
+  background: #95a5a6;
+  color: #fff;
+}
+
+#skipButton:hover:not(:disabled) {
+  background: #7f8c8d;
+}
+
+/* Enhanced Tutorial Modal */
+.tutorial-steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.tutorial-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.step-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.tutorial-step p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.tutorial-tip {
+  font-size: 0.85rem;
+  color: #636e72;
+  margin: 1rem 0;
+}
+
+.tutorial-tip kbd {
+  display: inline-block;
+  background: #f1f2f6;
+  border: 1px solid #dfe4ea;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+body[data-theme="space"] .tutorial-tip { color: #b2bec3; }
+body[data-theme="space"] .tutorial-tip kbd {
+  background: #0f3460;
+  border-color: #e94560;
+  color: #e4e4e4;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.modal button.secondary {
+  background: #95a5a6;
+}
+
+.modal button.secondary:hover {
+  background: #7f8c8d;
+}
+
+@media (max-width: 400px) {
+  .tutorial-steps {
+    grid-template-columns: 1fr;
+  }
+}
