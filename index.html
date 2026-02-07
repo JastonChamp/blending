@@ -26,22 +26,42 @@
             <span id="streakCount">0</span> in a row!
           </div>
         </div>
+        <div id="sessionSummary" class="session-summary" aria-label="Session statistics">
+          <button id="toggleSessionSummary" class="session-toggle" aria-expanded="false">📊 Session</button>
+          <div id="sessionDetails" class="session-details" hidden>
+            <div class="session-stat">
+              <span class="stat-icon">📝</span>
+              <span class="stat-label">Words:</span>
+              <span id="sessionWords" class="stat-value">0</span>
+            </div>
+            <div class="session-stat">
+              <span class="stat-icon">⏱️</span>
+              <span class="stat-label">Time:</span>
+              <span id="sessionTime" class="stat-value">0:00</span>
+            </div>
+            <div class="session-stat">
+              <span class="stat-icon">🎯</span>
+              <span class="stat-label">Best Streak:</span>
+              <span id="sessionBestStreak" class="stat-value">0</span>
+            </div>
+          </div>
+        </div>
         <div class="game-area">
           <div class="word-display-container">
             <div class="word-display" id="wordBox" aria-live="polite"></div>
             <div class="mascot" aria-hidden="true">🦜</div>
           </div>
           <div class="action-buttons">
-            <button id="spinButton" aria-label="Spin for a new word" accesskey="s">
+            <button id="spinButton" aria-label="Spin for a new word" accesskey="s" title="Get a new word to practice (Shortcut: S)">
               <span class="icon" aria-hidden="true">🎡</span> Spin
             </button>
-            <button id="repeatButton" aria-label="Repeat the word" accesskey="r" disabled>
+            <button id="repeatButton" aria-label="Repeat the word" accesskey="r" disabled title="Hear the word sounds again (Shortcut: R)">
               <span class="icon" aria-hidden="true">🔄</span> Repeat
             </button>
-            <button id="hintButton" aria-label="Get a hint" accesskey="h" hidden>
+            <button id="hintButton" aria-label="Get a hint" accesskey="h" hidden title="Highlight and hear each sound slowly (Shortcut: H)">
               <span class="icon" aria-hidden="true">💡</span> Hint
             </button>
-            <button id="skipButton" aria-label="Skip this word" hidden>
+            <button id="skipButton" aria-label="Skip this word" hidden title="Skip this word (resets your streak)">
               <span class="icon" aria-hidden="true">⏭️</span> Skip
             </button>
           </div>
@@ -136,9 +156,9 @@
             </label>
           </div>
           <div class="settings-buttons">
-            <button id="toggleAudioButton" aria-label="Toggle sounds">🔊 Sound On</button>
-            <button id="fullscreenButton" aria-label="Toggle fullscreen">⛶ Fullscreen</button>
-            <button id="resetProgressButton" aria-label="Reset all progress">🗑 Reset Progress</button>
+            <button id="toggleAudioButton" aria-label="Toggle sounds" title="Turn sound effects on or off">🔊 Sound On</button>
+            <button id="fullscreenButton" aria-label="Toggle fullscreen" title="Play in fullscreen mode">⛶ Fullscreen</button>
+            <button id="resetProgressButton" aria-label="Reset all progress" title="Clear all scores, badges, and word history">🗑 Reset Progress</button>
           </div>
         </div>
       </section>
