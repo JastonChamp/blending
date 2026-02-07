@@ -1561,7 +1561,13 @@ document.addEventListener('DOMContentLoaded', () => {
     score: 0, revealedWords: 0, totalWords: 0, usedWords: new Set(),
     currentWord: '', blendingTime: 3000, soundsEnabled: true,
     wordType: 'cvc', vowelFilter: 'all', theme: 'default',
-    celebrationMode: false, badges: new Map(), streak: 0
+    celebrationMode: false, badges: new Map(), streak: 0,
+    // Session tracking
+    sessionStartTime: Date.now(),
+    sessionWordsCompleted: 0,
+    sessionBestStreak: 0,
+    // Mastery tracking - words mastered per word type
+    masteredWords: {}
   };
 
   const els = {
@@ -1601,7 +1607,12 @@ document.addEventListener('DOMContentLoaded', () => {
     resetProgressButton: document.querySelector('#resetProgressButton'),
     skipButton: document.querySelector('#skipButton'),
     toggleLegend: document.querySelector('#toggleLegend'),
-    legendContent: document.querySelector('.legend-content')
+    legendContent: document.querySelector('.legend-content'),
+    toggleSessionSummary: document.querySelector('#toggleSessionSummary'),
+    sessionDetails: document.querySelector('#sessionDetails'),
+    sessionWords: document.querySelector('#sessionWords'),
+    sessionTime: document.querySelector('#sessionTime'),
+    sessionBestStreak: document.querySelector('#sessionBestStreak')
   };
 
   const wordTypeDescriptions = {
@@ -1615,6 +1626,20 @@ document.addEventListener('DOMContentLoaded', () => {
     softCAndG: 'e.g. cede, gene, scene',
     diphthongs: 'e.g. boy, car, cow',
     longVowels: 'e.g. find, road, tree'
+  };
+
+  // Difficulty ratings (1-5 stars)
+  const wordTypeDifficulty = {
+    cvc: 1,
+    ccvc: 2,
+    cvcc: 2,
+    ccvcc: 3,
+    digraphs: 3,
+    silentE: 3,
+    extended: 4,
+    diphthongs: 4,
+    softCAndG: 4,
+    longVowels: 5
   };
 
   const compliments = ['Great Job!', 'Awesome!', 'You’re a Star!', 'Well Done!', 'Fantastic!'];
@@ -1727,6 +1752,54 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.streak >= 2) {
       els.streakSection.classList.add('visible');
     }
+
+    // Streak milestone celebrations
+    const milestones = [3, 5, 10, 15, 20, 25];
+    if (milestones.includes(state.streak)) {
+      celebrateStreakMilestone(state.streak);
+    }
+  }
+
+  function celebrateStreakMilestone(streak) {
+    // Enhanced visual feedback for milestones
+    els.streakSection.classList.add('milestone');
+    setTimeout(() => els.streakSection.classList.remove('milestone'), 1500);
+
+    // Play special sound for milestones
+    if (state.soundsEnabled) {
+      if (streak >= 10) {
+        speakWord(`Amazing! ${streak} in a row!`);
+      } else if (streak >= 5) {
+        speakWord(`Fantastic! ${streak} streak!`);
+      } else {
+        speakWord(`Great! ${streak} in a row!`);
+      }
+    }
+
+    // Extra confetti for higher milestones
+    if (streak >= 10) {
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => launchFireworks(), i * 200);
+      }
+    } else if (streak >= 5) {
+      launchFireworks();
+      setTimeout(() => launchConfetti(), 300);
+    }
+
+    // Show milestone badge notification
+    showMilestoneNotification(streak);
+  }
+
+  function showMilestoneNotification(streak) {
+    const notification = document.createElement('div');
+    notification.className = 'milestone-notification';
+    notification.innerHTML = `<span class="milestone-icon">🔥</span><span>${streak} Streak!</span>`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 500);
+    }, 2000);
   }
 
   function resetStreak() {
@@ -1735,14 +1808,65 @@ document.addEventListener('DOMContentLoaded', () => {
     els.streakSection.classList.remove('visible');
   }
 
+  // Session tracking functions
+  function updateSessionStats() {
+    state.sessionWordsCompleted++;
+    if (state.streak > state.sessionBestStreak) {
+      state.sessionBestStreak = state.streak;
+    }
+
+    if (els.sessionWords) els.sessionWords.textContent = state.sessionWordsCompleted;
+    if (els.sessionBestStreak) els.sessionBestStreak.textContent = state.sessionBestStreak;
+  }
+
+  function formatSessionTime(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function updateSessionTimer() {
+    const elapsed = Date.now() - state.sessionStartTime;
+    if (els.sessionTime) els.sessionTime.textContent = formatSessionTime(elapsed);
+  }
+
+  // Update session timer every second
+  setInterval(updateSessionTimer, 1000);
+
   function showPlaceholder() {
     els.wordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">🎡</span><span>Press Spin to start!</span></div>';
   }
 
   function updateWordTypeDesc() {
     if (els.wordTypeDesc) {
-      els.wordTypeDesc.textContent = wordTypeDescriptions[state.wordType] || '';
+      const desc = wordTypeDescriptions[state.wordType] || '';
+      const difficulty = wordTypeDifficulty[state.wordType] || 1;
+      const stars = '⭐'.repeat(difficulty) + '☆'.repeat(5 - difficulty);
+      const mastery = getMasteryPercentage(state.wordType);
+      const masteryDisplay = mastery > 0 ? ` <span class="mastery-badge" title="Words mastered in this category">${mastery}% mastered</span>` : '';
+      els.wordTypeDesc.innerHTML = `<span class="difficulty-stars" title="Difficulty: ${difficulty}/5">${stars}</span> ${desc}${masteryDisplay}`;
     }
+  }
+
+  function getMasteryPercentage(wordType) {
+    const group = wordGroups[wordType];
+    if (!group) return 0;
+
+    const totalWords = Object.values(group).flat().length;
+    const masteredSet = state.masteredWords[wordType];
+    const masteredCount = masteredSet ? masteredSet.size : 0;
+
+    return totalWords > 0 ? Math.round((masteredCount / totalWords) * 100) : 0;
+  }
+
+  function trackMasteredWord(word) {
+    if (!state.masteredWords[state.wordType]) {
+      state.masteredWords[state.wordType] = new Set();
+    }
+    state.masteredWords[state.wordType].add(word.toLowerCase());
+    updateWordTypeDesc();
+    savePreferences();
   }
 
   function showCompliment() {
@@ -1752,6 +1876,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.soundsEnabled) speakWord(compliment);
     state.celebrationMode ? launchFireworks() : launchConfetti();
     updateStreak();
+    updateSessionStats();
+    trackMasteredWord(state.currentWord);
     setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
   }
 
@@ -1894,15 +2020,31 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function savePreferences() {
+    // Convert masteredWords Sets to Arrays for JSON storage
+    const masteredWordsArray = {};
+    for (const [type, words] of Object.entries(state.masteredWords)) {
+      masteredWordsArray[type] = Array.from(words);
+    }
+
     localStorage.setItem('wordSpinnerPrefs', JSON.stringify({
       ...state,
       usedWords: Array.from(state.usedWords),
-      badges: Object.fromEntries(state.badges)
+      badges: Object.fromEntries(state.badges),
+      masteredWords: masteredWordsArray
     }));
   }
 
   function loadPreferences() {
     const prefs = JSON.parse(localStorage.getItem('wordSpinnerPrefs')) || {};
+
+    // Convert masteredWords Arrays back to Sets
+    const masteredWords = {};
+    if (prefs.masteredWords) {
+      for (const [type, words] of Object.entries(prefs.masteredWords)) {
+        masteredWords[type] = new Set(words);
+      }
+    }
+
     Object.assign(state, {
       wordType: prefs.wordType || 'cvc',
       vowelFilter: prefs.vowelFilter || 'all',
@@ -1911,7 +2053,8 @@ document.addEventListener('DOMContentLoaded', () => {
       soundsEnabled: prefs.soundsEnabled ?? true,
       celebrationMode: prefs.celebrationMode || false,
       badges: new Map(Object.entries(prefs.badges || {})),
-      usedWords: new Set(prefs.usedWords || [])
+      usedWords: new Set(prefs.usedWords || []),
+      masteredWords: masteredWords
     });
 
     document.body.dataset.theme = state.theme;
@@ -2120,6 +2263,13 @@ document.addEventListener('DOMContentLoaded', () => {
     els.legendContent.hidden = !isHidden;
     els.toggleLegend.setAttribute('aria-expanded', isHidden);
     els.toggleLegend.textContent = isHidden ? '📖 Hide Guide' : '📖 Color Guide';
+  });
+
+  els.toggleSessionSummary.addEventListener('click', () => {
+    const isHidden = els.sessionDetails.hidden;
+    els.sessionDetails.hidden = !isHidden;
+    els.toggleSessionSummary.setAttribute('aria-expanded', isHidden);
+    els.toggleSessionSummary.textContent = isHidden ? '📊 Hide Session' : '📊 Session';
   });
 
   els.wordTypeSelector.addEventListener('change', () => {
