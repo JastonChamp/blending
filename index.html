@@ -178,7 +178,18 @@
           <div class="settings-buttons">
             <button id="toggleAudioButton" aria-label="Toggle sounds" title="Turn sound effects on or off">🔊 Sound On</button>
             <button id="fullscreenButton" aria-label="Toggle fullscreen" title="Play in fullscreen mode">⛶ Fullscreen</button>
-            <button id="resetProgressButton" aria-label="Reset all progress" title="Clear all scores, badges, and word history">🗑 Reset Progress</button>
+            <button id="parentDashboardButton" aria-label="Open parent dashboard" title="View learning progress and insights">👨‍👩‍👧 Parent Dashboard</button>
+            <button id="resetProgressButton" aria-label="Reset all progress" title="Clear all scores, badges, and word history">🗑 Reset</button>
+          </div>
+          <div class="settings-section">
+            <label for="dailyGoalSelect">Daily Word Goal:</label>
+            <select id="dailyGoalSelect">
+              <option value="5">5 words</option>
+              <option value="10" selected>10 words</option>
+              <option value="15">15 words</option>
+              <option value="20">20 words</option>
+              <option value="30">30 words</option>
+            </select>
           </div>
         </div>
       </section>
@@ -188,6 +199,124 @@
     </main>
     <div id="confettiContainer" aria-hidden="true"></div>
     <div id="scoreIncrement" class="score-increment" aria-hidden="true"></div>
+
+    <!-- Difficult Word Indicator -->
+    <div id="difficultWordBanner" class="difficult-word-banner" hidden>
+      <span class="banner-icon">📚</span>
+      <span class="banner-text">Review Word</span>
+    </div>
+
+    <!-- Daily Goal Complete Celebration -->
+    <div id="goalCompleteCelebration" class="goal-complete-celebration" hidden>
+      <div class="celebration-content">
+        <span class="celebration-icon">🎉</span>
+        <h3>Daily Goal Complete!</h3>
+        <p>Amazing work! You practiced <span id="celebrationWordCount">10</span> words today!</p>
+        <button id="closeCelebration">Keep Going!</button>
+      </div>
+    </div>
+
+    <!-- Parent Dashboard Modal -->
+    <dialog id="parentDashboardModal" class="modal parent-modal">
+      <div class="modal-content dashboard-content">
+        <div class="dashboard-header">
+          <h2>📊 Learning Dashboard</h2>
+          <button id="closeParentDashboard" class="close-btn" aria-label="Close dashboard">✕</button>
+        </div>
+
+        <div class="dashboard-tabs">
+          <button class="tab-btn active" data-tab="overview">Overview</button>
+          <button class="tab-btn" data-tab="progress">Progress</button>
+          <button class="tab-btn" data-tab="words">Word History</button>
+          <button class="tab-btn" data-tab="settings">Settings</button>
+        </div>
+
+        <div class="dashboard-tab-content" id="tab-overview">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-card-icon">📅</span>
+              <span class="stat-card-value" id="dashTotalDays">0</span>
+              <span class="stat-card-label">Days Practiced</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-icon">📝</span>
+              <span class="stat-card-value" id="dashTotalWords">0</span>
+              <span class="stat-card-label">Words Learned</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-icon">🔥</span>
+              <span class="stat-card-value" id="dashBestStreak">0</span>
+              <span class="stat-card-label">Best Streak</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-icon">⏱️</span>
+              <span class="stat-card-value" id="dashTotalTime">0m</span>
+              <span class="stat-card-label">Total Time</span>
+            </div>
+          </div>
+
+          <div class="weekly-chart-section">
+            <h3>This Week's Activity</h3>
+            <div class="weekly-chart" id="weeklyChart"></div>
+          </div>
+
+          <div class="mastery-overview">
+            <h3>Mastery Progress</h3>
+            <div id="masteryBars" class="mastery-bars"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-tab-content" id="tab-progress" hidden>
+          <div class="learning-path">
+            <h3>Learning Path</h3>
+            <p class="path-description">Master each level to unlock the next!</p>
+            <div id="learningPathList" class="path-list"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-tab-content" id="tab-words" hidden>
+          <div class="word-history-section">
+            <div class="history-filters">
+              <button class="filter-btn active" data-filter="all">All Words</button>
+              <button class="filter-btn" data-filter="difficult">Needs Practice</button>
+              <button class="filter-btn" data-filter="mastered">Mastered</button>
+            </div>
+            <div id="wordHistoryList" class="word-history-list"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-tab-content" id="tab-settings" hidden>
+          <div class="parent-settings">
+            <h3>Parental Controls</h3>
+            <div class="setting-row">
+              <label for="sessionTimeLimit">Session Time Limit:</label>
+              <select id="sessionTimeLimit">
+                <option value="0">No limit</option>
+                <option value="10">10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="20">20 minutes</option>
+                <option value="30">30 minutes</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label for="difficultyLock">Lock Difficulty Level:</label>
+              <select id="difficultyLock">
+                <option value="0">Auto-unlock</option>
+                <option value="1">CVC only</option>
+                <option value="2">Up to CCVC</option>
+                <option value="3">Up to Digraphs</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label>
+                <input type="checkbox" id="requireMastery">
+                Require 80% mastery to unlock next level
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
     <dialog id="tutorialModal" class="modal">
       <div class="modal-content">
         <h2>Welcome to Word Spinner!</h2>
