@@ -1567,8 +1567,39 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionWordsCompleted: 0,
     sessionBestStreak: 0,
     // Mastery tracking - words mastered per word type
-    masteredWords: {}
+    masteredWords: {},
+    // Premium features
+    dailyGoal: 10,
+    dailyProgress: 0,
+    dailyStreakDays: 0,
+    lastPracticeDate: null,
+    totalPracticeDays: 0,
+    totalWordsAllTime: 0,
+    totalTimeMinutes: 0,
+    allTimeBestStreak: 0,
+    wordHistory: [],
+    difficultWords: new Set(),
+    weeklyActivity: {},
+    unlockedLevels: ['cvc'],
+    requireMasteryToUnlock: true,
+    sessionTimeLimit: 0,
+    difficultyLock: 0,
+    goalCompletedToday: false
   };
+
+  // Learning path configuration
+  const learningPath = [
+    { id: 'cvc', name: 'CVC Words', icon: '🌟', requiredMastery: 0 },
+    { id: 'ccvc', name: 'CCVC Words', icon: '🚀', requiredMastery: 50 },
+    { id: 'cvcc', name: 'CVCC Words', icon: '🎯', requiredMastery: 50 },
+    { id: 'ccvcc', name: 'CCVCC Words', icon: '💎', requiredMastery: 60 },
+    { id: 'digraphs', name: 'Digraphs', icon: '🔮', requiredMastery: 60 },
+    { id: 'silentE', name: 'Silent E', icon: '✨', requiredMastery: 70 },
+    { id: 'extended', name: 'Extended Words', icon: '🏆', requiredMastery: 70 },
+    { id: 'diphthongs', name: 'Diphthongs', icon: '👑', requiredMastery: 75 },
+    { id: 'softCAndG', name: 'Soft C & G', icon: '🎭', requiredMastery: 75 },
+    { id: 'longVowels', name: 'Long Vowels', icon: '🌈', requiredMastery: 80 }
+  ];
 
   const els = {
     spinButton: document.querySelector('#spinButton'),
@@ -1612,7 +1643,32 @@ document.addEventListener('DOMContentLoaded', () => {
     sessionDetails: document.querySelector('#sessionDetails'),
     sessionWords: document.querySelector('#sessionWords'),
     sessionTime: document.querySelector('#sessionTime'),
-    sessionBestStreak: document.querySelector('#sessionBestStreak')
+    sessionBestStreak: document.querySelector('#sessionBestStreak'),
+    // Premium elements
+    dailyGoalWidget: document.querySelector('#dailyGoalWidget'),
+    goalRingProgress: document.querySelector('#goalRingProgress'),
+    dailyGoalCurrent: document.querySelector('#dailyGoalCurrent'),
+    dailyGoalTarget: document.querySelector('#dailyGoalTarget'),
+    dailyStreakDays: document.querySelector('#dailyStreakDays'),
+    dailyGoalSelect: document.querySelector('#dailyGoalSelect'),
+    goalCompleteCelebration: document.querySelector('#goalCompleteCelebration'),
+    celebrationWordCount: document.querySelector('#celebrationWordCount'),
+    closeCelebration: document.querySelector('#closeCelebration'),
+    difficultWordBanner: document.querySelector('#difficultWordBanner'),
+    parentDashboardButton: document.querySelector('#parentDashboardButton'),
+    parentDashboardModal: document.querySelector('#parentDashboardModal'),
+    closeParentDashboard: document.querySelector('#closeParentDashboard'),
+    dashTotalDays: document.querySelector('#dashTotalDays'),
+    dashTotalWords: document.querySelector('#dashTotalWords'),
+    dashBestStreak: document.querySelector('#dashBestStreak'),
+    dashTotalTime: document.querySelector('#dashTotalTime'),
+    weeklyChart: document.querySelector('#weeklyChart'),
+    masteryBars: document.querySelector('#masteryBars'),
+    learningPathList: document.querySelector('#learningPathList'),
+    wordHistoryList: document.querySelector('#wordHistoryList'),
+    sessionTimeLimit: document.querySelector('#sessionTimeLimit'),
+    difficultyLock: document.querySelector('#difficultyLock'),
+    requireMastery: document.querySelector('#requireMastery')
   };
 
   const wordTypeDescriptions = {
@@ -1878,6 +1934,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStreak();
     updateSessionStats();
     trackMasteredWord(state.currentWord);
+    trackWordCompletion(state.currentWord); // Premium tracking
     setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
   }
 
@@ -2026,11 +2083,16 @@ document.addEventListener('DOMContentLoaded', () => {
       masteredWordsArray[type] = Array.from(words);
     }
 
+    // Calculate session time to add to total
+    const sessionMinutes = Math.floor((Date.now() - state.sessionStartTime) / 60000);
+
     localStorage.setItem('wordSpinnerPrefs', JSON.stringify({
       ...state,
       usedWords: Array.from(state.usedWords),
       badges: Object.fromEntries(state.badges),
-      masteredWords: masteredWordsArray
+      masteredWords: masteredWordsArray,
+      difficultWords: Array.from(state.difficultWords),
+      totalTimeMinutes: state.totalTimeMinutes + sessionMinutes
     }));
   }
 
@@ -2054,8 +2116,28 @@ document.addEventListener('DOMContentLoaded', () => {
       celebrationMode: prefs.celebrationMode || false,
       badges: new Map(Object.entries(prefs.badges || {})),
       usedWords: new Set(prefs.usedWords || []),
-      masteredWords: masteredWords
+      masteredWords: masteredWords,
+      // Premium features
+      dailyGoal: prefs.dailyGoal || 10,
+      dailyProgress: prefs.dailyProgress || 0,
+      dailyStreakDays: prefs.dailyStreakDays || 0,
+      lastPracticeDate: prefs.lastPracticeDate || null,
+      totalPracticeDays: prefs.totalPracticeDays || 0,
+      totalWordsAllTime: prefs.totalWordsAllTime || 0,
+      totalTimeMinutes: prefs.totalTimeMinutes || 0,
+      allTimeBestStreak: prefs.allTimeBestStreak || 0,
+      wordHistory: prefs.wordHistory || [],
+      difficultWords: new Set(prefs.difficultWords || []),
+      weeklyActivity: prefs.weeklyActivity || {},
+      unlockedLevels: prefs.unlockedLevels || ['cvc'],
+      requireMasteryToUnlock: prefs.requireMasteryToUnlock ?? true,
+      sessionTimeLimit: prefs.sessionTimeLimit || 0,
+      difficultyLock: prefs.difficultyLock || 0,
+      goalCompletedToday: prefs.goalCompletedToday || false
     });
+
+    // Check if it's a new day and update streak
+    updateDailyStreak();
 
     document.body.dataset.theme = state.theme;
     els.wordTypeSelector.value = state.wordType;
@@ -2065,6 +2147,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAudioButton();
     els.celebrationModeCheckbox.checked = state.celebrationMode;
     updateWordTypeDesc();
+    updateDailyGoalUI();
+
+    // Update daily goal selector
+    if (els.dailyGoalSelect) {
+      els.dailyGoalSelect.value = state.dailyGoal;
+    }
   }
 
   function updateAudioButton() {
@@ -2244,12 +2332,363 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function skip() {
     if (!state.currentWord) return;
+    // Track as difficult word when skipped
+    state.difficultWords.add(state.currentWord.toLowerCase());
     resetStreak();
     els.skipButton.hidden = true;
     els.hintButton.hidden = true;
     els.repeatButton.disabled = true;
     showPlaceholder();
     announce('Word skipped. Press Spin for a new word.');
+    savePreferences();
+  }
+
+  // ============================================
+  // PREMIUM FEATURES
+  // ============================================
+
+  function getTodayString() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function updateDailyGoalUI() {
+    if (!els.dailyGoalCurrent) return;
+
+    els.dailyGoalCurrent.textContent = state.dailyProgress;
+    els.dailyGoalTarget.textContent = state.dailyGoal;
+    els.dailyStreakDays.textContent = `🔥 ${state.dailyStreakDays} day${state.dailyStreakDays !== 1 ? 's' : ''} streak`;
+
+    // Update progress ring
+    const circumference = 2 * Math.PI * 45; // r=45
+    const progress = Math.min(state.dailyProgress / state.dailyGoal, 1);
+    const offset = circumference * (1 - progress);
+
+    if (els.goalRingProgress) {
+      els.goalRingProgress.style.strokeDasharray = circumference;
+      els.goalRingProgress.style.strokeDashoffset = offset;
+      els.goalRingProgress.style.stroke = progress >= 1 ? '#00b894' : '#e94560';
+    }
+  }
+
+  function checkDailyGoalComplete() {
+    if (state.dailyProgress >= state.dailyGoal && !state.goalCompletedToday) {
+      state.goalCompletedToday = true;
+      showDailyGoalCelebration();
+      savePreferences();
+    }
+  }
+
+  function showDailyGoalCelebration() {
+    if (!els.goalCompleteCelebration) return;
+
+    els.celebrationWordCount.textContent = state.dailyGoal;
+    els.goalCompleteCelebration.hidden = false;
+
+    // Launch extra confetti
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => launchFireworks(), i * 200);
+    }
+
+    if (state.soundsEnabled) {
+      speakWord('Congratulations! You completed your daily goal!');
+    }
+  }
+
+  function updateDailyStreak() {
+    const today = getTodayString();
+
+    if (state.lastPracticeDate !== today) {
+      // Check if yesterday was practiced for streak
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayString = yesterday.toISOString().split('T')[0];
+
+      if (state.lastPracticeDate === yesterdayString) {
+        state.dailyStreakDays++;
+      } else if (state.lastPracticeDate !== today) {
+        state.dailyStreakDays = 1;
+      }
+
+      state.lastPracticeDate = today;
+      state.totalPracticeDays++;
+      state.dailyProgress = 0;
+      state.goalCompletedToday = false;
+    }
+  }
+
+  function trackWordCompletion(word) {
+    const today = getTodayString();
+
+    // Update daily progress
+    state.dailyProgress++;
+    state.totalWordsAllTime++;
+
+    // Update weekly activity
+    state.weeklyActivity[today] = (state.weeklyActivity[today] || 0) + 1;
+
+    // Add to word history
+    const existingIndex = state.wordHistory.findIndex(h => h.word === word.toLowerCase());
+    if (existingIndex >= 0) {
+      state.wordHistory[existingIndex].attempts++;
+      state.wordHistory[existingIndex].lastPracticed = today;
+    } else {
+      state.wordHistory.push({
+        word: word.toLowerCase(),
+        type: state.wordType,
+        firstPracticed: today,
+        lastPracticed: today,
+        attempts: 1,
+        mastered: false
+      });
+    }
+
+    // Remove from difficult words if practiced successfully
+    if (state.difficultWords.has(word.toLowerCase())) {
+      const historyItem = state.wordHistory.find(h => h.word === word.toLowerCase());
+      if (historyItem && historyItem.attempts >= 3) {
+        state.difficultWords.delete(word.toLowerCase());
+      }
+    }
+
+    // Update all-time best streak
+    if (state.streak > state.allTimeBestStreak) {
+      state.allTimeBestStreak = state.streak;
+    }
+
+    updateDailyGoalUI();
+    checkDailyGoalComplete();
+    checkLevelUnlocks();
+    savePreferences();
+  }
+
+  function checkLevelUnlocks() {
+    if (!state.requireMasteryToUnlock) return;
+
+    for (let i = 0; i < learningPath.length; i++) {
+      const level = learningPath[i];
+
+      if (state.unlockedLevels.includes(level.id)) continue;
+
+      // Check if previous level has required mastery
+      if (i > 0) {
+        const prevLevel = learningPath[i - 1];
+        const prevMastery = getMasteryPercentage(prevLevel.id);
+
+        if (prevMastery >= level.requiredMastery) {
+          state.unlockedLevels.push(level.id);
+          announceUnlock(level);
+        }
+      }
+    }
+  }
+
+  function announceUnlock(level) {
+    if (state.soundsEnabled) {
+      speakWord(`New level unlocked: ${level.name}!`);
+    }
+
+    // Show unlock notification
+    const notification = document.createElement('div');
+    notification.className = 'milestone-notification';
+    notification.innerHTML = `<span class="milestone-icon">${level.icon}</span><span>Unlocked: ${level.name}!</span>`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 500);
+    }, 3000);
+
+    launchFireworks();
+  }
+
+  function isLevelUnlocked(levelId) {
+    if (state.difficultyLock > 0) {
+      const levelIndex = learningPath.findIndex(l => l.id === levelId);
+      return levelIndex < state.difficultyLock;
+    }
+    return state.unlockedLevels.includes(levelId);
+  }
+
+  // Parent Dashboard Functions
+  function openParentDashboard() {
+    if (!els.parentDashboardModal) return;
+
+    updateDashboardStats();
+    renderWeeklyChart();
+    renderMasteryBars();
+    renderLearningPath();
+    renderWordHistory('all');
+
+    els.parentDashboardModal.showModal();
+  }
+
+  function updateDashboardStats() {
+    if (els.dashTotalDays) els.dashTotalDays.textContent = state.totalPracticeDays;
+    if (els.dashTotalWords) els.dashTotalWords.textContent = state.totalWordsAllTime;
+    if (els.dashBestStreak) els.dashBestStreak.textContent = state.allTimeBestStreak;
+
+    // Calculate total time
+    const sessionMinutes = Math.floor((Date.now() - state.sessionStartTime) / 60000);
+    const totalMins = state.totalTimeMinutes + sessionMinutes;
+    if (els.dashTotalTime) {
+      els.dashTotalTime.textContent = totalMins >= 60
+        ? `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`
+        : `${totalMins}m`;
+    }
+  }
+
+  function renderWeeklyChart() {
+    if (!els.weeklyChart) return;
+
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const today = new Date();
+    let maxWords = 1;
+    const weekData = [];
+
+    // Get last 7 days data
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const words = state.weeklyActivity[dateStr] || 0;
+      weekData.push({ day: days[date.getDay()], words, isToday: i === 0 });
+      if (words > maxWords) maxWords = words;
+    }
+
+    els.weeklyChart.innerHTML = weekData.map(d => `
+      <div class="chart-day">
+        <div class="chart-bar" style="height: ${(d.words / maxWords) * 80}px"></div>
+        <span class="chart-label">${d.day}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderMasteryBars() {
+    if (!els.masteryBars) return;
+
+    const types = ['cvc', 'ccvc', 'cvcc', 'digraphs', 'silentE', 'longVowels'];
+    const labels = { cvc: 'CVC', ccvc: 'CCVC', cvcc: 'CVCC', digraphs: 'Digraphs', silentE: 'Silent E', longVowels: 'Long Vowels' };
+
+    els.masteryBars.innerHTML = types.map(type => {
+      const percent = getMasteryPercentage(type);
+      return `
+        <div class="mastery-bar-item">
+          <span class="mastery-bar-label">${labels[type]}</span>
+          <div class="mastery-bar-track">
+            <div class="mastery-bar-fill" style="width: ${percent}%"></div>
+          </div>
+          <span class="mastery-bar-percent">${percent}%</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderLearningPath() {
+    if (!els.learningPathList) return;
+
+    els.learningPathList.innerHTML = learningPath.map((level, index) => {
+      const mastery = getMasteryPercentage(level.id);
+      const isUnlocked = isLevelUnlocked(level.id);
+      const isCurrent = state.wordType === level.id;
+      const isComplete = mastery >= 80;
+
+      let status, statusClass;
+      if (isComplete) {
+        status = '✓ Mastered';
+        statusClass = 'complete';
+      } else if (isUnlocked) {
+        status = `${mastery}% complete`;
+        statusClass = '';
+      } else {
+        status = `🔒 Unlock at ${level.requiredMastery}%`;
+        statusClass = 'locked';
+      }
+
+      const itemClass = `path-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}`;
+
+      return `
+        <div class="${itemClass}" data-level="${level.id}">
+          <span class="path-icon">${level.icon}</span>
+          <div class="path-info">
+            <span class="path-name">${level.name}</span>
+            <span class="path-status ${statusClass}">${status}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderWordHistory(filter) {
+    if (!els.wordHistoryList) return;
+
+    let words = [...state.wordHistory].reverse();
+
+    if (filter === 'difficult') {
+      words = words.filter(w => state.difficultWords.has(w.word));
+    } else if (filter === 'mastered') {
+      words = words.filter(w => w.attempts >= 5);
+    }
+
+    if (words.length === 0) {
+      els.wordHistoryList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No words yet. Start practicing!</p>';
+      return;
+    }
+
+    els.wordHistoryList.innerHTML = words.slice(0, 50).map(w => {
+      const isDifficult = state.difficultWords.has(w.word);
+      const isMastered = w.attempts >= 5;
+      const status = isDifficult ? '⚠️' : (isMastered ? '⭐' : '📝');
+
+      return `
+        <div class="history-item">
+          <span class="history-word">${w.word}</span>
+          <div class="history-meta">
+            <span class="history-type">${w.type.toUpperCase()}</span>
+            <span class="history-status">${status}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function initDashboardTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.dashboard-tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        tabContents.forEach(content => {
+          content.hidden = content.id !== `tab-${tabId}`;
+        });
+      });
+    });
+
+    // Filter buttons
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderWordHistory(btn.dataset.filter);
+      });
+    });
+  }
+
+  function updateWordTypeSelector() {
+    // Disable locked word types in selector
+    const options = els.wordTypeSelector.querySelectorAll('option');
+    options.forEach(opt => {
+      const isUnlocked = isLevelUnlocked(opt.value);
+      opt.disabled = !isUnlocked;
+      if (!isUnlocked) {
+        opt.textContent = opt.textContent.replace(' 🔒', '') + ' 🔒';
+      }
+    });
   }
 
   // Event listeners
@@ -2342,14 +2781,76 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   els.resetProgressButton.addEventListener('click', () => {
-    if (confirm('Reset all progress? This will clear your score, badges, and word history.')) {
+    if (confirm('Reset all progress? This will clear your score, badges, word history, and daily goals.')) {
       state.badges.clear();
+      state.wordHistory = [];
+      state.difficultWords.clear();
+      state.weeklyActivity = {};
+      state.totalWordsAllTime = 0;
+      state.totalPracticeDays = 0;
+      state.totalTimeMinutes = 0;
+      state.allTimeBestStreak = 0;
+      state.dailyProgress = 0;
+      state.dailyStreakDays = 0;
+      state.unlockedLevels = ['cvc'];
       resetStreak();
       resetGame();
       updateBadges();
+      updateDailyGoalUI();
+      savePreferences();
       announce('Progress has been reset');
     }
   });
+
+  // Premium feature event listeners
+  if (els.parentDashboardButton) {
+    els.parentDashboardButton.addEventListener('click', openParentDashboard);
+  }
+
+  if (els.closeParentDashboard) {
+    els.closeParentDashboard.addEventListener('click', () => {
+      els.parentDashboardModal.close();
+    });
+  }
+
+  if (els.closeCelebration) {
+    els.closeCelebration.addEventListener('click', () => {
+      els.goalCompleteCelebration.hidden = true;
+    });
+  }
+
+  if (els.dailyGoalSelect) {
+    els.dailyGoalSelect.addEventListener('change', () => {
+      state.dailyGoal = parseInt(els.dailyGoalSelect.value);
+      updateDailyGoalUI();
+      savePreferences();
+    });
+  }
+
+  if (els.sessionTimeLimit) {
+    els.sessionTimeLimit.addEventListener('change', () => {
+      state.sessionTimeLimit = parseInt(els.sessionTimeLimit.value);
+      savePreferences();
+    });
+  }
+
+  if (els.difficultyLock) {
+    els.difficultyLock.addEventListener('change', () => {
+      state.difficultyLock = parseInt(els.difficultyLock.value);
+      updateWordTypeSelector();
+      savePreferences();
+    });
+  }
+
+  if (els.requireMastery) {
+    els.requireMastery.addEventListener('change', () => {
+      state.requireMasteryToUnlock = els.requireMastery.checked;
+      savePreferences();
+    });
+  }
+
+  // Initialize dashboard tabs
+  initDashboardTabs();
 
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
