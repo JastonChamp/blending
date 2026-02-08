@@ -26,6 +26,26 @@
             <span id="streakCount">0</span> in a row!
           </div>
         </div>
+
+        <!-- Daily Goal Progress Ring -->
+        <div id="dailyGoalWidget" class="daily-goal-widget">
+          <div class="goal-ring-container">
+            <svg class="goal-ring" viewBox="0 0 100 100">
+              <circle class="goal-ring-bg" cx="50" cy="50" r="45"/>
+              <circle class="goal-ring-progress" id="goalRingProgress" cx="50" cy="50" r="45"/>
+            </svg>
+            <div class="goal-ring-content">
+              <span id="dailyGoalCurrent" class="goal-current">0</span>
+              <span class="goal-separator">/</span>
+              <span id="dailyGoalTarget" class="goal-target">10</span>
+            </div>
+          </div>
+          <div class="goal-info">
+            <span class="goal-label">Daily Goal</span>
+            <span id="dailyStreakDays" class="daily-streak">🔥 0 day streak</span>
+          </div>
+        </div>
+
         <div id="sessionSummary" class="session-summary" aria-label="Session statistics">
           <button id="toggleSessionSummary" class="session-toggle" aria-expanded="false">📊 Session</button>
           <div id="sessionDetails" class="session-details" hidden>
