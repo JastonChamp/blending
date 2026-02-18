@@ -1557,6 +1557,151 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
+  // ============================================================
+  // XP LEVEL SYSTEM
+  // ============================================================
+  const XP_LEVELS = [
+    { level: 1,  name: 'Phonics Rookie',    xpRequired: 0   },
+    { level: 2,  name: 'Sound Explorer',    xpRequired: 100 },
+    { level: 3,  name: 'Blending Beginner', xpRequired: 250 },
+    { level: 4,  name: 'Phonics Pal',       xpRequired: 500 },
+    { level: 5,  name: 'Blend Star',        xpRequired: 900 },
+    { level: 6,  name: 'Segment Hero',      xpRequired: 1400 },
+    { level: 7,  name: 'Word Wizard',       xpRequired: 2100 },
+    { level: 8,  name: 'Phonics Champion',  xpRequired: 3000 },
+    { level: 9,  name: 'Super Blender',     xpRequired: 4200 },
+    { level: 10, name: 'Phonics Master',    xpRequired: 6000 }
+  ];
+
+  const XP_REWARDS = {
+    blend_correct: 15,
+    blend_wrong: 3,
+    hear_choose_correct: 20,
+    hear_choose_wrong: 0,
+    segment_correct: 25,
+    segment_wrong: 0,
+    missing_correct: 20,
+    missing_wrong: 0,
+    first_sound_correct: 20,
+    first_sound_wrong: 0,
+    lesson_complete_3star: 50,
+    lesson_complete_2star: 30,
+    lesson_complete_1star: 15,
+    streak_bonus_5: 10,
+    streak_bonus_10: 25
+  };
+
+  // ============================================================
+  // PHONICS SOUND GROUPS (Jolly Phonics Style)
+  // ============================================================
+  const phonicsGroups = [
+    {
+      id: 'group1', name: 'Group 1', icon: '🌟', color: '#FF6B6B',
+      sounds: ['s', 'a', 't', 'p', 'i', 'n'],
+      description: 'The first sounds: s, a, t, p, i, n',
+      keywords: { s: 'snake', a: 'ant', t: 'top', p: 'pan', i: 'in', n: 'net' },
+      actions: {
+        s: 'Weave hand like a snake saying ssss',
+        a: 'Wiggle fingers by cheek like an ant',
+        t: 'Turn head side to side saying t-t-t',
+        p: 'Blow out like a puff of air',
+        i: 'Tap index finger on palm saying i-i-i',
+        n: 'Hold nose and say nnn'
+      },
+      wordTypes: ['cvc']
+    },
+    {
+      id: 'group2', name: 'Group 2', icon: '🚀', color: '#4ECDC4',
+      sounds: ['e', 'h', 'r', 'm', 'd'],
+      description: 'More letters: e, h, r, m, d',
+      keywords: { e: 'egg', h: 'hat', r: 'run', m: 'map', d: 'dog' },
+      actions: {
+        e: 'Tap egg on side of pan saying eh',
+        h: 'Pant like you are out of breath',
+        r: 'Pretend to be a robot saying rrr',
+        m: 'Rub tummy saying mmmm',
+        d: 'Beat a drum saying d-d-d'
+      },
+      wordTypes: ['cvc']
+    },
+    {
+      id: 'group3', name: 'Group 3', icon: '🎯', color: '#45B7D1',
+      sounds: ['g', 'o', 'u', 'l', 'f', 'b'],
+      description: 'Next group: g, o, u, l, f, b',
+      keywords: { g: 'got', o: 'on', u: 'up', l: 'leg', f: 'fan', b: 'bat' },
+      actions: {
+        g: 'Spiral hand down like water going down a drain',
+        o: 'Pretend to turn on a light saying o-o-o',
+        u: 'Pretend fingers are an umbrella opening',
+        l: 'Lick an imaginary lollipop saying lll',
+        f: 'Let hands gently fall saying fff',
+        b: 'Hit a ball saying b-b-b'
+      },
+      wordTypes: ['cvc']
+    },
+    {
+      id: 'group4', name: 'Group 4', icon: '💎', color: '#96CEB4',
+      sounds: ['ai', 'j', 'oa', 'ie', 'ee', 'or'],
+      description: 'Vowel digraphs: ai, j, oa, ie, ee, or',
+      keywords: { ai: 'rain', j: 'jam', oa: 'goat', ie: 'pie', ee: 'feet', or: 'fork' },
+      actions: {
+        ai: 'Cup hand to ear as if hearing rain',
+        j: 'Pretend to wobble like jelly',
+        oa: 'Cup hands around mouth like megaphone',
+        ie: 'Point to eye then pat knee saying i-e',
+        ee: 'Stretch arms out wide saying eeee',
+        or: 'Open and close hands like a crab'
+      },
+      wordTypes: ['diphthongs', 'longVowels']
+    },
+    {
+      id: 'group5', name: 'Group 5', icon: '🔮', color: '#FFEAA7',
+      sounds: ['sh', 'ch', 'th', 'ng'],
+      description: 'Digraphs: sh, ch, th, ng',
+      keywords: { sh: 'ship', ch: 'chip', th: 'thin', ng: 'ring' },
+      actions: {
+        sh: 'Finger over lips saying shhh',
+        ch: 'Pretend to be a train saying ch-ch-ch',
+        th: 'Put tongue between teeth',
+        ng: 'Arms out like a weight lifter saying ng'
+      },
+      wordTypes: ['digraphs']
+    },
+    {
+      id: 'group6', name: 'Group 6', icon: '✨', color: '#DDA0DD',
+      sounds: ['oo', 'ar', 'ow', 'oi', 'er', 'air'],
+      description: 'Special vowels: oo, ar, ow, oi, er, air',
+      keywords: { oo: 'moon', ar: 'car', ow: 'cow', oi: 'oil', er: 'fern', air: 'hair' },
+      actions: {
+        oo: 'Point to moon saying ooo',
+        ar: 'Open mouth wide like at the dentist',
+        ow: 'Pretend to be hurt saying ow!',
+        oi: 'Point finger saying oi!',
+        er: 'Shrug shoulders saying er...',
+        air: 'Sway arms like wind saying aaiirr'
+      },
+      wordTypes: ['diphthongs']
+    },
+    {
+      id: 'group7', name: 'Group 7', icon: '🏆', color: '#F0E68C',
+      sounds: ['magic-e'],
+      description: 'Magic E makes the vowel say its name!',
+      keywords: { 'magic-e': 'cake, kite, home, tune, Pete' },
+      actions: {
+        'magic-e': 'Flick fingers like magic saying e-e-e!'
+      },
+      wordTypes: ['silentE']
+    },
+    {
+      id: 'group8', name: 'Group 8', icon: '👑', color: '#87CEEB',
+      sounds: ['cc/ck', 'bl', 'cl', 'fl', 'gl', 'pl', 'sl'],
+      description: 'Consonant blends at the start',
+      keywords: { 'bl': 'black', 'cl': 'clap', 'fl': 'flag', 'gl': 'glad', 'pl': 'plan', 'sl': 'slip' },
+      actions: { 'bl': 'Blend bl together quickly' },
+      wordTypes: ['ccvc', 'cvcc']
+    }
+  ];
+
   const state = {
     score: 0, revealedWords: 0, totalWords: 0, usedWords: new Set(),
     currentWord: '', blendingTime: 3000, soundsEnabled: true,
@@ -1584,7 +1729,30 @@ document.addEventListener('DOMContentLoaded', () => {
     requireMasteryToUnlock: true,
     sessionTimeLimit: 0,
     difficultyLock: 0,
-    goalCompletedToday: false
+    goalCompletedToday: false,
+    // === NEW: XP & Hearts system ===
+    xp: 0,
+    xpLevel: 1,
+    hearts: 5,
+    maxHearts: 5,
+    lastHeartRegenTime: Date.now(),
+    // === NEW: Exercise mode ===
+    exerciseMode: 'blend',
+    // === NEW: Active lesson ===
+    inLesson: false,
+    lessonWordType: 'cvc',
+    lessonExercises: [],
+    lessonCurrentIndex: 0,
+    lessonMistakes: 0,
+    lessonCorrect: 0,
+    lessonXPEarned: 0,
+    // === NEW: Lesson stars per word type ===
+    lessonStars: {},
+    // === NEW: current phonics group ===
+    currentGroupId: null,
+    // === NEW: Segmenting state ===
+    segmentTapped: [],
+    segmentUnits: []
   };
 
   // Learning path configuration
@@ -1668,7 +1836,82 @@ document.addEventListener('DOMContentLoaded', () => {
     wordHistoryList: document.querySelector('#wordHistoryList'),
     sessionTimeLimit: document.querySelector('#sessionTimeLimit'),
     difficultyLock: document.querySelector('#difficultyLock'),
-    requireMastery: document.querySelector('#requireMastery')
+    requireMastery: document.querySelector('#requireMastery'),
+    // === NEW elements ===
+    xpBarFill: document.querySelector('#xpBarFill'),
+    xpLabel: document.querySelector('#xpLabel'),
+    xpLevelBadge: document.querySelector('#xpLevelBadge'),
+    levelName: document.querySelector('#levelName'),
+    heartsDisplay: document.querySelector('#heartsDisplay'),
+    headerStreakDays: document.querySelector('#headerStreakDays'),
+    xpPop: document.querySelector('#xpPop'),
+    heartLostBanner: document.querySelector('#heartLostBanner'),
+    heartLostText: document.querySelector('#heartLostText'),
+    mascotSpeech: document.querySelector('#mascotSpeech'),
+    mascotChar: document.querySelector('#mascotChar'),
+    // Exercise mode buttons
+    exModeButtons: document.querySelectorAll('.ex-mode-btn'),
+    blendActionButtons: document.querySelector('#blendActionButtons'),
+    selfAssessButtons: document.querySelector('#selfAssessButtons'),
+    assessYes: document.querySelector('#assessYes'),
+    assessNo: document.querySelector('#assessNo'),
+    answerFeedback: document.querySelector('#answerFeedback'),
+    feedbackIcon: document.querySelector('#feedbackIcon'),
+    feedbackText: document.querySelector('#feedbackText'),
+    // Hear & Choose
+    exerciseHearChoose: document.querySelector('#exerciseHearChoose'),
+    playWordBtn: document.querySelector('#playWordBtn'),
+    hearChooseOptions: document.querySelector('#hearChooseOptions'),
+    // Segment
+    exerciseSegment: document.querySelector('#exerciseSegment'),
+    segmentBoxes: document.querySelector('#segmentBoxes'),
+    segmentCheckBtn: document.querySelector('#segmentCheckBtn'),
+    // Missing
+    exerciseMissing: document.querySelector('#exerciseMissing'),
+    missingWordDisplay: document.querySelector('#missingWordDisplay'),
+    missingOptions: document.querySelector('#missingOptions'),
+    // First Sound
+    exerciseFirstSound: document.querySelector('#exerciseFirstSound'),
+    firstSoundWord: document.querySelector('#firstSoundWord'),
+    playFirstSoundBtn: document.querySelector('#playFirstSoundBtn'),
+    firstSoundOptions: document.querySelector('#firstSoundOptions'),
+    // Mode tabs
+    modeTabs: document.querySelectorAll('.mode-tab'),
+    panelFreePlay: document.querySelector('#panelFreePlay'),
+    panelLesson: document.querySelector('#panelLesson'),
+    panelGroups: document.querySelector('#panelGroups'),
+    // Lesson
+    lessonInProgress: document.querySelector('#lessonInProgress'),
+    lessonChooser: document.querySelector('#lessonChooser'),
+    lessonList: document.querySelector('#lessonList'),
+    lessonProgressDots: document.querySelector('#lessonProgressDots'),
+    lessonHearts: document.querySelector('#lessonHearts'),
+    lessonBackBtn: document.querySelector('#lessonBackBtn'),
+    lessonExLabel: document.querySelector('#lessonExLabel'),
+    lessonWordBox: document.querySelector('#lessonWordBox'),
+    lessonExerciseUI: document.querySelector('#lessonExerciseUI'),
+    lessonFeedback: document.querySelector('#lessonFeedback'),
+    lessonFeedbackIcon: document.querySelector('#lessonFeedbackIcon'),
+    lessonFeedbackText: document.querySelector('#lessonFeedbackText'),
+    // Lesson complete
+    lessonCompleteModal: document.querySelector('#lessonCompleteModal'),
+    lcStar1: document.querySelector('#lcStar1'),
+    lcStar2: document.querySelector('#lcStar2'),
+    lcStar3: document.querySelector('#lcStar3'),
+    lcCorrect: document.querySelector('#lcCorrect'),
+    lcXPEarned: document.querySelector('#lcXPEarned'),
+    lcHeartsLeft: document.querySelector('#lcHeartsLeft'),
+    lcContinueBtn: document.querySelector('#lcContinueBtn'),
+    // Level up
+    levelUpModal: document.querySelector('#levelUpModal'),
+    luLevelName: document.querySelector('#luLevelName'),
+    luCloseBtn: document.querySelector('#luCloseBtn'),
+    // Phonics groups
+    phonicsGroupsGrid: document.querySelector('#phonicsGroupsGrid'),
+    groupDetail: document.querySelector('#groupDetail'),
+    groupDetailContent: document.querySelector('#groupDetailContent'),
+    groupBackBtn: document.querySelector('#groupBackBtn'),
+    practiceGroupBtn: document.querySelector('#practiceGroupBtn')
   };
 
   const wordTypeDescriptions = {
@@ -1929,13 +2172,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const compliment = compliments[Math.floor(Math.random() * compliments.length)];
     els.complimentBox.textContent = compliment;
     els.complimentBox.classList.add('show');
-    if (state.soundsEnabled) speakWord(compliment);
     state.celebrationMode ? launchFireworks() : launchConfetti();
     updateStreak();
     updateSessionStats();
     trackMasteredWord(state.currentWord);
-    trackWordCompletion(state.currentWord); // Premium tracking
+    trackWordCompletion(state.currentWord);
+    // XP & mascot
+    awardXP(XP_REWARDS.blend_correct);
+    setMascotState(state.streak >= 5 ? 'excited' : 'happy');
+    // Streak XP bonuses
+    if (state.streak === 5) awardXP(XP_REWARDS.streak_bonus_5);
+    if (state.streak === 10) awardXP(XP_REWARDS.streak_bonus_10);
+    // Update header daily streak
+    if (els.headerStreakDays) els.headerStreakDays.textContent = state.dailyStreakDays;
     setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
+    // Show self-assessment after blend mode
+    if (state.exerciseMode === 'blend' && !state.inLesson) {
+      setTimeout(() => {
+        if (els.selfAssessButtons) els.selfAssessButtons.hidden = false;
+      }, 2200);
+    }
   }
 
   // ✅ PARSER — now supports -igh / -eigh with silent GH,
@@ -2092,7 +2348,13 @@ document.addEventListener('DOMContentLoaded', () => {
       badges: Object.fromEntries(state.badges),
       masteredWords: masteredWordsArray,
       difficultWords: Array.from(state.difficultWords),
-      totalTimeMinutes: state.totalTimeMinutes + sessionMinutes
+      totalTimeMinutes: state.totalTimeMinutes + sessionMinutes,
+      // New fields
+      xp: state.xp,
+      xpLevel: state.xpLevel,
+      hearts: state.hearts,
+      lastHeartRegenTime: state.lastHeartRegenTime,
+      lessonStars: state.lessonStars
     }));
   }
 
@@ -2133,7 +2395,13 @@ document.addEventListener('DOMContentLoaded', () => {
       requireMasteryToUnlock: prefs.requireMasteryToUnlock ?? true,
       sessionTimeLimit: prefs.sessionTimeLimit || 0,
       difficultyLock: prefs.difficultyLock || 0,
-      goalCompletedToday: prefs.goalCompletedToday || false
+      goalCompletedToday: prefs.goalCompletedToday || false,
+      // New: XP & Hearts
+      xp: prefs.xp || 0,
+      xpLevel: prefs.xpLevel || 1,
+      hearts: prefs.hearts ?? 5,
+      lastHeartRegenTime: prefs.lastHeartRegenTime || Date.now(),
+      lessonStars: prefs.lessonStars || {}
     });
 
     // Check if it's a new day and update streak
@@ -2148,6 +2416,9 @@ document.addEventListener('DOMContentLoaded', () => {
     els.celebrationModeCheckbox.checked = state.celebrationMode;
     updateWordTypeDesc();
     updateDailyGoalUI();
+    updateXPBar();
+    updateHeartsUI();
+    if (els.headerStreakDays) els.headerStreakDays.textContent = state.dailyStreakDays;
 
     // Update daily goal selector
     if (els.dailyGoalSelect) {
@@ -2294,6 +2565,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function spin() {
     els.spinButton.disabled = true;
+    if (els.selfAssessButtons) els.selfAssessButtons.hidden = true;
     state.currentWord = getRandomWord();
     await revealWord(state.currentWord);
     els.spinButton.disabled = false;
@@ -2691,6 +2963,1093 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ============================================================
+  // XP & LEVEL SYSTEM
+  // ============================================================
+  function getLevelInfo(xp) {
+    let currentLevel = XP_LEVELS[0];
+    for (const lvl of XP_LEVELS) {
+      if (xp >= lvl.xpRequired) currentLevel = lvl;
+      else break;
+    }
+    const nextLevel = XP_LEVELS.find(l => l.level === currentLevel.level + 1);
+    const xpIntoLevel = xp - currentLevel.xpRequired;
+    const xpForLevel = nextLevel ? nextLevel.xpRequired - currentLevel.xpRequired : 999;
+    return { currentLevel, nextLevel, xpIntoLevel, xpForLevel };
+  }
+
+  function updateXPBar() {
+    const { currentLevel, xpIntoLevel, xpForLevel, nextLevel } = getLevelInfo(state.xp);
+    const pct = Math.min((xpIntoLevel / xpForLevel) * 100, 100);
+    if (els.xpBarFill) els.xpBarFill.style.width = `${pct}%`;
+    if (els.xpLabel) els.xpLabel.textContent = nextLevel ? `${state.xp} / ${nextLevel.xpRequired} XP` : `${state.xp} XP (Max!)`;
+    if (els.xpLevelBadge) els.xpLevelBadge.textContent = `Lv ${currentLevel.level}`;
+    if (els.levelName) els.levelName.textContent = currentLevel.name;
+  }
+
+  function awardXP(amount, label) {
+    if (amount <= 0) return;
+    const oldLevel = getLevelInfo(state.xp).currentLevel.level;
+    state.xp += amount;
+    const newInfo = getLevelInfo(state.xp);
+    updateXPBar();
+    showXPPop(`+${amount} XP`);
+    if (newInfo.currentLevel.level > oldLevel) {
+      showLevelUp(newInfo.currentLevel.name);
+    }
+    savePreferences();
+  }
+
+  function showXPPop(text) {
+    if (!els.xpPop) return;
+    els.xpPop.textContent = text;
+    els.xpPop.classList.add('show');
+    setTimeout(() => els.xpPop.classList.remove('show'), 1200);
+  }
+
+  function showLevelUp(levelName) {
+    if (!els.levelUpModal) return;
+    els.luLevelName.textContent = levelName;
+    els.levelUpModal.hidden = false;
+    launchFireworks();
+    if (state.soundsEnabled) speakWord(`Level up! You are now a ${levelName}!`);
+  }
+
+  // ============================================================
+  // HEARTS SYSTEM
+  // ============================================================
+  function updateHeartsUI() {
+    if (!els.heartsDisplay) return;
+    const hearts = els.heartsDisplay.querySelectorAll('.heart-icon');
+    hearts.forEach((h, i) => {
+      const heartNum = i + 1;
+      if (heartNum <= state.hearts) {
+        h.classList.add('active');
+        h.textContent = '❤️';
+      } else {
+        h.classList.remove('active');
+        h.textContent = '🖤';
+      }
+    });
+  }
+
+  function loseHeart(msg) {
+    if (state.hearts > 0) state.hearts--;
+    updateHeartsUI();
+    showHeartLost(msg);
+    // Bounce mascot sadly
+    setMascotState('sad');
+  }
+
+  function gainHeart() {
+    if (state.hearts < state.maxHearts) {
+      state.hearts++;
+      updateHeartsUI();
+    }
+  }
+
+  function showHeartLost(msg) {
+    if (!els.heartLostBanner) return;
+    if (els.heartLostText) els.heartLostText.textContent = msg || 'Oops! –1 Heart';
+    els.heartLostBanner.hidden = false;
+    setTimeout(() => { els.heartLostBanner.hidden = true; }, 2000);
+  }
+
+  // Regen 1 heart every 20 minutes (up to max)
+  function tickHeartRegen() {
+    const now = Date.now();
+    const elapsed = now - state.lastHeartRegenTime;
+    const interval = 20 * 60 * 1000; // 20 min
+    if (state.hearts < state.maxHearts && elapsed >= interval) {
+      gainHeart();
+      state.lastHeartRegenTime = now;
+      savePreferences();
+    }
+  }
+  setInterval(tickHeartRegen, 60000); // check every minute
+
+  // ============================================================
+  // MASCOT
+  // ============================================================
+  const mascotMessages = {
+    happy: ["Great job! 🎉", "Brilliant! ⭐", "You're amazing! 🌟", "Super blending! 🦜", "Fantastic! 🎊", "Keep it up! 💪"],
+    encouraging: ["Nearly there! 💛", "Try again! 🔄", "You can do it! 💪", "Don't give up! 🌈", "Almost! Keep going! ✨"],
+    excited: ["WOW! 🎆", "INCREDIBLE! 🎇", "PERFECT! 🏆", "Streak! 🔥", "Amazing phonics! ⚡"],
+    sad: ["Oops! Try again 💙", "Hmm, let's try again 🤔", "Nearly! 💛"],
+    greeting: ["Hi! Ready to blend? 🦜", "Let's learn phonics! 📚", "Press Spin to start! 🎡"]
+  };
+
+  function setMascotState(mood) {
+    if (!els.mascotChar) return;
+    els.mascotChar.dataset.mood = mood;
+    const msgs = mascotMessages[mood] || mascotMessages.happy;
+    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    showMascotSpeech(msg);
+  }
+
+  function showMascotSpeech(text) {
+    if (!els.mascotSpeech) return;
+    els.mascotSpeech.textContent = text;
+    els.mascotSpeech.classList.add('visible');
+    clearTimeout(els.mascotSpeech._hideTimer);
+    els.mascotSpeech._hideTimer = setTimeout(() => {
+      els.mascotSpeech.classList.remove('visible');
+    }, 2500);
+  }
+
+  // ============================================================
+  // ANSWER FEEDBACK
+  // ============================================================
+  function showFeedback(correct, correctText, container) {
+    const fb = container === 'lesson' ? els.lessonFeedback : els.answerFeedback;
+    const icon = container === 'lesson' ? els.lessonFeedbackIcon : els.feedbackIcon;
+    const text = container === 'lesson' ? els.lessonFeedbackText : els.feedbackText;
+    if (!fb) return;
+    fb.hidden = false;
+    fb.className = `answer-feedback ${correct ? 'correct' : 'wrong'}`;
+    icon.textContent = correct ? '✅' : '❌';
+    text.textContent = correctText || (correct ? 'Correct! Great job!' : 'Not quite – let\'s keep practising!');
+    clearTimeout(fb._hideTimer);
+    fb._hideTimer = setTimeout(() => { fb.hidden = true; }, 1800);
+  }
+
+  // ============================================================
+  // EXERCISE MODE SYSTEM
+  // ============================================================
+  function setExerciseMode(mode) {
+    state.exerciseMode = mode;
+    // Update exercise mode buttons
+    document.querySelectorAll('.ex-mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.exercise === mode);
+    });
+    // Hide/show exercise UIs
+    const allExUIs = ['exerciseHearChoose', 'exerciseSegment', 'exerciseMissing', 'exerciseFirstSound'];
+    allExUIs.forEach(id => {
+      const el = document.querySelector(`#${id}`);
+      if (el) el.hidden = true;
+    });
+    if (els.blendActionButtons) els.blendActionButtons.hidden = mode !== 'blend';
+    if (els.selfAssessButtons) els.selfAssessButtons.hidden = true;
+    // Show the right UI when not in blend mode
+    if (mode === 'hear_choose' && els.exerciseHearChoose) els.exerciseHearChoose.hidden = false;
+    if (mode === 'segment' && els.exerciseSegment) els.exerciseSegment.hidden = false;
+    if (mode === 'missing' && els.exerciseMissing) els.exerciseMissing.hidden = false;
+    if (mode === 'first_sound' && els.exerciseFirstSound) els.exerciseFirstSound.hidden = false;
+
+    // Reset the word display
+    showPlaceholder();
+    if (mode !== 'blend') setupNewExercise();
+  }
+
+  function setupNewExercise() {
+    const mode = state.exerciseMode;
+    if (mode === 'blend') { spin(); return; }
+
+    // Get a smart word (spaced repetition: prefer difficult words)
+    const word = getSmartWord();
+    state.currentWord = word;
+
+    if (mode === 'hear_choose') setupHearChoose(word);
+    else if (mode === 'segment') setupSegment(word);
+    else if (mode === 'missing') setupMissing(word);
+    else if (mode === 'first_sound') setupFirstSound(word);
+  }
+
+  // Spaced repetition: pull difficult words more often
+  function getSmartWord() {
+    const all = getAvailableWords();
+    const difficult = all.filter(w => state.difficultWords.has(w.toLowerCase()));
+    const unused = all.filter(w => !state.usedWords.has(w));
+
+    // 40% chance: pick from difficult words if available
+    if (difficult.length > 0 && Math.random() < 0.4) {
+      return difficult[Math.floor(Math.random() * difficult.length)];
+    }
+    // Otherwise pick unused
+    if (unused.length > 0) return unused[Math.floor(Math.random() * unused.length)];
+    // Reset if all used
+    state.usedWords.clear();
+    return all[Math.floor(Math.random() * all.length)];
+  }
+
+  // ============================================================
+  // EXERCISE: HEAR & CHOOSE
+  // ============================================================
+  function setupHearChoose(word) {
+    if (!els.hearChooseOptions) return;
+    // Get 3 wrong options from same category
+    const allWords = getAvailableWords().filter(w => w.toLowerCase() !== word.toLowerCase());
+    const shuffled = allWords.sort(() => Math.random() - 0.5).slice(0, 3);
+    const options = [...shuffled, word].sort(() => Math.random() - 0.5);
+
+    els.hearChooseOptions.innerHTML = '';
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = opt.toLowerCase();
+      btn.addEventListener('click', () => handleHearChooseAnswer(btn, opt, word));
+      els.hearChooseOptions.appendChild(btn);
+    });
+
+    // Show word in display as a question mark
+    if (els.wordBox) els.wordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">👂</span><span>Listen and choose!</span></div>';
+
+    // Auto-play the word
+    setTimeout(() => speakWord(word), 400);
+    setMascotState('greeting');
+  }
+
+  function handleHearChooseAnswer(btn, chosen, correct) {
+    const isCorrect = chosen.toLowerCase() === correct.toLowerCase();
+    // Disable all buttons
+    document.querySelectorAll('#hearChooseOptions .choice-btn').forEach(b => {
+      b.disabled = true;
+      if (b.textContent === correct.toLowerCase()) b.classList.add('correct-answer');
+    });
+    btn.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+
+    if (isCorrect) {
+      awardXP(XP_REWARDS.hear_choose_correct);
+      updateScore(20);
+      updateStreak();
+      showFeedback(true, `✅ "${correct}" – well done!`);
+      setMascotState('happy');
+      if (state.soundsEnabled) speakWord(correct);
+      trackWordCompletion(correct);
+    } else {
+      loseHeart('Wrong! –1 Heart');
+      state.difficultWords.add(correct.toLowerCase());
+      showFeedback(false, `❌ It was "${correct}"`);
+      setMascotState('encouraging');
+      if (state.soundsEnabled) speakWord(correct);
+    }
+
+    setTimeout(() => setupHearChoose(getSmartWord()), 2200);
+  }
+
+  // ============================================================
+  // EXERCISE: SEGMENT IT
+  // ============================================================
+  function setupSegment(word) {
+    if (!els.segmentBoxes) return;
+    const units = parseWord(word);
+    state.segmentUnits = units;
+    state.segmentTapped = [];
+
+    // Show word at top
+    if (els.wordBox) {
+      els.wordBox.innerHTML = '';
+      units.forEach((unit, idx) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = unit.text;
+        if (unit.isVowel) span.classList.add('vowel');
+        if (unit.isDigraph) span.classList.add('digraph');
+        if (unit.isSilent) span.classList.add('silent');
+        if (unit.isLongVowel) span.classList.add('long-vowel');
+        if (unit.isDiphthong) span.classList.add('diphthong');
+        span.style.animationDelay = `${idx * 0.1}s`;
+        els.wordBox.appendChild(span);
+      });
+    }
+
+    // Build tappable phoneme boxes
+    els.segmentBoxes.innerHTML = '';
+    units.forEach((unit, idx) => {
+      const box = document.createElement('button');
+      box.className = 'segment-box';
+      box.dataset.idx = idx;
+      box.textContent = unit.text;
+      if (unit.isSilent) {
+        box.classList.add('silent-box');
+        box.title = 'Silent letter';
+      }
+      box.addEventListener('click', () => handleSegmentTap(idx, unit, box));
+      els.segmentBoxes.appendChild(box);
+    });
+
+    if (els.segmentCheckBtn) {
+      els.segmentCheckBtn.disabled = true;
+      els.segmentCheckBtn.onclick = handleSegmentCheck;
+    }
+    setMascotState('greeting');
+    showMascotSpeech('Tap each sound in order! ✂️');
+  }
+
+  function handleSegmentTap(idx, unit, box) {
+    if (state.segmentTapped.includes(idx)) return;
+    state.segmentTapped.push(idx);
+    box.classList.add('tapped');
+
+    // Play the phoneme sound
+    let sound = unit.sound || unit.text.toLowerCase();
+    if (!unit.sound) {
+      if (unit.isLongVowel) sound = `long_${unit.text.toLowerCase()}`;
+      else if (unit.isSoft) sound = `soft_${unit.text.toLowerCase()}`;
+    }
+    if (!unit.isSilent) playSound(sound).catch(() => {});
+
+    // Enable check when all non-silent tapped or all tapped
+    const totalBoxes = state.segmentUnits.length;
+    if (state.segmentTapped.length >= totalBoxes) {
+      if (els.segmentCheckBtn) els.segmentCheckBtn.disabled = false;
+    }
+  }
+
+  function handleSegmentCheck() {
+    const word = state.currentWord;
+    const units = state.segmentUnits;
+    // Check that they tapped all units in some order
+    const allTapped = state.segmentTapped.length >= units.length;
+
+    if (allTapped) {
+      awardXP(XP_REWARDS.segment_correct);
+      updateScore(25);
+      updateStreak();
+      showFeedback(true, `✅ "${word}" has ${units.length} sound${units.length !== 1 ? 's' : ''}!`);
+      setMascotState('excited');
+      if (state.soundsEnabled) speakWord(word);
+      trackWordCompletion(word);
+      setTimeout(() => setupSegment(getSmartWord()), 2200);
+    } else {
+      loseHeart('Tap all the sounds first!');
+      showFeedback(false, 'Tap each phoneme box first!');
+      setMascotState('encouraging');
+    }
+  }
+
+  // ============================================================
+  // EXERCISE: MISSING SOUND
+  // ============================================================
+  function setupMissing(word) {
+    if (!els.missingWordDisplay || !els.missingOptions) return;
+    const units = parseWord(word);
+    if (units.length < 2) { setupMissing(getSmartWord()); return; }
+
+    // Pick a non-silent unit to blank out (prefer vowel for variety)
+    const eligible = units.map((u, i) => ({ u, i })).filter(({ u }) => !u.isSilent);
+    if (eligible.length === 0) { setupMissing(getSmartWord()); return; }
+    const pick = eligible[Math.floor(Math.random() * eligible.length)];
+    const blankIdx = pick.i;
+    const correctUnit = pick.u;
+
+    // Show word with blank
+    els.missingWordDisplay.innerHTML = '';
+    units.forEach((unit, idx) => {
+      const span = document.createElement('span');
+      if (idx === blankIdx) {
+        span.className = 'missing-blank';
+        span.textContent = '___';
+      } else {
+        span.className = 'letter';
+        span.textContent = unit.text;
+        if (unit.isVowel) span.classList.add('vowel');
+        if (unit.isDigraph) span.classList.add('digraph');
+        if (unit.isSilent) span.classList.add('silent');
+        if (unit.isLongVowel) span.classList.add('long-vowel');
+      }
+      els.missingWordDisplay.appendChild(span);
+    });
+
+    // Generate distractors (other sounds from the word + random phonemes)
+    const correctText = correctUnit.text.toLowerCase();
+    const distractors = generateDistractors(correctText, 3);
+    const allChoices = [correctText, ...distractors].sort(() => Math.random() - 0.5);
+
+    els.missingOptions.innerHTML = '';
+    allChoices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn phoneme-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => handleMissingAnswer(btn, choice, correctText, word));
+      els.missingOptions.appendChild(btn);
+    });
+
+    if (els.wordBox) els.wordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">❓</span><span>Fill in the missing sound!</span></div>';
+    setMascotState('greeting');
+    showMascotSpeech('Which sound is missing? ❓');
+  }
+
+  function generateDistractors(correct, count) {
+    const commonSounds = ['a', 'e', 'i', 'o', 'u', 'sh', 'ch', 'th', 'ng', 'ar', 'er', 'ow', 'oy', 'ai', 'ee', 'oo'];
+    const distract = commonSounds.filter(s => s !== correct).sort(() => Math.random() - 0.5);
+    return distract.slice(0, count);
+  }
+
+  function handleMissingAnswer(btn, chosen, correct, word) {
+    const isCorrect = chosen === correct;
+    document.querySelectorAll('#missingOptions .choice-btn').forEach(b => {
+      b.disabled = true;
+      if (b.textContent === correct) b.classList.add('correct-answer');
+    });
+    btn.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+
+    if (isCorrect) {
+      awardXP(XP_REWARDS.missing_correct);
+      updateScore(20);
+      updateStreak();
+      showFeedback(true, `✅ "${correct}" – great phonics!`);
+      setMascotState('happy');
+      if (state.soundsEnabled) speakWord(word);
+      trackWordCompletion(word);
+    } else {
+      loseHeart('Missing sound wrong! –1 Heart');
+      state.difficultWords.add(word.toLowerCase());
+      showFeedback(false, `❌ It was "${correct}" – "${word}"`);
+      setMascotState('encouraging');
+    }
+
+    setTimeout(() => setupMissing(getSmartWord()), 2200);
+  }
+
+  // ============================================================
+  // EXERCISE: FIRST SOUND
+  // ============================================================
+  function setupFirstSound(word) {
+    if (!els.firstSoundWord || !els.firstSoundOptions) return;
+    const units = parseWord(word);
+    const firstUnit = units.find(u => !u.isSilent);
+    if (!firstUnit) { setupFirstSound(getSmartWord()); return; }
+    const correctSound = firstUnit.text.toLowerCase();
+
+    // Display word
+    if (els.firstSoundWord) {
+      els.firstSoundWord.innerHTML = '';
+      units.forEach((unit, idx) => {
+        const span = document.createElement('span');
+        span.className = 'letter' + (idx === 0 ? ' first-letter-highlight' : '');
+        span.textContent = unit.text;
+        if (unit.isVowel) span.classList.add('vowel');
+        if (unit.isDigraph) span.classList.add('digraph');
+        if (unit.isSilent) span.classList.add('silent');
+        if (unit.isLongVowel) span.classList.add('long-vowel');
+        els.firstSoundWord.appendChild(span);
+      });
+    }
+
+    // Auto-play
+    if (state.soundsEnabled) setTimeout(() => speakWord(word), 300);
+
+    // Play first sound button
+    if (els.playFirstSoundBtn) {
+      els.playFirstSoundBtn.onclick = () => speakWord(word);
+    }
+
+    // Build choices
+    const distractors = generateDistractors(correctSound, 3);
+    const allChoices = [correctSound, ...distractors].sort(() => Math.random() - 0.5);
+
+    els.firstSoundOptions.innerHTML = '';
+    allChoices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn phoneme-btn';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => handleFirstSoundAnswer(btn, choice, correctSound, word));
+      els.firstSoundOptions.appendChild(btn);
+    });
+
+    if (els.wordBox) els.wordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">🔤</span><span>What\'s the first sound?</span></div>';
+    setMascotState('greeting');
+  }
+
+  function handleFirstSoundAnswer(btn, chosen, correct, word) {
+    const isCorrect = chosen === correct;
+    document.querySelectorAll('#firstSoundOptions .choice-btn').forEach(b => {
+      b.disabled = true;
+      if (b.textContent === correct) b.classList.add('correct-answer');
+    });
+    btn.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+
+    if (isCorrect) {
+      awardXP(XP_REWARDS.first_sound_correct);
+      updateScore(20);
+      updateStreak();
+      showFeedback(true, `✅ "${correct}" – the first sound in "${word}"`);
+      setMascotState('happy');
+      if (state.soundsEnabled) speakWord(word);
+      trackWordCompletion(word);
+    } else {
+      loseHeart('Wrong first sound! –1 Heart');
+      state.difficultWords.add(word.toLowerCase());
+      showFeedback(false, `❌ "${correct}" is the first sound in "${word}"`);
+      setMascotState('encouraging');
+    }
+
+    setTimeout(() => setupFirstSound(getSmartWord()), 2200);
+  }
+
+  // ============================================================
+  // LESSON MODE
+  // ============================================================
+  const LESSON_SIZE = 8;
+  const LESSON_EXERCISE_TYPES = ['blend', 'hear_choose', 'segment', 'missing', 'first_sound'];
+
+  function buildLesson(wordType) {
+    const words = Object.values(wordGroups[wordType] || wordGroups.cvc).flat();
+    if (words.length === 0) return [];
+    const shuffled = [...words].sort(() => Math.random() - 0.5).slice(0, LESSON_SIZE);
+    // Assign exercise types cyclically
+    return shuffled.map((word, i) => ({
+      word,
+      type: LESSON_EXERCISE_TYPES[i % LESSON_EXERCISE_TYPES.length]
+    }));
+  }
+
+  function renderLessonChooser() {
+    if (!els.lessonList) return;
+    els.lessonList.innerHTML = learningPath.map(level => {
+      const isUnlocked = isLevelUnlocked(level.id);
+      const stars = state.lessonStars[level.id] || 0;
+      const starsHTML = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+      return `
+        <div class="lesson-card ${isUnlocked ? '' : 'locked'}" data-level="${level.id}">
+          <div class="lesson-card-icon">${level.icon}</div>
+          <div class="lesson-card-info">
+            <div class="lesson-card-name">${level.name}</div>
+            <div class="lesson-card-stars" title="${stars}/3 stars">${starsHTML}</div>
+            <div class="lesson-card-desc">${wordTypeDescriptions[level.id] || ''}</div>
+          </div>
+          ${isUnlocked ? '' : '<div class="lesson-lock">🔒</div>'}
+        </div>
+      `;
+    }).join('');
+
+    // Add click handlers
+    els.lessonList.querySelectorAll('.lesson-card:not(.locked)').forEach(card => {
+      card.addEventListener('click', () => startLesson(card.dataset.level));
+    });
+  }
+
+  function startLesson(wordType) {
+    state.inLesson = true;
+    state.lessonWordType = wordType;
+    state.lessonExercises = buildLesson(wordType);
+    state.lessonCurrentIndex = 0;
+    state.lessonMistakes = 0;
+    state.lessonCorrect = 0;
+    state.lessonXPEarned = 0;
+
+    // Save original word type and restore after lesson
+    state._prelessonWordType = state.wordType;
+    state.wordType = wordType;
+
+    // Show lesson in progress
+    if (els.lessonChooser) els.lessonChooser.hidden = true;
+    if (els.lessonInProgress) els.lessonInProgress.hidden = false;
+
+    renderLessonProgressDots();
+    renderLessonExercise();
+  }
+
+  function renderLessonProgressDots() {
+    if (!els.lessonProgressDots) return;
+    els.lessonProgressDots.innerHTML = state.lessonExercises.map((_, i) => {
+      let cls = 'dot';
+      if (i < state.lessonCurrentIndex) cls += ' done';
+      else if (i === state.lessonCurrentIndex) cls += ' current';
+      return `<span class="${cls}"></span>`;
+    }).join('');
+
+    if (els.lessonHearts) {
+      els.lessonHearts.innerHTML = '';
+      for (let i = 0; i < state.maxHearts; i++) {
+        const h = document.createElement('span');
+        h.textContent = i < state.hearts ? '❤️' : '🖤';
+        els.lessonHearts.appendChild(h);
+      }
+    }
+  }
+
+  async function renderLessonExercise() {
+    if (state.lessonCurrentIndex >= state.lessonExercises.length) {
+      finishLesson(); return;
+    }
+    const exercise = state.lessonExercises[state.lessonCurrentIndex];
+    const { word, type } = exercise;
+    state.currentWord = word;
+
+    renderLessonProgressDots();
+
+    // Label
+    const labels = {
+      blend: '🎵 Blend It',
+      hear_choose: '👂 Hear & Choose',
+      segment: '✂️ Segment It',
+      missing: '❓ Missing Sound',
+      first_sound: '🔤 First Sound'
+    };
+    if (els.lessonExLabel) els.lessonExLabel.textContent = labels[type] || type;
+
+    // Render exercise in lessonWordBox + lessonExerciseUI
+    if (els.lessonWordBox) els.lessonWordBox.innerHTML = '';
+    if (els.lessonExerciseUI) els.lessonExerciseUI.innerHTML = '';
+
+    if (type === 'blend') {
+      await renderLessonBlend(word);
+    } else if (type === 'hear_choose') {
+      renderLessonHearChoose(word);
+    } else if (type === 'segment') {
+      renderLessonSegment(word);
+    } else if (type === 'missing') {
+      renderLessonMissing(word);
+    } else if (type === 'first_sound') {
+      renderLessonFirstSound(word);
+    }
+  }
+
+  async function renderLessonBlend(word) {
+    if (!els.lessonWordBox || !els.lessonExerciseUI) return;
+    const units = parseWord(word);
+
+    units.forEach((unit, idx) => {
+      const span = document.createElement('span');
+      span.textContent = unit.text;
+      span.className = 'letter';
+      if (unit.isVowel) span.classList.add('vowel');
+      if (unit.isDigraph) span.classList.add('digraph');
+      if (unit.isSilent) span.classList.add('silent');
+      if (unit.isLongVowel) span.classList.add('long-vowel');
+      if (unit.isDiphthong) span.classList.add('diphthong');
+      span.style.animationDelay = `${idx * 0.3}s`;
+      els.lessonWordBox.appendChild(span);
+    });
+
+    for (const unit of units) {
+      await delay(350);
+      if (unit.isSilent) continue;
+      let sound = unit.sound || unit.text.toLowerCase();
+      if (!unit.sound) {
+        if (unit.isLongVowel) sound = `long_${sound}`;
+        else if (unit.isSoft) sound = `soft_${sound}`;
+      }
+      await playSound(sound);
+    }
+
+    if (state.soundsEnabled) await speakWord(word);
+
+    // Show self-assessment buttons
+    const assessDiv = document.createElement('div');
+    assessDiv.className = 'lesson-self-assess';
+    assessDiv.innerHTML = `
+      <p class="assess-prompt">Did you blend it?</p>
+      <button class="assess-yes lesson-assess-yes">✅ Yes, I got it!</button>
+      <button class="assess-no lesson-assess-no">❌ Not quite</button>
+    `;
+    els.lessonExerciseUI.appendChild(assessDiv);
+
+    assessDiv.querySelector('.lesson-assess-yes').addEventListener('click', () => {
+      awardXP(XP_REWARDS.blend_correct);
+      state.lessonCorrect++;
+      state.lessonXPEarned += XP_REWARDS.blend_correct;
+      showLessonFeedback(true, `✅ "${word}" – brilliant blending!`);
+      advanceLessonExercise();
+    });
+    assessDiv.querySelector('.lesson-assess-no').addEventListener('click', () => {
+      awardXP(XP_REWARDS.blend_wrong);
+      state.lessonMistakes++;
+      state.lessonXPEarned += XP_REWARDS.blend_wrong;
+      loseHeart('Keep practising! –1 Heart');
+      showLessonFeedback(false, `Try again – "${word}"`);
+      if (state.soundsEnabled) speakWord(word);
+      advanceLessonExercise();
+    });
+  }
+
+  function renderLessonHearChoose(word) {
+    const allWords = Object.values(wordGroups[state.lessonWordType] || wordGroups.cvc).flat();
+    const distractors = allWords.filter(w => w.toLowerCase() !== word.toLowerCase())
+      .sort(() => Math.random() - 0.5).slice(0, 3);
+    const choices = [...distractors, word].sort(() => Math.random() - 0.5);
+
+    if (els.lessonWordBox) els.lessonWordBox.innerHTML = '<div class="word-placeholder"><span class="placeholder-icon">👂</span><span>Hear &amp; choose!</span></div>';
+
+    const ui = document.createElement('div');
+    ui.innerHTML = `
+      <button class="play-word-btn lesson-play-btn">🔊 Hear the word</button>
+      <div class="choice-grid lesson-choices"></div>
+    `;
+    ui.querySelector('.lesson-play-btn').addEventListener('click', () => speakWord(word));
+    const grid = ui.querySelector('.lesson-choices');
+    choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = ch.toLowerCase();
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === word.toLowerCase()) b.classList.add('correct-answer');
+        });
+        const correct = ch.toLowerCase() === word.toLowerCase();
+        btn.classList.add(correct ? 'correct-answer' : 'wrong-answer');
+        if (correct) {
+          awardXP(XP_REWARDS.hear_choose_correct);
+          state.lessonCorrect++;
+          state.lessonXPEarned += XP_REWARDS.hear_choose_correct;
+          showLessonFeedback(true, `✅ "${word}"`);
+        } else {
+          loseHeart('Wrong word! –1 Heart');
+          state.lessonMistakes++;
+          showLessonFeedback(false, `❌ It was "${word}"`);
+          if (state.soundsEnabled) speakWord(word);
+        }
+        setTimeout(() => advanceLessonExercise(), 1800);
+      });
+      grid.appendChild(btn);
+    });
+    els.lessonExerciseUI.appendChild(ui);
+    setTimeout(() => speakWord(word), 400);
+  }
+
+  function renderLessonSegment(word) {
+    const units = parseWord(word);
+
+    // Show word
+    if (els.lessonWordBox) {
+      units.forEach((unit, idx) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = unit.text;
+        if (unit.isVowel) span.classList.add('vowel');
+        if (unit.isDigraph) span.classList.add('digraph');
+        if (unit.isSilent) span.classList.add('silent');
+        if (unit.isLongVowel) span.classList.add('long-vowel');
+        span.style.animationDelay = `${idx * 0.1}s`;
+        els.lessonWordBox.appendChild(span);
+      });
+    }
+
+    const tapped = [];
+    const ui = document.createElement('div');
+    ui.innerHTML = '<p class="exercise-prompt">Tap each sound:</p><div class="segment-boxes lesson-seg-boxes"></div><button class="check-answer-btn" disabled>✅ Check!</button>';
+    const boxes = ui.querySelector('.lesson-seg-boxes');
+    const checkBtn = ui.querySelector('.check-answer-btn');
+
+    units.forEach((unit, idx) => {
+      const box = document.createElement('button');
+      box.className = `segment-box${unit.isSilent ? ' silent-box' : ''}`;
+      box.textContent = unit.text;
+      box.addEventListener('click', () => {
+        if (tapped.includes(idx)) return;
+        tapped.push(idx);
+        box.classList.add('tapped');
+        let sound = unit.sound || unit.text.toLowerCase();
+        if (!unit.sound) {
+          if (unit.isLongVowel) sound = `long_${sound}`;
+          else if (unit.isSoft) sound = `soft_${sound}`;
+        }
+        if (!unit.isSilent) playSound(sound).catch(() => {});
+        if (tapped.length >= units.length) checkBtn.disabled = false;
+      });
+      boxes.appendChild(box);
+    });
+
+    checkBtn.addEventListener('click', () => {
+      if (tapped.length >= units.length) {
+        awardXP(XP_REWARDS.segment_correct);
+        state.lessonCorrect++;
+        state.lessonXPEarned += XP_REWARDS.segment_correct;
+        showLessonFeedback(true, `✅ "${word}" has ${units.length} sounds!`);
+        if (state.soundsEnabled) speakWord(word);
+        setTimeout(() => advanceLessonExercise(), 1800);
+      }
+    });
+    els.lessonExerciseUI.appendChild(ui);
+  }
+
+  function renderLessonMissing(word) {
+    const units = parseWord(word);
+    const eligible = units.map((u, i) => ({ u, i })).filter(({ u }) => !u.isSilent);
+    if (eligible.length === 0) { advanceLessonExercise(); return; }
+    const pick = eligible[Math.floor(Math.random() * eligible.length)];
+    const correctText = pick.u.text.toLowerCase();
+
+    if (els.lessonWordBox) {
+      const wrap = document.createElement('div');
+      wrap.className = 'missing-word-display';
+      units.forEach((unit, idx) => {
+        const s = document.createElement('span');
+        if (idx === pick.i) { s.className = 'missing-blank'; s.textContent = '___'; }
+        else {
+          s.className = 'letter';
+          s.textContent = unit.text;
+          if (unit.isVowel) s.classList.add('vowel');
+          if (unit.isDigraph) s.classList.add('digraph');
+          if (unit.isSilent) s.classList.add('silent');
+          if (unit.isLongVowel) s.classList.add('long-vowel');
+        }
+        wrap.appendChild(s);
+      });
+      els.lessonWordBox.appendChild(wrap);
+    }
+
+    const distractors = generateDistractors(correctText, 3);
+    const choices = [correctText, ...distractors].sort(() => Math.random() - 0.5);
+    const ui = document.createElement('div');
+    ui.className = 'choice-grid phoneme-choices';
+    choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn phoneme-btn';
+      btn.textContent = ch;
+      btn.addEventListener('click', () => {
+        ui.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === correctText) b.classList.add('correct-answer');
+        });
+        const correct = ch === correctText;
+        btn.classList.add(correct ? 'correct-answer' : 'wrong-answer');
+        if (correct) {
+          awardXP(XP_REWARDS.missing_correct);
+          state.lessonCorrect++;
+          state.lessonXPEarned += XP_REWARDS.missing_correct;
+          showLessonFeedback(true, `✅ "${correctText}" – correct!`);
+          if (state.soundsEnabled) speakWord(word);
+        } else {
+          loseHeart('Missing sound wrong! –1 Heart');
+          state.lessonMistakes++;
+          showLessonFeedback(false, `❌ It was "${correctText}"`);
+        }
+        setTimeout(() => advanceLessonExercise(), 1800);
+      });
+      ui.appendChild(btn);
+    });
+    els.lessonExerciseUI.appendChild(ui);
+  }
+
+  function renderLessonFirstSound(word) {
+    const units = parseWord(word);
+    const firstUnit = units.find(u => !u.isSilent);
+    if (!firstUnit) { advanceLessonExercise(); return; }
+    const correctSound = firstUnit.text.toLowerCase();
+
+    // Display word
+    if (els.lessonWordBox) {
+      units.forEach((unit, idx) => {
+        const span = document.createElement('span');
+        span.className = 'letter' + (idx === 0 ? ' first-letter-highlight' : '');
+        span.textContent = unit.text;
+        if (unit.isVowel) span.classList.add('vowel');
+        if (unit.isDigraph) span.classList.add('digraph');
+        if (unit.isSilent) span.classList.add('silent');
+        if (unit.isLongVowel) span.classList.add('long-vowel');
+        els.lessonWordBox.appendChild(span);
+      });
+    }
+
+    const distractors = generateDistractors(correctSound, 3);
+    const choices = [correctSound, ...distractors].sort(() => Math.random() - 0.5);
+    const ui = document.createElement('div');
+    ui.innerHTML = '<button class="play-word-btn lesson-play-btn">🔊 Hear the word</button>';
+    ui.querySelector('.lesson-play-btn').addEventListener('click', () => speakWord(word));
+    const grid = document.createElement('div');
+    grid.className = 'choice-grid phoneme-choices';
+    choices.forEach(ch => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn phoneme-btn';
+      btn.textContent = ch;
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.choice-btn').forEach(b => {
+          b.disabled = true;
+          if (b.textContent === correctSound) b.classList.add('correct-answer');
+        });
+        const correct = ch === correctSound;
+        btn.classList.add(correct ? 'correct-answer' : 'wrong-answer');
+        if (correct) {
+          awardXP(XP_REWARDS.first_sound_correct);
+          state.lessonCorrect++;
+          state.lessonXPEarned += XP_REWARDS.first_sound_correct;
+          showLessonFeedback(true, `✅ "${correctSound}" – first sound in "${word}"`);
+          if (state.soundsEnabled) speakWord(word);
+        } else {
+          loseHeart('Wrong first sound! –1 Heart');
+          state.lessonMistakes++;
+          showLessonFeedback(false, `❌ "${correctSound}" is the first sound`);
+        }
+        setTimeout(() => advanceLessonExercise(), 1800);
+      });
+      grid.appendChild(btn);
+    });
+    ui.appendChild(grid);
+    els.lessonExerciseUI.appendChild(ui);
+    setTimeout(() => speakWord(word), 400);
+  }
+
+  function showLessonFeedback(correct, text) {
+    if (!els.lessonFeedback) return;
+    els.lessonFeedback.hidden = false;
+    els.lessonFeedback.className = `answer-feedback ${correct ? 'correct' : 'wrong'}`;
+    if (els.lessonFeedbackIcon) els.lessonFeedbackIcon.textContent = correct ? '✅' : '❌';
+    if (els.lessonFeedbackText) els.lessonFeedbackText.textContent = text;
+    clearTimeout(els.lessonFeedback._hideTimer);
+    els.lessonFeedback._hideTimer = setTimeout(() => { els.lessonFeedback.hidden = true; }, 1600);
+  }
+
+  function advanceLessonExercise() {
+    state.lessonCurrentIndex++;
+    if (state.lessonCurrentIndex >= state.lessonExercises.length) {
+      finishLesson();
+    } else {
+      renderLessonExercise();
+    }
+  }
+
+  function finishLesson() {
+    state.inLesson = false;
+    // Restore word type
+    if (state._prelessonWordType) {
+      state.wordType = state._prelessonWordType;
+    }
+
+    // Calculate stars: 3=0 mistakes, 2=1-2 mistakes, 1=3-4 mistakes, 0=5+ mistakes
+    let stars = 3;
+    if (state.lessonMistakes >= 5) stars = 0;
+    else if (state.lessonMistakes >= 3) stars = 1;
+    else if (state.lessonMistakes >= 1) stars = 2;
+
+    // Award bonus XP for lesson completion
+    const bonusXP = stars === 3 ? XP_REWARDS.lesson_complete_3star :
+                    stars === 2 ? XP_REWARDS.lesson_complete_2star :
+                    XP_REWARDS.lesson_complete_1star;
+    awardXP(bonusXP);
+    state.lessonXPEarned += bonusXP;
+
+    // Save best stars for this level
+    const prev = state.lessonStars[state.lessonWordType] || 0;
+    if (stars > prev) state.lessonStars[state.lessonWordType] = stars;
+
+    // Update lesson complete modal
+    if (els.lcStar1) els.lcStar1.textContent = stars >= 1 ? '⭐' : '☆';
+    if (els.lcStar2) els.lcStar2.textContent = stars >= 2 ? '⭐' : '☆';
+    if (els.lcStar3) els.lcStar3.textContent = stars >= 3 ? '⭐' : '☆';
+    if (els.lcCorrect) els.lcCorrect.textContent = state.lessonCorrect;
+    if (els.lcXPEarned) els.lcXPEarned.textContent = `+${state.lessonXPEarned}`;
+    if (els.lcHeartsLeft) els.lcHeartsLeft.textContent = state.hearts;
+    if (els.lessonCompleteModal) els.lessonCompleteModal.hidden = false;
+
+    launchFireworks();
+    if (state.soundsEnabled) {
+      const msg = stars === 3 ? 'Perfect lesson! Three stars!' :
+                  stars === 2 ? 'Great lesson! Two stars!' : 'Lesson complete! Keep practising!';
+      speakWord(msg);
+    }
+    savePreferences();
+  }
+
+  function exitLesson() {
+    state.inLesson = false;
+    if (state._prelessonWordType) state.wordType = state._prelessonWordType;
+    if (els.lessonInProgress) els.lessonInProgress.hidden = true;
+    if (els.lessonChooser) els.lessonChooser.hidden = false;
+    renderLessonChooser();
+  }
+
+  // ============================================================
+  // PHONICS GROUPS
+  // ============================================================
+  function renderPhonicsGroupsGrid() {
+    if (!els.phonicsGroupsGrid) return;
+    els.phonicsGroupsGrid.innerHTML = phonicsGroups.map(group => `
+      <div class="group-card" data-group="${group.id}" style="--group-color: ${group.color}">
+        <div class="group-card-icon">${group.icon}</div>
+        <div class="group-card-name">${group.name}</div>
+        <div class="group-sounds">${group.sounds.map(s => `<span class="sound-chip">${s}</span>`).join('')}</div>
+        <div class="group-card-desc">${group.description}</div>
+      </div>
+    `).join('');
+
+    els.phonicsGroupsGrid.querySelectorAll('.group-card').forEach(card => {
+      card.addEventListener('click', () => showGroupDetail(card.dataset.group));
+    });
+  }
+
+  function showGroupDetail(groupId) {
+    const group = phonicsGroups.find(g => g.id === groupId);
+    if (!group) return;
+    state.currentGroupId = groupId;
+
+    if (els.phonicsGroupsGrid) els.phonicsGroupsGrid.hidden = true;
+    if (els.groupDetail) els.groupDetail.hidden = false;
+
+    if (els.groupDetailContent) {
+      els.groupDetailContent.innerHTML = `
+        <div class="group-header" style="background: ${group.color}20; border-left: 4px solid ${group.color}">
+          <span class="group-detail-icon">${group.icon}</span>
+          <h3>${group.name} – ${group.description}</h3>
+        </div>
+        <div class="sounds-detail-grid">
+          ${group.sounds.map(sound => `
+            <div class="sound-detail-card">
+              <div class="sound-letter" style="background:${group.color}">${sound}</div>
+              <div class="sound-keyword">${group.keywords[sound] || ''}</div>
+              <div class="sound-action">${group.actions[sound] || ''}</div>
+              <button class="sound-play-btn" data-sound="${sound}">🔊 Hear it</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // Play buttons
+      els.groupDetailContent.querySelectorAll('.sound-play-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = btn.dataset.sound;
+          if (s.length <= 2) playSound(s).catch(() => speakWord(s));
+          else speakWord(s);
+        });
+      });
+    }
+  }
+
+  function hideGroupDetail() {
+    if (els.phonicsGroupsGrid) els.phonicsGroupsGrid.hidden = false;
+    if (els.groupDetail) els.groupDetail.hidden = true;
+  }
+
+  // ============================================================
+  // MODE TABS
+  // ============================================================
+  function switchMode(mode) {
+    document.querySelectorAll('.mode-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.mode === mode);
+      t.setAttribute('aria-selected', t.dataset.mode === mode);
+    });
+    const panels = { freeplay: els.panelFreePlay, lesson: els.panelLesson, groups: els.panelGroups };
+    Object.entries(panels).forEach(([key, panel]) => {
+      if (panel) {
+        panel.hidden = key !== mode;
+        panel.classList.toggle('active', key === mode);
+      }
+    });
+    if (mode === 'lesson') {
+      renderLessonChooser();
+    } else if (mode === 'groups') {
+      renderPhonicsGroupsGrid();
+      if (els.groupDetail) els.groupDetail.hidden = true;
+      if (els.phonicsGroupsGrid) els.phonicsGroupsGrid.hidden = false;
+    }
+  }
+
+  // Override showCompliment to use XP and mascot
+  const _originalShowCompliment = showCompliment;
+
+  function showComplimentEnhanced() {
+    const compliment = compliments[Math.floor(Math.random() * compliments.length)];
+    els.complimentBox.textContent = compliment;
+    els.complimentBox.classList.add('show');
+    state.celebrationMode ? launchFireworks() : launchConfetti();
+    updateStreak();
+    updateSessionStats();
+    trackMasteredWord(state.currentWord);
+    trackWordCompletion(state.currentWord);
+    awardXP(XP_REWARDS.blend_correct);
+    setMascotState(state.streak >= 5 ? 'excited' : 'happy');
+    setTimeout(() => els.complimentBox.classList.remove('show'), 2000);
+
+    // After blend completes, show self-assessment
+    if (state.exerciseMode === 'blend' && !state.inLesson) {
+      if (els.selfAssessButtons) els.selfAssessButtons.hidden = false;
+    }
+  }
+
+  // ============================================================
   // Event listeners
   els.spinButton.addEventListener('click', spin);
   els.repeatButton.addEventListener('click', repeat);
@@ -2793,10 +4152,17 @@ document.addEventListener('DOMContentLoaded', () => {
       state.dailyProgress = 0;
       state.dailyStreakDays = 0;
       state.unlockedLevels = ['cvc'];
+      state.xp = 0;
+      state.xpLevel = 1;
+      state.hearts = 5;
+      state.lessonStars = {};
       resetStreak();
       resetGame();
       updateBadges();
       updateDailyGoalUI();
+      updateXPBar();
+      updateHeartsUI();
+      if (els.headerStreakDays) els.headerStreakDays.textContent = '0';
       savePreferences();
       announce('Progress has been reset');
     }
@@ -2852,6 +4218,96 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize dashboard tabs
   initDashboardTabs();
 
+  // === NEW: Mode tab listeners ===
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+  });
+
+  // === NEW: Exercise mode button listeners ===
+  document.querySelectorAll('.ex-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.exercise !== state.exerciseMode) {
+        setExerciseMode(btn.dataset.exercise);
+      }
+    });
+  });
+
+  // === NEW: Self-assessment buttons ===
+  if (els.assessYes) {
+    els.assessYes.addEventListener('click', () => {
+      if (els.selfAssessButtons) els.selfAssessButtons.hidden = true;
+      awardXP(XP_REWARDS.blend_correct);
+      setMascotState('excited');
+    });
+  }
+  if (els.assessNo) {
+    els.assessNo.addEventListener('click', () => {
+      if (els.selfAssessButtons) els.selfAssessButtons.hidden = true;
+      loseHeart('Keep practising! –1 Heart');
+      state.difficultWords.add(state.currentWord.toLowerCase());
+      setMascotState('encouraging');
+      savePreferences();
+    });
+  }
+
+  // === NEW: Hear & Choose play button ===
+  if (els.playWordBtn) {
+    els.playWordBtn.addEventListener('click', () => {
+      if (state.currentWord) speakWord(state.currentWord);
+    });
+  }
+
+  // === NEW: Segment check button ===
+  if (els.segmentCheckBtn) {
+    els.segmentCheckBtn.addEventListener('click', handleSegmentCheck);
+  }
+
+  // === NEW: Lesson back button ===
+  if (els.lessonBackBtn) {
+    els.lessonBackBtn.addEventListener('click', () => {
+      if (confirm('Exit this lesson? Your progress will be lost.')) exitLesson();
+    });
+  }
+
+  // === NEW: Lesson complete continue ===
+  if (els.lcContinueBtn) {
+    els.lcContinueBtn.addEventListener('click', () => {
+      if (els.lessonCompleteModal) els.lessonCompleteModal.hidden = true;
+      exitLesson();
+    });
+  }
+
+  // === NEW: Level up close ===
+  if (els.luCloseBtn) {
+    els.luCloseBtn.addEventListener('click', () => {
+      if (els.levelUpModal) els.levelUpModal.hidden = true;
+    });
+  }
+
+  // === NEW: Group back button ===
+  if (els.groupBackBtn) {
+    els.groupBackBtn.addEventListener('click', hideGroupDetail);
+  }
+
+  // === NEW: Practice group button ===
+  if (els.practiceGroupBtn) {
+    els.practiceGroupBtn.addEventListener('click', () => {
+      const group = phonicsGroups.find(g => g.id === state.currentGroupId);
+      if (group && group.wordTypes && group.wordTypes[0]) {
+        // Switch to free play with this word type
+        switchMode('freeplay');
+        state.wordType = group.wordTypes[0];
+        if (els.wordTypeSelector) els.wordTypeSelector.value = state.wordType;
+        updateWordTypeDesc();
+        resetGame();
+        showMascotSpeech(`Practising ${group.name} sounds! 🎵`);
+      }
+    });
+  }
+
+  // Patch showCompliment to use enhanced version
+  window._showComplimentPatched = true;
+
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
     const key = e.key.toLowerCase();
@@ -2865,6 +4321,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPreferences();
     updateBadges();
     resetGame();
+    updateXPBar();
+    updateHeartsUI();
+    setMascotState('greeting');
+    renderLessonChooser();
+    renderPhonicsGroupsGrid();
     if (!localStorage.getItem('hasSeenTutorial')) els.tutorialModal.showModal();
   })();
 });
