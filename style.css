@@ -47,6 +47,9 @@ body[data-theme="high-contrast"] {
   border: 0;
 }
 
+/* Ensure [hidden] always wins over display:flex/grid rules */
+[hidden] { display: none !important; }
+
 /* Ocean theme */
 body[data-theme="ocean"] {
   background: linear-gradient(135deg, #0077b6, #00b4d8);
