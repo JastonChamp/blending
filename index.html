@@ -100,16 +100,22 @@
 
         <!-- Mode Grid -->
         <nav class="mode-grid" aria-label="Activity modes">
+
+          <!-- Blending section -->
+          <p class="mode-section-label">Blending</p>
+          <button class="mode-card mode-card--highlight" data-mode="blend">
+            <span class="mode-icon" aria-hidden="true">🎯</span>
+            <span class="mode-name">Blend It!</span>
+            <span class="mode-desc">Step by step · for beginners</span>
+          </button>
           <button class="mode-card" data-mode="classicBlend">
             <span class="mode-icon" aria-hidden="true">🔊</span>
             <span class="mode-name">Listen &amp; Blend</span>
-            <span class="mode-desc">Hear every sound</span>
+            <span class="mode-desc">Free mode · confident learners</span>
           </button>
-          <button class="mode-card" data-mode="blend">
-            <span class="mode-icon" aria-hidden="true">🎯</span>
-            <span class="mode-name">Blend It!</span>
-            <span class="mode-desc">Reveal each sound</span>
-          </button>
+
+          <!-- Phoneme identification section -->
+          <p class="mode-section-label">Phoneme Skills</p>
           <button class="mode-card" data-mode="hear">
             <span class="mode-icon" aria-hidden="true">👂</span>
             <span class="mode-name">Hear &amp; Choose</span>
@@ -125,12 +131,38 @@
             <span class="mode-name">Missing Sound</span>
             <span class="mode-desc">Find the gap</span>
           </button>
+
+          <!-- Phonemic awareness section -->
+          <p class="mode-section-label">Phonemic Awareness</p>
           <button class="mode-card" data-mode="first">
             <span class="mode-icon" aria-hidden="true">🚀</span>
             <span class="mode-name">First Sound</span>
             <span class="mode-desc">What starts it?</span>
           </button>
+          <button class="mode-card" data-mode="last">
+            <span class="mode-icon" aria-hidden="true">🔚</span>
+            <span class="mode-name">Last Sound</span>
+            <span class="mode-desc">What ends it?</span>
+          </button>
+          <button class="mode-card" data-mode="middle">
+            <span class="mode-icon" aria-hidden="true">🎵</span>
+            <span class="mode-name">Middle Sound</span>
+            <span class="mode-desc">Find the vowel!</span>
+          </button>
+
         </nav>
+
+        <!-- Letter Sounds banner -->
+        <button class="stories-banner stories-banner--green" id="btn-letter-sounds" aria-label="Open letter sounds introduction">
+          <span class="stories-banner-mascot">
+            <img src="images/mascot/giri-whiteboard.png" alt="Giri" draggable="false" width="52" height="52" style="object-fit:contain"/>
+          </span>
+          <span class="stories-banner-text">
+            <span class="stories-banner-title">🔤 Letter Sounds</span>
+            <span class="stories-banner-sub">Tap any sound to hear it · organised by type</span>
+          </span>
+          <span class="stories-banner-arrow">→</span>
+        </button>
 
         <!-- Stories banner -->
         <button class="stories-banner" id="btn-stories" aria-label="Open Giri story library">
@@ -139,7 +171,7 @@
           </span>
           <span class="stories-banner-text">
             <span class="stories-banner-title">📚 Giri Stories</span>
-            <span class="stories-banner-sub">16 decodable phonics stories · 4 levels</span>
+            <span class="stories-banner-sub">16 decodable phonics stories · Read Aloud &amp; Decode</span>
           </span>
           <span class="stories-banner-arrow">→</span>
         </button>
@@ -214,6 +246,22 @@
           </div>
         </div>
         <div id="stories-content" class="stories-content"></div>
+      </section>
+
+      <!-- SCREEN: LETTER SOUNDS -->
+      <section class="screen" id="screen-letter-sounds" aria-label="Letter sounds introduction">
+        <div class="stories-screen-header">
+          <button class="icon-btn" id="btn-ls-back" aria-label="Back to home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+          <h2 class="stories-screen-title">Letter Sounds</h2>
+          <div class="stories-screen-mascot" aria-hidden="true">
+            <img src="images/mascot/giri-whiteboard.png" alt="" draggable="false" width="38" height="38" style="object-fit:contain"/>
+          </div>
+        </div>
+        <div id="ls-content" class="stories-content"></div>
       </section>
 
       <!-- SCREEN: RESULT -->

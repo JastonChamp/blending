@@ -1,11 +1,14 @@
 /**
- * Blend It! Mode
+ * Blend It! — Sequential Guided Mode  (ideal for beginners / new decoders)
  *
- * Core loop:
- * 1. Show the word image (emoji)
- * 2. Sequentially reveal each phoneme tile with its sound
- * 3. After all phonemes revealed, say the full blended word
- * 4. Child self-assesses or uses mic to check pronunciation
+ * Step-by-step sound reveal with explicit scaffolding:
+ * 1. Show word image + tip prompt
+ * 2. Child presses "Next Sound" to reveal each phoneme one at a time
+ * 3. Visual step-dots track progress
+ * 4. After all sounds: explicit "Blend it!" call-to-action plays the word
+ * 5. Self-assess
+ *
+ * Designed for parents and teachers introducing blending to new readers.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
@@ -13,157 +16,189 @@ import { buildWordAnimation } from '../components/wheel.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
 
-/** @type {import('../data/words.js').Word|null} */
-let currentWord = null;
+let currentWord   = null;
 let revealedCount = 0;
-let blendStartTime = 0;
-let isRevealing = false;
+let blendStart    = 0;
+let isRevealing   = false;
+
+// ── Setup ─────────────────────────────────────────────────────────────────
 
 /**
- * Set up Blend It mode for a word.
  * @param {import('../data/words.js').Word} word
- * @param {object} els  DOM element references
+ * @param {object} els
  */
 export function setupBlend(word, els) {
-  currentWord = word;
+  currentWord   = word;
   revealedCount = 0;
-  blendStartTime = Date.now();
-  isRevealing = false;
+  blendStart    = Date.now();
+  isRevealing   = false;
 
-  // Show image
   renderWordImage(word, els.wordEmoji, true);
+  els.wordDisplay.innerHTML = '';
 
-  // Instruction
-  els.modeInstruction.textContent = 'Listen to each sound, then blend them together!';
+  els.modeInstruction.textContent = 'Press "Next Sound" to hear each sound — then blend!';
 
-  // Set up phoneme row (initially all hidden)
-  renderPhonemes(word, els.phonemeRow, {
-    showDiacritics: true,
-    revealedIndices: [],
-  });
+  // Phoneme row: all hidden at start
+  renderPhonemes(word, els.phonemeRow, { showDiacritics: true, revealedIndices: [] });
 
-  // Mode area: blend timer / play buttons
-  els.modeArea.innerHTML = `
-    <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-4);">
-      <button class="btn btn--primary btn--xl" id="btn-reveal-next" aria-label="Reveal next sound">
-        Reveal Sound 🔊
-      </button>
-      <div class="blend-progress" aria-live="polite" id="blend-progress">
-        Sound 0 of ${word.graphemes.length}
-      </div>
-    </div>
-  `;
+  _renderControls(els, word, 'initial');
 
-  // Show action buttons
   els.btnCheck.style.display = 'none';
   els.btnSayIt.style.display = 'none';
-  els.btnSkip.style.display = '';
+  els.btnSkip.style.display  = '';
 
-  // Bind reveal button
-  document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
-    revealNextPhoneme(word, els);
-  });
-
-  // Auto-reveal if autoplay is on
   if (store.get('autoplay')) {
-    setTimeout(() => revealNextPhoneme(word, els), 600);
+    setTimeout(() => _revealNext(word, els), 700);
   }
 }
 
-async function revealNextPhoneme(word, els) {
+// ── Controls rendering ────────────────────────────────────────────────────
+
+function _renderControls(els, word, stage) {
+  const total = word.graphemes.length;
+
+  // Step dots
+  const dots = Array.from({ length: total }, (_, i) => {
+    const filled = i < revealedCount ? 'filled' : '';
+    const active = i === revealedCount ? 'current' : '';
+    return `<span class="step-dot ${filled} ${active}" aria-hidden="true"></span>`;
+  }).join('');
+
+  const dotsHtml = `
+    <div class="step-dots" aria-label="Progress: ${revealedCount} of ${total} sounds revealed">
+      ${dots}
+    </div>
+  `;
+
+  if (stage === 'initial' || stage === 'revealing') {
+    const remaining = total - revealedCount;
+    const btnLabel  = revealedCount === 0
+      ? '▶ First Sound'
+      : remaining === 1 ? '▶ Last Sound' : '▶ Next Sound';
+
+    els.modeArea.innerHTML = /* html */`
+      <div class="blend-guided-wrap">
+        <div class="blend-tip" id="blend-tip">
+          ${revealedCount === 0
+            ? '👂 Listen to each sound and say it out loud!'
+            : `Sound ${revealedCount} of ${total} — keep going!`}
+        </div>
+        ${dotsHtml}
+        <button class="btn btn--primary btn--xl blend-next-btn" id="btn-reveal-next"
+                aria-label="${btnLabel}">
+          ${btnLabel}
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-reveal-next')?.addEventListener('click', () => {
+      _revealNext(word, els);
+    });
+
+  } else if (stage === 'blend') {
+    els.modeArea.innerHTML = /* html */`
+      <div class="blend-guided-wrap">
+        <div class="blend-blend-cta" id="blend-cta">
+          🔗 Now put them together!
+        </div>
+        ${dotsHtml}
+        <button class="btn btn--success btn--xl" id="btn-blend-now"
+                aria-label="Blend all sounds together">
+          🔊 Blend it!
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-blend-now')?.addEventListener('click', () => {
+      _doBlend(word, els);
+    });
+
+    if (store.get('autoplay')) {
+      setTimeout(() => _doBlend(word, els), 500);
+    }
+
+  } else if (stage === 'assess') {
+    els.modeArea.innerHTML = /* html */`
+      <div class="blend-guided-wrap">
+        <div class="blend-assess-prompt">Did you blend it right?</div>
+        ${dotsHtml}
+        <div class="blend-assess-btns">
+          <button class="btn btn--success btn--xl" id="btn-self-yes">Yes! ✓</button>
+          <button class="btn btn--ghost btn--xl"   id="btn-self-no">Not yet</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('btn-self-yes')?.addEventListener('click', () => {
+      els.onResult(true, Date.now() - blendStart);
+    });
+    document.getElementById('btn-self-no')?.addEventListener('click', () => {
+      els.onResult(false, Date.now() - blendStart);
+    });
+  }
+}
+
+// ── Reveal logic ──────────────────────────────────────────────────────────
+
+async function _revealNext(word, els) {
   if (isRevealing || revealedCount >= word.graphemes.length) return;
   isRevealing = true;
 
   revealedCount++;
+  const idx = revealedCount - 1;
 
   // Update phoneme display
-  const revealed = Array.from({ length: revealedCount }, (_, i) => i);
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
-    revealedIndices: revealed,
+    revealedIndices: Array.from({ length: revealedCount }, (_, i) => i),
   });
 
-  // Play the phoneme sound
-  const idx = revealedCount - 1;
+  // Play the phoneme
   await audio.speakPhoneme(word.graphemes[idx], word.types[idx]);
-
-  // Update progress text
-  const progressEl = document.getElementById('blend-progress');
-  if (progressEl) {
-    progressEl.textContent = `Sound ${revealedCount} of ${word.graphemes.length}`;
-  }
-
-  // All revealed?
-  if (revealedCount >= word.graphemes.length) {
-    await onAllRevealed(word, els);
-  }
+  await _delay(200);
 
   isRevealing = false;
 
-  // Auto-continue if autoplay
-  if (store.get('autoplay') && revealedCount < word.graphemes.length) {
-    setTimeout(() => revealNextPhoneme(word, els), 400);
+  if (revealedCount >= word.graphemes.length) {
+    // All revealed → go to blend stage
+    _renderControls(els, word, 'blend');
+  } else {
+    _renderControls(els, word, 'revealing');
+    if (store.get('autoplay')) {
+      await _delay(400);
+      _revealNext(word, els);
+    }
   }
 }
 
-async function onAllRevealed(word, els) {
-  // Build the word animation
-  buildWordAnimation(word, els.wordDisplay, (i) => {
-    audio.playSfx('pop');
-  });
-
-  // Update phoneme row: show all with diacritics
+async function _doBlend(word, els) {
+  // Show all tiles with labels
   renderPhonemes(word, els.phonemeRow, {
     showDiacritics: true,
     showLabels: true,
-    revealedIndices: null, // all
+    revealedIndices: null,
   });
 
-  // Short pause then say the full word
-  await new Promise(r => setTimeout(r, 600));
+  // Build word animation
+  buildWordAnimation(word, els.wordDisplay);
+
+  // Brief pause then say the blended word
+  await _delay(500);
   await audio.speakWord(word.word);
 
-  // Update mode area with self-assess buttons
-  els.modeArea.innerHTML = `
-    <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-4);">
-      <p style="font-size:var(--font-size-lg); font-weight:700; color:var(--text);">
-        Did you blend it right?
-      </p>
-      <div style="display:flex; gap:var(--space-4);">
-        <button class="btn btn--success btn--xl" id="btn-self-yes" aria-label="Yes, I got it!">
-          Yes! ✓
-        </button>
-        <button class="btn btn--ghost btn--xl" id="btn-self-no" aria-label="Not quite, try again">
-          Not yet
-        </button>
-      </div>
-    </div>
-  `;
-
-  // Show Say It button
   els.btnSayIt.style.display = '';
 
-  blendStartTime = Date.now() - blendStartTime;
-
-  document.getElementById('btn-self-yes')?.addEventListener('click', () => {
-    els.onResult(true, blendStartTime);
-  });
-
-  document.getElementById('btn-self-no')?.addEventListener('click', () => {
-    els.onResult(false, blendStartTime);
-  });
+  _renderControls(els, word, 'assess');
 }
 
-/**
- * Get the current word for this mode.
- * @returns {import('../data/words.js').Word|null}
- */
-export function getCurrentWord() {
-  return currentWord;
-}
+const _delay = ms => new Promise(r => setTimeout(r, ms));
+
+// ── Exports ───────────────────────────────────────────────────────────────
+
+export function getCurrentWord() { return currentWord; }
 
 export function cleanup() {
-  currentWord = null;
+  currentWord   = null;
   revealedCount = 0;
-  isRevealing = false;
+  isRevealing   = false;
 }

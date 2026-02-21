@@ -16,6 +16,7 @@ import { renderDashboard, destroyDashboard } from './components/dashboard.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
 import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
+import { initLetterSounds, cleanupLetterSounds } from './modes/letterSounds.js';
 
 class App {
   constructor() {
@@ -146,6 +147,27 @@ class App {
     // Stories screen back button (→ home)
     document.getElementById('btn-stories-back')?.addEventListener('click', () => {
       cleanupStoryMode();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Letter Sounds button (home → letter sounds screen)
+    document.getElementById('btn-letter-sounds')?.addEventListener('click', () => {
+      initLetterSounds(
+        document.getElementById('ls-content'),
+        () => {
+          cleanupLetterSounds();
+          this._showScreen('screen-home');
+          mascot.setHomeState('holdCard');
+        },
+      );
+      this._showScreen('screen-letter-sounds');
+      mascot.setState('whiteboard');
+    });
+
+    // Letter Sounds screen back button (→ home)
+    document.getElementById('btn-ls-back')?.addEventListener('click', () => {
+      cleanupLetterSounds();
       this._showScreen('screen-home');
       mascot.setHomeState('holdCard');
     });
