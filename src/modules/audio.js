@@ -28,6 +28,8 @@ const PHONEME_FILES = {
   a: 'a', e: 'e', i: 'i', o: 'o', u: 'u',
   long_a: 'long_a', long_e: 'long_e', long_i: 'long_i',
   long_o: 'long_o', long_u: 'long_u',
+  // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
+  oi: 'oi', ow: 'ow', aw: 'aw',
 };
 
 /**
@@ -47,6 +49,8 @@ const PHONEME_TTS = {
   a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
   // Long vowels
   long_a: 'ay',  long_e: 'ee',  long_i: 'eye',  long_o: 'oh',  long_u: 'you',
+  // Diphthongs
+  oi: 'oy',  ow: 'ow',  aw: 'aw',
 };
 
 /** Sound effect file names */
@@ -115,6 +119,13 @@ class AudioManager {
     let key = grapheme.toLowerCase();
     if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
     if (type === 'se') return; // silent-e: no sound
+
+    // Diphthong: normalise oy→oi, ou→ow, au→aw so they share one audio file each
+    if (type === 'dp') {
+      const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
+      key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();
+      return this._playPhonemeAudio(key);
+    }
 
     // Consolidate blend components (fl, sl, etc.) — speak each letter separately
     if (type === 'bl' && grapheme.length === 2) {
@@ -225,8 +236,32 @@ class AudioManager {
       utt.pitch = 1.1;
       utt.volume = 1;
       if (this._ttsVoice) utt.voice = this._ttsVoice;
-      utt.onend = () => resolve();
-      utt.onerror = () => resolve();
+
+      let resolved = false;
+      const done = () => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(safariFallback);
+        clearInterval(safariResumeCheck);
+        resolve();
+      };
+
+      utt.onend  = done;
+      utt.onerror = done;
+
+      // Safari bug: speechSynthesis.onend can silently never fire, stalling
+      // the whole playback chain. Resolve after a generous time limit based
+      // on text length so the app always continues.
+      const estimatedMs = Math.max(1500, Math.ceil(text.length * 80 / rate)) + 800;
+      const safariFallback = setTimeout(done, estimatedMs);
+
+      // Safari iOS: synthesis silently pauses when the page loses focus or
+      // another audio event fires. Poll and resume so sounds keep playing.
+      const safariResumeCheck = setInterval(() => {
+        if (resolved) { clearInterval(safariResumeCheck); return; }
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      }, 250);
+
       speechSynthesis.speak(utt);
     });
   }
@@ -284,6 +319,10 @@ class AudioManager {
       const type     = wordData.types[i];
       let key = grapheme.toLowerCase();
       if (type === 'lv') key = `long_${grapheme.toLowerCase()}`;
+      if (type === 'dp') {
+        const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
+        key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();
+      }
       if (type === 'se' || this._buffers.has(key)) continue;
       const filename = PHONEME_FILES[key];
       if (filename) {

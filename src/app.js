@@ -213,6 +213,11 @@ class App {
     mode.setup(this._currentWord, {
       ...this._els,
       onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
+      onGroupChange: (group) => {
+        // Teacher changed category in Listen & Blend — reload immediately
+        this._cleanupMode();
+        this._startGame(group || undefined);
+      },
     });
   }
 

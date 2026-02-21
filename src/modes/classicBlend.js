@@ -7,11 +7,15 @@
  *
  * Ideal for whole-class modelling:  teacher presses Play, children listen
  * and join in, then self-assess.
+ *
+ * Includes a category selector so the teacher can freely choose which
+ * word group to practise (Short A, Digraphs, Blends, etc.).
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
 import { audio } from '../modules/audio.js';
 import { store } from '../modules/store.js';
+import { WORD_GROUPS, GROUP_ORDER } from '../data/words.js';
 
 /** @type {import('../data/words.js').Word|null} */
 let currentWord = null;
@@ -21,7 +25,7 @@ let startTime = 0;
 /**
  * Set up Classic Blend mode for a word.
  * @param {import('../data/words.js').Word} word
- * @param {object} els  DOM element references
+ * @param {object} els  DOM element references + callbacks
  */
 export function setupClassicBlend(word, els) {
   currentWord = word;
@@ -41,7 +45,7 @@ export function setupClassicBlend(word, els) {
     revealedIndices: null, // all visible
   });
 
-  // Build the mode area
+  // Build the mode area (category picker + play controls)
   _renderControls(els, word);
 
   // Hide check / say-it buttons; show skip
@@ -55,10 +59,36 @@ export function setupClassicBlend(word, els) {
   }
 }
 
+// ── Category selector ─────────────────────────────────────────────────────
+
+function _buildGroupOptions() {
+  const savedGroup = store.get('currentGroup') || '';
+  const allSelected = !savedGroup ? 'selected' : '';
+  const options = [`<option value="" ${allSelected}>🔤 All Words</option>`];
+  for (const key of GROUP_ORDER) {
+    const g = WORD_GROUPS[key];
+    const sel = savedGroup === key ? 'selected' : '';
+    options.push(`<option value="${key}" ${sel}>${g.icon} ${g.label}</option>`);
+  }
+  return options.join('');
+}
+
+// ── Controls rendering ────────────────────────────────────────────────────
+
 function _renderControls(els, word, played = false) {
   els.modeArea.innerHTML = `
-    <div style="display:flex; flex-direction:column; align-items:center; gap:var(--space-4);">
-      <div style="display:flex; gap:var(--space-3); flex-wrap:wrap; justify-content:center;">
+    <div class="classic-blend-wrap">
+
+      <!-- Category selector -->
+      <div class="category-row">
+        <label class="category-label" for="classic-group-select">Category:</label>
+        <select id="classic-group-select" class="category-select" aria-label="Choose word category">
+          ${_buildGroupOptions()}
+        </select>
+      </div>
+
+      <!-- Play buttons -->
+      <div class="classic-btn-row">
         <button class="btn btn--primary btn--xl" id="btn-classic-play" aria-label="Play all sounds">
           ▶ Play Sounds
         </button>
@@ -68,8 +98,10 @@ function _renderControls(els, word, played = false) {
         </button>
         ` : ''}
       </div>
+
+      <!-- Self-assessment (after first play) -->
       ${played ? `
-      <div style="display:flex; gap:var(--space-4); margin-top:var(--space-2);">
+      <div class="classic-assess-row">
         <button class="btn btn--success btn--xl" id="btn-self-yes" aria-label="Yes, I blended it!">
           Yes! ✓
         </button>
@@ -78,8 +110,16 @@ function _renderControls(els, word, played = false) {
         </button>
       </div>
       ` : ''}
+
     </div>
   `;
+
+  // Category change → notify app to reload with new group
+  document.getElementById('classic-group-select')?.addEventListener('change', (e) => {
+    const group = e.target.value || null;
+    store.set('currentGroup', group);
+    els.onGroupChange?.(group);
+  });
 
   document.getElementById('btn-classic-play')?.addEventListener('click', () => {
     _playSounds(word, els);
@@ -97,6 +137,8 @@ function _renderControls(els, word, played = false) {
     els.onResult(false, Date.now() - startTime);
   });
 }
+
+// ── Playback ──────────────────────────────────────────────────────────────
 
 async function _playSounds(word, els) {
   if (isPlaying) return;

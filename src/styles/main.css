@@ -26,6 +26,7 @@
   --c-blend:       #f97316;
   --c-silent-e:    #94a3b8;
   --c-r-control:   #ec4899;
+  --c-diphthong:   #0d9488;
 
   /* Surfaces */
   --bg:           #f8f7ff;
@@ -137,6 +138,7 @@
   --c-long-vowel:  #006600;
   --c-digraph:     #660066;
   --c-blend:       #994400;
+  --c-diphthong:   #0a6b62;
 }
 
 /* ── Dark mode ── */
@@ -599,6 +601,7 @@ input, select, textarea { font-family: inherit; }
 .letter-tile--blend       { background: var(--c-blend); }
 .letter-tile--silent-e    { background: var(--c-silent-e); font-size: var(--font-size-lg); }
 .letter-tile--r-control   { background: var(--c-r-control); }
+.letter-tile--diphthong   { background: var(--c-diphthong); }
 .letter-tile--revealed    { animation: pop 0.35s var(--ease-bounce); }
 
 /* ── PHONEME ROW ── */
@@ -637,6 +640,7 @@ input, select, textarea { font-family: inherit; }
 .phoneme-symbol--blend       { background: var(--c-blend); }
 .phoneme-symbol--silent-e    { background: var(--c-silent-e); }
 .phoneme-symbol--r-control   { background: var(--c-r-control); }
+.phoneme-symbol--diphthong   { background: var(--c-diphthong); }
 
 /* Active tile highlight used by Classic Blend mode during sound playback */
 .phoneme-tile.active .phoneme-symbol {
@@ -673,6 +677,58 @@ input, select, textarea { font-family: inherit; }
 
 /* ── 7. MODE AREA ── */
 .mode-area { width: 100%; }
+
+/* Classic Blend layout */
+.classic-blend-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+.classic-btn-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.classic-assess-row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Category selector */
+.category-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-4);
+}
+.category-label {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.category-select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding-right: var(--space-5);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b5cf6' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0 center;
+}
+.category-select:focus { outline: 2px solid var(--color-primary); border-radius: 4px; }
 
 /* Choice buttons (Hear & Choose, Missing Sound, First Sound) */
 .choice-grid {
