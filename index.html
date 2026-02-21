@@ -1,582 +1,330 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="default">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="PhonicsQuest – the most fun phonics blending and segmenting game for kids!">
-  <title>PhonicsQuest – Blend, Segment &amp; Shine!</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="PhonicsQuest – the phonics learning adventure for early readers. Practice blending, segmenting, and identifying sounds." />
+  <meta name="theme-color" content="#6c63ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="PhonicsQuest" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="/blending/manifest.json" />
+  <link rel="apple-touch-icon" href="/blending/icons/icon-192.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/src/styles/main.css" />
+
+  <title>PhonicsQuest</title>
 </head>
 <body>
-  <div class="app-wrapper">
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <!-- ===== HEADER ===== -->
-    <header>
+  <div id="app" role="application" aria-label="PhonicsQuest phonics learning app">
+
+    <!-- APP HEADER -->
+    <header class="app-header" role="banner">
       <div class="header-left">
-        <div class="app-logo">
-          <span class="logo-icon">🦜</span>
-          <span class="logo-text">PhonicsQuest</span>
+        <button class="mascot-btn" id="mascot-trigger" aria-label="Ollie the owl – tap to cheer!">
+          <div class="mascot-mini" id="mascot-mini" aria-hidden="true"></div>
+        </button>
+        <span class="app-brand">PhonicsQuest</span>
+      </div>
+
+      <div class="header-stats" id="header-stats" aria-label="Your progress">
+        <div class="stat-chip" aria-label="Hearts remaining" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">❤️</span>
+          <span class="stat-value" id="hearts-val">5</span>
+        </div>
+        <div class="stat-chip" aria-label="Day streak" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">🔥</span>
+          <span class="stat-value" id="streak-val">0</span>
+        </div>
+        <div class="stat-chip" aria-label="Experience points" aria-live="polite">
+          <span class="stat-icon" aria-hidden="true">⭐</span>
+          <span class="stat-value" id="xp-val">0</span>
         </div>
       </div>
-      <div class="header-center">
-        <!-- XP Bar -->
-        <div class="xp-bar-wrap" id="xpBarWrap" title="Experience Points">
-          <span class="xp-level-badge" id="xpLevelBadge">Lv 1</span>
-          <div class="xp-bar-track">
-            <div class="xp-bar-fill" id="xpBarFill"></div>
-          </div>
-          <span class="xp-label" id="xpLabel">0 / 100 XP</span>
-        </div>
-        <div class="level-name" id="levelName">Phonics Rookie</div>
-      </div>
-      <div class="header-right">
-        <!-- Hearts / Lives -->
-        <div class="hearts-display" id="heartsDisplay" aria-label="Lives remaining">
-          <span class="heart-icon active" data-heart="1">❤️</span>
-          <span class="heart-icon active" data-heart="2">❤️</span>
-          <span class="heart-icon active" data-heart="3">❤️</span>
-          <span class="heart-icon active" data-heart="4">❤️</span>
-          <span class="heart-icon active" data-heart="5">❤️</span>
-        </div>
-        <!-- Streak flame -->
-        <div class="header-streak" id="headerStreak" title="Daily streak">
-          <span class="streak-flame-big">🔥</span>
-          <span id="headerStreakDays">0</span>
-        </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="settings-btn" aria-label="Settings" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="dashboard-btn" aria-label="Parent dashboard" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </button>
       </div>
     </header>
 
-    <main class="container">
-
-      <!-- ===== MODE TABS ===== -->
-      <div class="mode-tabs" role="tablist" aria-label="Game mode">
-        <button class="mode-tab active" id="tabFreePlay" role="tab" aria-selected="true" data-mode="freeplay">
-          <span class="tab-icon">🎡</span> Free Play
-        </button>
-        <button class="mode-tab" id="tabLesson" role="tab" aria-selected="false" data-mode="lesson">
-          <span class="tab-icon">📚</span> Lessons
-        </button>
-        <button class="mode-tab" id="tabPhonicsGroups" role="tab" aria-selected="false" data-mode="groups">
-          <span class="tab-icon">🎵</span> Sound Groups
-        </button>
+    <!-- Level Bar -->
+    <div class="level-bar-wrapper" aria-label="Level progress" role="complementary">
+      <span class="level-label">Lv <strong id="level-val">1</strong></span>
+      <div class="level-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="level-bar-fill" id="level-bar-fill" style="width:0%"></div>
       </div>
+      <span class="level-label">Lv <strong id="level-next-val">2</strong></span>
+    </div>
 
-      <!-- ===== FREE PLAY PANEL ===== -->
-      <section id="panelFreePlay" class="panel active" aria-label="Free Play mode">
+    <!-- MAIN CONTENT -->
+    <main id="main-content" class="main-content">
 
-        <!-- Score + Streak row -->
-        <div class="score-streak-row">
-          <div class="score-pill" aria-live="polite">
-            <span class="score-icon">⭐</span>
-            <span id="scoreValue">0</span> pts
-          </div>
-          <div id="streakSection" class="streak-section" aria-live="polite">
-            <span class="streak-flame">🔥</span>
-            <span id="streakCount">0</span> in a row!
-          </div>
-          <!-- Daily Goal Ring -->
-          <div id="dailyGoalWidget" class="daily-goal-widget">
-            <div class="goal-ring-container">
-              <svg class="goal-ring" viewBox="0 0 100 100">
-                <circle class="goal-ring-bg" cx="50" cy="50" r="45"/>
-                <circle class="goal-ring-progress" id="goalRingProgress" cx="50" cy="50" r="45"/>
-              </svg>
-              <div class="goal-ring-content">
-                <span id="dailyGoalCurrent" class="goal-current">0</span>
-                <span class="goal-separator">/</span>
-                <span id="dailyGoalTarget" class="goal-target">10</span>
-              </div>
-            </div>
-            <div class="goal-info">
-              <span class="goal-label">Daily Goal</span>
-              <span id="dailyStreakDays" class="daily-streak">🔥 0 day streak</span>
-            </div>
-          </div>
-          <!-- Session Summary -->
-          <div id="sessionSummary" class="session-summary">
-            <button id="toggleSessionSummary" class="session-toggle" aria-expanded="false">📊 Stats</button>
-            <div id="sessionDetails" class="session-details" hidden>
-              <div class="session-stat"><span class="stat-icon">📝</span><span class="stat-label">Words:</span><span id="sessionWords" class="stat-value">0</span></div>
-              <div class="session-stat"><span class="stat-icon">⏱️</span><span class="stat-label">Time:</span><span id="sessionTime" class="stat-value">0:00</span></div>
-              <div class="session-stat"><span class="stat-icon">🎯</span><span class="stat-label">Best Streak:</span><span id="sessionBestStreak" class="stat-value">0</span></div>
-            </div>
-          </div>
+      <!-- SCREEN: HOME -->
+      <section class="screen active" id="screen-home" aria-label="Choose your activity">
+        <div class="home-hero" aria-hidden="true">
+          <div class="mascot-home" id="mascot-home"></div>
         </div>
+        <h1 class="home-title">Ready to read?</h1>
+        <p class="home-subtitle">Pick your adventure!</p>
 
-        <!-- Exercise Mode Selector -->
-        <div class="exercise-mode-bar" role="group" aria-label="Exercise type">
-          <button class="ex-mode-btn active" data-exercise="blend" title="Listen and blend the sounds">
-            <span class="ex-icon">🎵</span><span class="ex-label">Blend It</span>
-          </button>
-          <button class="ex-mode-btn" data-exercise="hear_choose" title="Listen and choose the word">
-            <span class="ex-icon">👂</span><span class="ex-label">Hear &amp; Choose</span>
-          </button>
-          <button class="ex-mode-btn" data-exercise="segment" title="Tap each sound in the word">
-            <span class="ex-icon">✂️</span><span class="ex-label">Segment It</span>
-          </button>
-          <button class="ex-mode-btn" data-exercise="missing" title="Fill in the missing sound">
-            <span class="ex-icon">❓</span><span class="ex-label">Missing Sound</span>
-          </button>
-          <button class="ex-mode-btn" data-exercise="first_sound" title="What is the first sound?">
-            <span class="ex-icon">🔤</span><span class="ex-label">First Sound</span>
+        <!-- Spin Wheel -->
+        <div class="wheel-wrapper" id="wheel-wrapper">
+          <canvas id="spin-wheel" width="260" height="260" aria-label="Word category wheel" role="img"></canvas>
+          <button class="spin-btn" id="spin-btn" aria-label="Spin the wheel to pick a word category">
+            SPIN!
           </button>
         </div>
 
-        <!-- Main Game Area -->
-        <div class="game-area">
+        <!-- Mode Grid -->
+        <nav class="mode-grid" aria-label="Activity modes">
+          <button class="mode-card" data-mode="blend">
+            <span class="mode-icon" aria-hidden="true">🎯</span>
+            <span class="mode-name">Blend It!</span>
+            <span class="mode-desc">Combine sounds</span>
+          </button>
+          <button class="mode-card" data-mode="hear">
+            <span class="mode-icon" aria-hidden="true">👂</span>
+            <span class="mode-name">Hear &amp; Choose</span>
+            <span class="mode-desc">Listen carefully</span>
+          </button>
+          <button class="mode-card" data-mode="segment">
+            <span class="mode-icon" aria-hidden="true">✂️</span>
+            <span class="mode-name">Segment It</span>
+            <span class="mode-desc">Break it apart</span>
+          </button>
+          <button class="mode-card" data-mode="missing">
+            <span class="mode-icon" aria-hidden="true">🔍</span>
+            <span class="mode-name">Missing Sound</span>
+            <span class="mode-desc">Find the gap</span>
+          </button>
+          <button class="mode-card" data-mode="first">
+            <span class="mode-icon" aria-hidden="true">🚀</span>
+            <span class="mode-name">First Sound</span>
+            <span class="mode-desc">What starts it?</span>
+          </button>
+        </nav>
 
-          <!-- Mascot -->
-          <div class="mascot-wrap" aria-hidden="true">
-            <div class="mascot-character" id="mascotChar">
-              <div class="mascot-body">🦜</div>
-              <div class="mascot-speech" id="mascotSpeech"></div>
-            </div>
-          </div>
-
-          <!-- Word Display Box -->
-          <div class="word-display-container">
-            <div class="word-display" id="wordBox" aria-live="polite"></div>
-          </div>
-
-          <!-- ===== EXERCISE UIs ===== -->
-
-          <!-- HEAR & CHOOSE exercise UI -->
-          <div class="exercise-ui" id="exerciseHearChoose" hidden>
-            <p class="exercise-prompt">Listen to the word and choose it:</p>
-            <button class="play-word-btn" id="playWordBtn" aria-label="Play word">
-              <span class="play-icon">🔊</span> Hear Word
-            </button>
-            <div class="choice-grid" id="hearChooseOptions" role="group" aria-label="Word choices"></div>
-          </div>
-
-          <!-- SEGMENT exercise UI -->
-          <div class="exercise-ui" id="exerciseSegment" hidden>
-            <p class="exercise-prompt">Tap each sound in order:</p>
-            <div class="segment-boxes" id="segmentBoxes" role="group" aria-label="Phoneme buttons"></div>
-            <button class="check-answer-btn" id="segmentCheckBtn" disabled>
-              ✅ Check!
-            </button>
-          </div>
-
-          <!-- MISSING SOUND exercise UI -->
-          <div class="exercise-ui" id="exerciseMissing" hidden>
-            <p class="exercise-prompt">Choose the missing sound:</p>
-            <div class="missing-word-display" id="missingWordDisplay"></div>
-            <div class="choice-grid phoneme-choices" id="missingOptions" role="group" aria-label="Phoneme choices"></div>
-          </div>
-
-          <!-- FIRST SOUND exercise UI -->
-          <div class="exercise-ui" id="exerciseFirstSound" hidden>
-            <p class="exercise-prompt" id="firstSoundPrompt">What is the <strong>first sound</strong> in:</p>
-            <div class="first-sound-word" id="firstSoundWord"></div>
-            <button class="play-word-btn" id="playFirstSoundBtn" aria-label="Hear the word">
-              <span class="play-icon">🔊</span> Hear it
-            </button>
-            <div class="choice-grid phoneme-choices" id="firstSoundOptions" role="group" aria-label="Sound choices"></div>
-          </div>
-
-          <!-- Feedback overlay -->
-          <div class="answer-feedback" id="answerFeedback" aria-live="assertive" hidden>
-            <span class="feedback-icon" id="feedbackIcon"></span>
-            <span class="feedback-text" id="feedbackText"></span>
-          </div>
-
-          <!-- Action Buttons (Blend mode) -->
-          <div class="action-buttons" id="blendActionButtons">
-            <button id="spinButton" aria-label="Get a new word" accesskey="s" title="Get a new word (S)">
-              <span class="icon" aria-hidden="true">🎡</span> Spin
-            </button>
-            <button id="repeatButton" aria-label="Repeat the word" accesskey="r" disabled title="Replay sounds (R)">
-              <span class="icon" aria-hidden="true">🔄</span> Repeat
-            </button>
-            <button id="hintButton" aria-label="Get a hint" accesskey="h" hidden title="Hint (H)">
-              <span class="icon" aria-hidden="true">💡</span> Hint
-            </button>
-            <button id="skipButton" aria-label="Skip this word" hidden title="Skip word">
-              <span class="icon" aria-hidden="true">⏭️</span> Skip
-            </button>
-          </div>
-
-          <!-- Self-assessment for blend mode -->
-          <div class="self-assess-buttons" id="selfAssessButtons" hidden>
-            <p class="assess-prompt">Did you blend it?</p>
-            <button class="assess-yes" id="assessYes">✅ Yes, I got it!</button>
-            <button class="assess-no" id="assessNo">❌ Not quite</button>
-          </div>
-
-          <div class="keyboard-hints" aria-hidden="true">
-            <span class="kbd-hint"><kbd class="kbd">S</kbd> Spin</span>
-            <span class="kbd-hint"><kbd class="kbd">R</kbd> Repeat</span>
-            <span class="kbd-hint"><kbd class="kbd">H</kbd> Hint</span>
-          </div>
-        </div><!-- /.game-area -->
-
-        <!-- Progress Bar -->
-        <div class="progress-container">
-          <div class="progress-icon" id="progressIcon" aria-hidden="true">🚀</div>
-          <div id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            <div id="progressFill"></div>
-          </div>
-          <p id="progressText" aria-live="polite">0 / 0 Words</p>
+        <!-- Daily Goal -->
+        <div class="daily-goal" role="status" aria-label="Daily goal progress">
+          <span class="goal-label">Today</span>
+          <div class="goal-track"><div class="goal-fill" id="goal-fill" style="width:0%"></div></div>
+          <span class="goal-count"><span id="goal-done">0</span>/<span id="goal-total">10</span></span>
         </div>
-
-        <div id="badges" class="badges"></div>
-
-        <div id="colorLegend" class="color-legend" aria-label="Letter color guide">
-          <button id="toggleLegend" class="legend-toggle" aria-expanded="false">📖 Color Guide</button>
-          <div class="legend-content" hidden>
-            <span class="legend-item"><span class="legend-color vowel"></span> Vowel</span>
-            <span class="legend-item"><span class="legend-color digraph"></span> Digraph</span>
-            <span class="legend-item"><span class="legend-color silent"></span> Silent</span>
-            <span class="legend-item"><span class="legend-color diphthong"></span> Diphthong</span>
-            <span class="legend-item"><span class="legend-color long-vowel"></span> Long Vowel</span>
-          </div>
-        </div>
-
-        <div id="complimentBox" class="compliment-box" aria-live="assertive"></div>
-        <div id="blendingTimerContainer" role="timer" aria-label="Blending timer">
-          <p class="timer-label" aria-live="polite">Blend now! ⏳</p>
-          <div id="blendingTimer" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-
-      </section><!-- /#panelFreePlay -->
-
-      <!-- ===== LESSON PANEL ===== -->
-      <section id="panelLesson" class="panel" hidden aria-label="Lesson mode">
-
-        <!-- Lesson in progress view -->
-        <div id="lessonInProgress" hidden>
-          <div class="lesson-header">
-            <button class="lesson-back-btn" id="lessonBackBtn" aria-label="Exit lesson">✕</button>
-            <!-- Lesson progress dots -->
-            <div class="lesson-progress-dots" id="lessonProgressDots" aria-label="Lesson progress"></div>
-            <!-- Hearts in lesson -->
-            <div class="lesson-hearts" id="lessonHearts" aria-label="Hearts remaining"></div>
-          </div>
-          <!-- The actual exercise is rendered inside #wordBox area -->
-          <div class="lesson-exercise-area">
-            <div class="lesson-exercise-label" id="lessonExLabel"></div>
-            <div class="lesson-word-display" id="lessonWordBox" aria-live="polite"></div>
-            <div class="lesson-exercise-ui" id="lessonExerciseUI"></div>
-            <div class="answer-feedback" id="lessonFeedback" aria-live="assertive" hidden>
-              <span class="feedback-icon" id="lessonFeedbackIcon"></span>
-              <span class="feedback-text" id="lessonFeedbackText"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lesson chooser view -->
-        <div id="lessonChooser">
-          <h2 class="section-title">Choose Your Lesson</h2>
-          <p class="section-sub">Each lesson has 8 exercises. Earn up to 3 stars!</p>
-          <div class="lesson-list" id="lessonList"></div>
-        </div>
-
-      </section><!-- /#panelLesson -->
-
-      <!-- ===== PHONICS GROUPS PANEL ===== -->
-      <section id="panelGroups" class="panel" hidden aria-label="Sound groups – Jolly Phonics style">
-        <h2 class="section-title">🎵 Phonics Sound Groups</h2>
-        <p class="section-sub">Learn sounds in groups, just like Jolly Phonics!</p>
-        <div class="groups-grid" id="phonicsGroupsGrid"></div>
-        <div class="group-detail" id="groupDetail" hidden>
-          <button class="group-back-btn" id="groupBackBtn">← Back to groups</button>
-          <div class="group-detail-content" id="groupDetailContent"></div>
-          <button class="practice-group-btn" id="practiceGroupBtn">🎵 Practice this group!</button>
-        </div>
-      </section><!-- /#panelGroups -->
-
-      <!-- ===== SETTINGS TOGGLE ===== -->
-      <section class="settings-toggle">
-        <button id="toggleSettingsButton" aria-expanded="false" aria-controls="advancedSettings">
-          ⚙️ Customize
-        </button>
       </section>
-      <section id="advancedSettings" class="advanced-settings">
-        <h2 class="sr-only">Game Settings</h2>
-        <div class="controls-section">
-          <div class="select-controls">
-            <div>
-              <label for="wordTypeSelector">Word Type:</label>
-              <select id="wordTypeSelector" aria-label="Select word type">
-                <option value="cvc" selected>CVC Words</option>
-                <option value="ccvc">CCVC Words</option>
-                <option value="cvcc">CVCC Words</option>
-                <option value="ccvcc">CCVCC Words</option>
-                <option value="digraphs">Digraphs</option>
-                <option value="extended">Extended Words</option>
-                <option value="silentE">Silent E Words</option>
-                <option value="softCAndG">Soft C &amp; G Words</option>
-                <option value="diphthongs">Diphthongs</option>
-                <option value="longVowels">Long Vowel Words (Advanced)</option>
-              </select>
-              <div id="wordTypeDesc" class="word-type-desc">e.g. cat, dog, sun</div>
-            </div>
-            <div>
-              <label for="vowelSelector">Focus Vowel:</label>
-              <select id="vowelSelector" aria-label="Select focus vowel">
-                <option value="all" selected>All Vowels</option>
-                <option value="a">A</option>
-                <option value="e">E</option>
-                <option value="i">I</option>
-                <option value="o">O</option>
-                <option value="u">U</option>
-              </select>
-            </div>
-            <div>
-              <label for="themeSelector">Theme:</label>
-              <select id="themeSelector" aria-label="Select theme">
-                <option value="default">Default</option>
-                <option value="space">Space Adventure</option>
-                <option value="forest">Enchanted Forest</option>
-                <option value="ocean">Ocean Explorer</option>
-                <option value="high-contrast">High Contrast</option>
-              </select>
-            </div>
+
+      <!-- SCREEN: GAME -->
+      <section class="screen" id="screen-game" aria-label="Game" aria-live="polite">
+
+        <!-- Word Stage -->
+        <div class="word-stage" id="word-stage">
+          <div class="word-image-wrap" id="word-image-wrap" aria-hidden="true">
+            <div class="word-emoji" id="word-emoji"></div>
           </div>
-          <div class="timer-controls">
-            <label for="blendingDelayInput">Blending Time (sec):</label>
-            <div class="time-adjust" id="blendingDelayInput">
-              <button id="decreaseBlendingTime" aria-label="Decrease blending time">➖</button>
-              <span id="blendingTimeDisplay" aria-live="polite">3</span>
-              <button id="increaseBlendingTime" aria-label="Increase blending time">➕</button>
+          <div class="word-display" id="word-display" aria-label="Current word" role="img" aria-live="off"></div>
+          <div class="phoneme-row" id="phoneme-row" role="list" aria-label="Word sounds"></div>
+          <p class="mode-instruction" id="mode-instruction" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- Mode Area -->
+        <div class="mode-area" id="mode-area" role="group" aria-label="Answer choices"></div>
+
+        <!-- Action Bar -->
+        <div class="action-bar" id="action-bar">
+          <button class="btn btn--ghost" id="btn-say-it" aria-label="Hear the word spoken aloud">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
+            </svg>
+            Say It
+          </button>
+          <button class="btn btn--primary" id="btn-check" aria-label="Check my answer">Check ✓</button>
+          <button class="btn btn--ghost" id="btn-skip" aria-label="Skip this word">Skip →</button>
+        </div>
+
+        <!-- Mic Button -->
+        <button class="mic-btn" id="btn-mic" aria-label="Say the word to score yourself" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+            <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+          </svg>
+        </button>
+
+        <div class="speech-bubble" id="speech-bubble" aria-live="polite" hidden></div>
+
+        <button class="back-btn" id="btn-back" aria-label="Back to menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Menu
+        </button>
+
+      </section>
+
+      <!-- SCREEN: RESULT -->
+      <section class="screen" id="screen-result" aria-label="Round result" aria-live="assertive">
+        <div class="result-mascot" id="result-mascot" aria-hidden="true"></div>
+        <p class="result-badge" id="result-badge"></p>
+        <h2 class="result-message" id="result-message"></h2>
+        <div class="result-word-display" id="result-word-display"></div>
+        <div class="result-xp" id="result-xp" aria-live="polite"></div>
+        <button class="btn btn--primary btn--xl" id="btn-next">Next Word! →</button>
+      </section>
+
+    </main>
+
+    <!-- Floating mascot -->
+    <div class="mascot-float" id="mascot" aria-hidden="true"></div>
+
+    <!-- Toast notifications -->
+    <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Confetti canvas -->
+    <canvas id="confetti-canvas" aria-hidden="true"
+            style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+
+    <!-- SETTINGS MODAL -->
+    <div class="modal-overlay" id="modal-settings" role="dialog" aria-modal="true" aria-label="Settings" hidden>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2 class="modal-title">Settings</h2>
+          <button class="modal-close" aria-label="Close settings" data-close="modal-settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <section class="settings-group">
+            <h3 class="settings-label">Theme</h3>
+            <div class="theme-swatches" role="group" aria-label="Color themes">
+              <button class="theme-swatch active" data-theme="default" aria-label="Default purple" aria-pressed="true">
+                <span class="swatch-dot" style="background:#6c63ff"></span>
+              </button>
+              <button class="theme-swatch" data-theme="ocean" aria-label="Ocean blue" aria-pressed="false">
+                <span class="swatch-dot" style="background:#0ea5e9"></span>
+              </button>
+              <button class="theme-swatch" data-theme="forest" aria-label="Forest green" aria-pressed="false">
+                <span class="swatch-dot" style="background:#22c55e"></span>
+              </button>
+              <button class="theme-swatch" data-theme="sunset" aria-label="Sunset orange" aria-pressed="false">
+                <span class="swatch-dot" style="background:#f97316"></span>
+              </button>
+              <button class="theme-swatch" data-theme="contrast" aria-label="High contrast" aria-pressed="false">
+                <span class="swatch-dot" style="background:#000"></span>
+              </button>
             </div>
-          </div>
-          <div class="settings-section">
-            <label>
-              <input type="checkbox" id="celebrationMode" aria-label="Enable celebration mode">
-              Celebration Mode
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Audio</h3>
+            <label class="toggle-row">
+              <span>Sound Effects</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="sfx-toggle" role="switch" checked />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
             </label>
-          </div>
-          <div class="settings-buttons">
-            <button id="toggleAudioButton" aria-label="Toggle sounds" title="Toggle sound effects">🔊 Sound On</button>
-            <button id="fullscreenButton" aria-label="Toggle fullscreen" title="Fullscreen mode">⛶ Fullscreen</button>
-            <button id="parentDashboardButton" aria-label="Open parent dashboard" title="Learning Dashboard">👨‍👩‍👧 Dashboard</button>
-            <button id="resetProgressButton" aria-label="Reset all progress" title="Reset everything">🗑 Reset</button>
-          </div>
-          <div class="settings-section">
-            <label for="dailyGoalSelect">Daily Word Goal:</label>
-            <select id="dailyGoalSelect">
-              <option value="5">5 words</option>
-              <option value="10" selected>10 words</option>
-              <option value="15">15 words</option>
-              <option value="20">20 words</option>
-              <option value="30">30 words</option>
-            </select>
-          </div>
+            <label class="toggle-row">
+              <span>Auto-play word</span>
+              <span class="toggle-wrap">
+                <input type="checkbox" id="autoplay-toggle" role="switch" checked />
+                <span class="toggle-track" aria-hidden="true"></span>
+              </span>
+            </label>
+            <div class="slider-row">
+              <label for="voice-speed">Voice Speed</label>
+              <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="0.8" />
+              <span id="voice-speed-display">0.8×</span>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Difficulty</h3>
+            <div class="diff-group" role="group" aria-label="Difficulty">
+              <button class="diff-btn active" data-diff="1" aria-pressed="true">Starter</button>
+              <button class="diff-btn" data-diff="2" aria-pressed="false">Explorer</button>
+              <button class="diff-btn" data-diff="3" aria-pressed="false">Champion</button>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3 class="settings-label">Daily Goal</h3>
+            <div class="slider-row">
+              <label for="goal-range">Words per day</label>
+              <input type="range" id="goal-range" min="5" max="30" step="5" value="10" />
+              <span id="goal-range-display">10</span>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <button class="btn btn--danger" id="reset-progress-btn">Reset All Progress</button>
+          </section>
         </div>
-      </section>
-
-      <footer>
-        <p class="note">Tip: Say each sound aloud as you blend!</p>
-      </footer>
-
-    </main><!-- /.container -->
-
-    <!-- ===== OVERLAYS & MODALS ===== -->
-    <div id="confettiContainer" aria-hidden="true"></div>
-    <div id="scoreIncrement" class="score-increment" aria-hidden="true"></div>
-
-    <!-- Difficult Word Banner -->
-    <div id="difficultWordBanner" class="difficult-word-banner" hidden>
-      <span class="banner-icon">📚</span>
-      <span class="banner-text">Review Word – keep practising!</span>
-    </div>
-
-    <!-- Heart Lost -->
-    <div id="heartLostBanner" class="heart-lost-banner" hidden>
-      <span class="banner-icon">💔</span>
-      <span class="banner-text" id="heartLostText">Oops! –1 Heart</span>
-    </div>
-
-    <!-- XP Earned Pop -->
-    <div id="xpPop" class="xp-pop" aria-hidden="true"></div>
-
-    <!-- Daily Goal Complete -->
-    <div id="goalCompleteCelebration" class="goal-complete-celebration" hidden>
-      <div class="celebration-content">
-        <span class="celebration-icon">🎉</span>
-        <h3>Daily Goal Complete!</h3>
-        <p>Amazing work! You practised <span id="celebrationWordCount">10</span> words today!</p>
-        <button id="closeCelebration">Keep Going!</button>
       </div>
     </div>
 
-    <!-- Lesson Complete Modal -->
-    <div id="lessonCompleteModal" class="lesson-complete-modal" hidden>
-      <div class="lc-content">
-        <h2 class="lc-title">Lesson Complete! 🎉</h2>
-        <div class="lc-stars" id="lcStars">
-          <span class="lc-star" id="lcStar1">⭐</span>
-          <span class="lc-star" id="lcStar2">⭐</span>
-          <span class="lc-star" id="lcStar3">⭐</span>
+    <!-- DASHBOARD MODAL -->
+    <div class="modal-overlay" id="modal-dashboard" role="dialog" aria-modal="true" aria-label="Parent Dashboard" hidden>
+      <div class="modal-panel modal-panel--wide">
+        <div class="modal-header">
+          <h2 class="modal-title">Parent Dashboard</h2>
+          <button class="modal-close" aria-label="Close dashboard" data-close="modal-dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
-        <div class="lc-stats">
-          <div class="lc-stat">
-            <span class="lc-stat-icon">✅</span>
-            <span class="lc-stat-val" id="lcCorrect">8</span>
-            <span class="lc-stat-label">Correct</span>
-          </div>
-          <div class="lc-stat">
-            <span class="lc-stat-icon">⚡</span>
-            <span class="lc-stat-val" id="lcXPEarned">+80</span>
-            <span class="lc-stat-label">XP Earned</span>
-          </div>
-          <div class="lc-stat">
-            <span class="lc-stat-icon">❤️</span>
-            <span class="lc-stat-val" id="lcHeartsLeft">5</span>
-            <span class="lc-stat-label">Hearts Left</span>
-          </div>
-        </div>
-        <button class="lc-continue-btn" id="lcContinueBtn">Continue!</button>
+        <div class="modal-body" id="dashboard-content"><!-- Injected by dashboard.js --></div>
       </div>
     </div>
 
-    <!-- Level Up Modal -->
-    <div id="levelUpModal" class="level-up-modal" hidden>
-      <div class="lu-content">
-        <div class="lu-icon">🏆</div>
-        <h2 class="lu-title">Level Up!</h2>
-        <p class="lu-level" id="luLevelName">Blending Star</p>
-        <button class="lu-close-btn" id="luCloseBtn">Awesome!</button>
+    <!-- PIN MODAL -->
+    <div class="modal-overlay" id="modal-pin" role="dialog" aria-modal="true" aria-label="Enter PIN" hidden>
+      <div class="modal-panel modal-panel--sm">
+        <div class="modal-header">
+          <h2 class="modal-title">Parent Area</h2>
+        </div>
+        <div class="modal-body pin-body">
+          <p>Enter your 4-digit PIN:</p>
+          <div class="pin-inputs">
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="0" aria-label="PIN digit 1"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="1" aria-label="PIN digit 2"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="2" aria-label="PIN digit 3"/>
+            <input type="password" inputmode="numeric" maxlength="1" class="pin-digit" data-index="3" aria-label="PIN digit 4"/>
+          </div>
+          <p class="pin-hint" id="pin-hint" aria-live="polite"></p>
+          <button class="btn btn--primary" id="pin-confirm-btn">Enter</button>
+          <button class="btn btn--ghost btn--sm" id="pin-cancel-btn">Cancel</button>
+          <p class="pin-setup-hint">First time? Use <strong>1234</strong></p>
+        </div>
       </div>
     </div>
 
-    <!-- Parent Dashboard Modal -->
-    <dialog id="parentDashboardModal" class="modal parent-modal">
-      <div class="modal-content dashboard-content">
-        <div class="dashboard-header">
-          <h2>📊 Learning Dashboard</h2>
-          <button id="closeParentDashboard" class="close-btn" aria-label="Close dashboard">✕</button>
-        </div>
-        <div class="dashboard-tabs">
-          <button class="tab-btn active" data-tab="overview">Overview</button>
-          <button class="tab-btn" data-tab="progress">Progress</button>
-          <button class="tab-btn" data-tab="words">Word History</button>
-          <button class="tab-btn" data-tab="settings">Settings</button>
-        </div>
-        <div class="dashboard-tab-content" id="tab-overview">
-          <div class="stats-grid">
-            <div class="stat-card"><span class="stat-card-icon">📅</span><span class="stat-card-value" id="dashTotalDays">0</span><span class="stat-card-label">Days Practised</span></div>
-            <div class="stat-card"><span class="stat-card-icon">📝</span><span class="stat-card-value" id="dashTotalWords">0</span><span class="stat-card-label">Words Learned</span></div>
-            <div class="stat-card"><span class="stat-card-icon">🔥</span><span class="stat-card-value" id="dashBestStreak">0</span><span class="stat-card-label">Best Streak</span></div>
-            <div class="stat-card"><span class="stat-card-icon">⏱️</span><span class="stat-card-value" id="dashTotalTime">0m</span><span class="stat-card-label">Total Time</span></div>
-          </div>
-          <div class="weekly-chart-section">
-            <h3>This Week's Activity</h3>
-            <div class="weekly-chart" id="weeklyChart"></div>
-          </div>
-          <div class="mastery-overview">
-            <h3>Mastery Progress</h3>
-            <div id="masteryBars" class="mastery-bars"></div>
-          </div>
-        </div>
-        <div class="dashboard-tab-content" id="tab-progress" hidden>
-          <div class="learning-path">
-            <h3>Learning Path</h3>
-            <p class="path-description">Master each level to unlock the next!</p>
-            <div id="learningPathList" class="path-list"></div>
-          </div>
-        </div>
-        <div class="dashboard-tab-content" id="tab-words" hidden>
-          <div class="word-history-section">
-            <div class="history-filters">
-              <button class="filter-btn active" data-filter="all">All Words</button>
-              <button class="filter-btn" data-filter="difficult">Needs Practice</button>
-              <button class="filter-btn" data-filter="mastered">Mastered</button>
-            </div>
-            <div id="wordHistoryList" class="word-history-list"></div>
-          </div>
-        </div>
-        <div class="dashboard-tab-content" id="tab-settings" hidden>
-          <div class="parent-settings">
-            <h3>Parental Controls</h3>
-            <div class="setting-row">
-              <label for="sessionTimeLimit">Session Time Limit:</label>
-              <select id="sessionTimeLimit">
-                <option value="0">No limit</option>
-                <option value="10">10 minutes</option>
-                <option value="15">15 minutes</option>
-                <option value="20">20 minutes</option>
-                <option value="30">30 minutes</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <label for="difficultyLock">Lock Difficulty Level:</label>
-              <select id="difficultyLock">
-                <option value="0">Auto-unlock</option>
-                <option value="1">CVC only</option>
-                <option value="2">Up to CCVC</option>
-                <option value="3">Up to Digraphs</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <label>
-                <input type="checkbox" id="requireMastery">
-                Require 80% mastery to unlock next level
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </dialog>
+  </div><!-- /#app -->
 
-    <!-- Tutorial Modal -->
-    <dialog id="tutorialModal" class="modal">
-      <div class="modal-content tutorial-modal-content">
-        <div class="tutorial-mascot">🦜</div>
-        <h2>Welcome to PhonicsQuest!</h2>
-        <p class="tutorial-tagline">The most fun way to learn phonics!</p>
-        <div class="tutorial-steps">
-          <div class="tutorial-step">
-            <span class="step-icon">🎡</span>
-            <div>
-              <strong>Spin</strong> to get a new word
-              <br><small>See letters revealed one by one</small>
-            </div>
-          </div>
-          <div class="tutorial-step">
-            <span class="step-icon">👂</span>
-            <div>
-              <strong>Listen</strong> to each sound
-              <br><small>Each phoneme plays aloud</small>
-            </div>
-          </div>
-          <div class="tutorial-step">
-            <span class="step-icon">✂️</span>
-            <div>
-              <strong>Segment</strong> words into sounds
-              <br><small>Tap each phoneme separately</small>
-            </div>
-          </div>
-          <div class="tutorial-step">
-            <span class="step-icon">🗣️</span>
-            <div>
-              <strong>Blend</strong> sounds together
-              <br><small>Say the whole word aloud!</small>
-            </div>
-          </div>
-          <div class="tutorial-step">
-            <span class="step-icon">⭐</span>
-            <div>
-              <strong>Earn XP</strong> &amp; level up
-              <br><small>Collect hearts, badges &amp; stars!</small>
-            </div>
-          </div>
-        </div>
-        <p class="tutorial-tip">Shortcut keys: <kbd>S</kbd> Spin &nbsp; <kbd>R</kbd> Repeat &nbsp; <kbd>H</kbd> Hint</p>
-        <div class="modal-buttons">
-          <button id="startTutorial">Let's Play!</button>
-          <button id="skipTutorial" class="secondary">Skip Intro</button>
-        </div>
-      </div>
-    </dialog>
-
-    <div id="screenReaderAnnounce" class="sr-only" aria-live="assertive"></div>
-
-  </div><!-- /.app-wrapper -->
-  <script src="script.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
