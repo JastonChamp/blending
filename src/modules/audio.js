@@ -225,8 +225,32 @@ class AudioManager {
       utt.pitch = 1.1;
       utt.volume = 1;
       if (this._ttsVoice) utt.voice = this._ttsVoice;
-      utt.onend = () => resolve();
-      utt.onerror = () => resolve();
+
+      let resolved = false;
+      const done = () => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(safariFallback);
+        clearInterval(safariResumeCheck);
+        resolve();
+      };
+
+      utt.onend  = done;
+      utt.onerror = done;
+
+      // Safari bug: speechSynthesis.onend can silently never fire, stalling
+      // the whole playback chain. Resolve after a generous time limit based
+      // on text length so the app always continues.
+      const estimatedMs = Math.max(1500, Math.ceil(text.length * 80 / rate)) + 800;
+      const safariFallback = setTimeout(done, estimatedMs);
+
+      // Safari iOS: synthesis silently pauses when the page loses focus or
+      // another audio event fires. Poll and resume so sounds keep playing.
+      const safariResumeCheck = setInterval(() => {
+        if (resolved) { clearInterval(safariResumeCheck); return; }
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      }, 250);
+
       speechSynthesis.speak(utt);
     });
   }
