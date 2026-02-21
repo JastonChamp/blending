@@ -15,6 +15,7 @@ import { spinWheel, buildWordAnimation } from './components/wheel.js';
 import { renderDashboard, destroyDashboard } from './components/dashboard.js';
 import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
 import { MODES } from './modes/index.js';
+import { initStoryMode, showBrowser, cleanupStoryMode } from './modes/storyMode.js';
 
 class App {
   constructor() {
@@ -123,6 +124,28 @@ class App {
     // Back button
     this._els.btnBack?.addEventListener('click', () => {
       this._cleanupMode();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Stories button (home → stories screen)
+    document.getElementById('btn-stories')?.addEventListener('click', () => {
+      initStoryMode(
+        document.getElementById('stories-content'),
+        () => {
+          cleanupStoryMode();
+          this._showScreen('screen-home');
+          mascot.setHomeState('holdCard');
+        },
+      );
+      showBrowser();
+      this._showScreen('screen-stories');
+      mascot.setState('celebrate');
+    });
+
+    // Stories screen back button (→ home)
+    document.getElementById('btn-stories-back')?.addEventListener('click', () => {
+      cleanupStoryMode();
       this._showScreen('screen-home');
       mascot.setHomeState('holdCard');
     });

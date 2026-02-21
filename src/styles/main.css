@@ -1495,3 +1495,407 @@ input, select, textarea { font-family: inherit; }
 .highlight-anim {
   animation: pop 0.4s var(--ease-bounce);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GIRI STORIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Home banner ─────────────────────────────────────────────────────────── */
+.stories-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 420px;
+  margin: var(--space-4) auto 0;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%);
+  border: 2px solid #d8b4fe;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--dur-fast) var(--ease-bounce),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+.stories-banner:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.stories-banner:active { transform: scale(0.97); }
+
+.stories-banner-mascot { flex-shrink: 0; }
+.stories-banner-mascot img { display: block; }
+
+.stories-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stories-banner-title {
+  font-size: var(--font-size-base);
+  font-weight: 800;
+  color: #7c3aed;
+}
+.stories-banner-sub {
+  font-size: var(--font-size-sm);
+  color: #6b7280;
+}
+.stories-banner-arrow {
+  font-size: var(--font-size-xl);
+  color: #a855f7;
+  font-weight: 700;
+}
+
+/* ── Screen header ───────────────────────────────────────────────────────── */
+.stories-screen-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 480px;
+  padding-bottom: var(--space-3);
+  flex-shrink: 0;
+}
+.stories-screen-title {
+  flex: 1;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  text-align: center;
+  color: var(--color-text);
+}
+.stories-screen-mascot img { display: block; }
+
+.stories-content {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  overflow-y: auto;
+}
+
+/* ── Browser: tabs ───────────────────────────────────────────────────────── */
+.stories-browser { width: 100%; }
+
+.stories-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.stories-tabs::-webkit-scrollbar { display: none; }
+
+.story-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--dur-fast) var(--ease-out);
+  gap: 2px;
+}
+.story-tab:hover { border-color: var(--tab-color); background: color-mix(in srgb, var(--tab-color) 10%, transparent); }
+.story-tab.active {
+  border-color: var(--tab-color);
+  background: color-mix(in srgb, var(--tab-color) 15%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--tab-color) 30%, transparent);
+}
+.story-tab-num {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--tab-color);
+}
+.story-tab-name {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.story-tab.active .story-tab-name { color: var(--color-text); }
+
+/* ── Browser: level strip ────────────────────────────────────────────────── */
+.stories-level-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--level-bg);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+.slstrip-label {
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  color: var(--level-color);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.slstrip-name {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+.slstrip-sounds {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  flex: 1;
+}
+.slstrip-prop {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--level-color);
+}
+
+/* ── Browser: story card grid ────────────────────────────────────────────── */
+.story-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.story-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: center;
+  transition: transform var(--dur-fast) var(--ease-bounce),
+              box-shadow var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast);
+}
+.story-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+.story-card:active { transform: scale(0.97); }
+
+.story-card-illo {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.story-card-mascot {
+  width: 76%;
+  height: 76%;
+  object-fit: contain;
+  z-index: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+  margin-bottom: -4px;
+}
+.story-card-prop {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: 1.6rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+.story-card-title {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: var(--color-text);
+  padding: 0 var(--space-2);
+  line-height: 1.3;
+}
+.story-card-level {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+/* ── Reader ──────────────────────────────────────────────────────────────── */
+.story-reader {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Illustration header */
+.story-illo {
+  width: 100%;
+  min-height: 180px;
+  background: var(--level-bg);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--level-color) 25%, transparent);
+}
+.story-illo-mascot {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  z-index: 2;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12));
+  animation: bob 3s ease-in-out infinite;
+}
+.story-illo-prop {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+  animation: bob 4s ease-in-out infinite reverse;
+}
+/* Steam wisps above the pot */
+.story-illo-steam {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+.story-illo-steam span {
+  display: block;
+  width: 6px;
+  height: 28px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--level-color) 35%, white);
+  opacity: 0.6;
+  animation: steam-rise 2s ease-in-out infinite;
+}
+.story-illo-steam span:nth-child(2) { animation-delay: 0.4s; }
+.story-illo-steam span:nth-child(3) { animation-delay: 0.8s; }
+
+@keyframes steam-rise {
+  0%   { transform: scaleY(1) translateY(0); opacity: 0.6; }
+  50%  { transform: scaleY(1.3) translateY(-8px); opacity: 0.3; }
+  100% { transform: scaleY(1) translateY(0); opacity: 0.6; }
+}
+
+/* Meta bar */
+.story-meta-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.story-lib-btn {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--level-color);
+  border-color: var(--level-color);
+  flex-shrink: 0;
+}
+.story-meta-badge {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+}
+
+.story-reader-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+/* Story body lines */
+.story-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sline {
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-3);
+  transition: background var(--dur-fast), box-shadow var(--dur-fast);
+  line-height: 1.65;
+}
+
+/* Intro — plain large text */
+.sline--intro {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Structural label */
+.sline--label {
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  background: transparent;
+  padding-left: 0;
+  padding-top: var(--space-3);
+  padding-bottom: 0;
+}
+
+/* Beat text following a label */
+.sline--beat {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  margin-top: var(--space-1);
+}
+
+/* Signature refrain */
+.sline--refrain {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: #7c3aed;
+  background: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%);
+  border: 2px solid #d8b4fe;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* Ending line */
+.sline--end {
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  color: var(--color-success);
+  background: color-mix(in srgb, var(--color-success) 10%, transparent);
+  border: 2px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+  text-align: center;
+}
+
+/* Active / highlighted line during TTS */
+.sline--active {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  transform: scale(1.01);
+}
+.sline--label.sline--active {
+  color: var(--color-primary);
+  background: transparent !important;
+  box-shadow: none;
+  transform: none;
+}
+
+/* TTS bar */
+.story-tts-bar {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  padding: var(--space-4) 0 var(--space-6);
+}
