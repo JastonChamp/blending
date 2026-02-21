@@ -34,8 +34,9 @@ export const WORD_GROUPS = {
   'long-i':   { label: 'Long I',   color: '#14b8a6', bg: '#ccfbf1', icon: '🪁', audioFile: 'long_i' },
   'long-o':   { label: 'Long O',   color: '#f59e0b', bg: '#fef3c7', icon: '🏠', audioFile: 'long_o' },
   'long-u':   { label: 'Long U',   color: '#6366f1', bg: '#e0e7ff', icon: '🎵', audioFile: 'long_u' },
-  'digraphs': { label: 'Digraphs', color: '#8b5cf6', bg: '#ede9fe', icon: '⭐', audioFile: null },
-  'blends':   { label: 'Blends',   color: '#f97316', bg: '#ffedd5', icon: '🚀', audioFile: null },
+  'digraphs':   { label: 'Digraphs',   color: '#8b5cf6', bg: '#ede9fe', icon: '⭐', audioFile: null },
+  'blends':     { label: 'Blends',     color: '#f97316', bg: '#ffedd5', icon: '🚀', audioFile: null },
+  'diphthongs': { label: 'Diphthongs', color: '#0d9488', bg: '#ccfbf1', icon: '🌀', audioFile: null },
 };
 
 /**
@@ -315,6 +316,48 @@ export const WORDS = [
   { id:'swim',  word:'swim',  graphemes:['sw','i','m'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🏊' },
   { id:'sled',  word:'sled',  graphemes:['sl','e','d'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🛷' },
   { id:'slug',  word:'slug',  graphemes:['sl','u','g'],   types:['bl','sv','c'],  pattern:'blend', group:'blends', level:3, emoji:'🐌' },
+
+  /* ══════════════════════════════════════
+     DIPHTHONGS  (level 3)
+     oi/oy · ou/ow · aw
+  ══════════════════════════════════════ */
+  // oi / oy
+  { id:'oil',   word:'oil',   graphemes:['oi','l'],          types:['dp','c'],       pattern:'other', group:'diphthongs', level:3, emoji:'🛢️' },
+  { id:'coin',  word:'coin',  graphemes:['c','oi','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🪙' },
+  { id:'foil',  word:'foil',  graphemes:['f','oi','l'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🍳' },
+  { id:'soil',  word:'soil',  graphemes:['s','oi','l'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🌱' },
+  { id:'coil',  word:'coil',  graphemes:['c','oi','l'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🌀' },
+  { id:'boil',  word:'boil',  graphemes:['b','oi','l'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'♨️' },
+  { id:'boy',   word:'boy',   graphemes:['b','oy'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'👦' },
+  { id:'toy',   word:'toy',   graphemes:['t','oy'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🪀' },
+  { id:'joy',   word:'joy',   graphemes:['j','oy'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'😄' },
+
+  // ou / ow
+  { id:'cow',   word:'cow',   graphemes:['c','ow'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🐄' },
+  { id:'now',   word:'now',   graphemes:['n','ow'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'⏰' },
+  { id:'how',   word:'how',   graphemes:['h','ow'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'❓' },
+  { id:'bow_dip', word:'bow', graphemes:['b','ow'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🎀' },
+  { id:'town',  word:'town',  graphemes:['t','ow','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🏘️' },
+  { id:'gown',  word:'gown',  graphemes:['g','ow','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'👗' },
+  { id:'down',  word:'down',  graphemes:['d','ow','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'⬇️' },
+  { id:'out',   word:'out',   graphemes:['ou','t'],          types:['dp','c'],       pattern:'other', group:'diphthongs', level:3, emoji:'🚪' },
+  { id:'shout', word:'shout', graphemes:['sh','ou','t'],     types:['d','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'📢' },
+  { id:'loud',  word:'loud',  graphemes:['l','ou','d'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🔊' },
+  { id:'cloud', word:'cloud', graphemes:['cl','ou','d'],     types:['bl','dp','c'],  pattern:'other', group:'diphthongs', level:3, emoji:'☁️' },
+  { id:'mouth', word:'mouth', graphemes:['m','ou','th'],     types:['c','dp','d'],   pattern:'other', group:'diphthongs', level:3, emoji:'👄' },
+  { id:'south', word:'south', graphemes:['s','ou','th'],     types:['c','dp','d'],   pattern:'other', group:'diphthongs', level:3, emoji:'🧭' },
+
+  // aw
+  { id:'saw',   word:'saw',   graphemes:['s','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🔨' },
+  { id:'jaw',   word:'jaw',   graphemes:['j','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'💪' },
+  { id:'paw',   word:'paw',   graphemes:['p','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🐾' },
+  { id:'raw',   word:'raw',   graphemes:['r','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'🥩' },
+  { id:'law',   word:'law',   graphemes:['l','aw'],          types:['c','dp'],       pattern:'other', group:'diphthongs', level:3, emoji:'⚖️' },
+  { id:'yawn',  word:'yawn',  graphemes:['y','aw','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'😴' },
+  { id:'dawn',  word:'dawn',  graphemes:['d','aw','n'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🌅' },
+  { id:'hawk',  word:'hawk',  graphemes:['h','aw','k'],      types:['c','dp','c'],   pattern:'other', group:'diphthongs', level:3, emoji:'🦅' },
+  { id:'draw',  word:'draw',  graphemes:['dr','aw'],         types:['bl','dp'],      pattern:'other', group:'diphthongs', level:3, emoji:'🎨' },
+  { id:'claw',  word:'claw',  graphemes:['cl','aw'],         types:['bl','dp'],      pattern:'other', group:'diphthongs', level:3, emoji:'🦞' },
 ];
 
 /**
@@ -378,5 +421,5 @@ export function getRandomWord(maxLevel = 1) {
 export const GROUP_ORDER = [
   'short-a','short-e','short-i','short-o','short-u',
   'long-a','long-e','long-i','long-o','long-u',
-  'digraphs','blends',
+  'digraphs','blends','diphthongs',
 ];

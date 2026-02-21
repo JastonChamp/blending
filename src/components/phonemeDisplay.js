@@ -15,6 +15,7 @@ const TYPE_CLASS = {
   bl: 'blend',
   se: 'silent-e',
   rc: 'r-control',
+  dp: 'diphthong',
 };
 
 /** Human-readable labels for phoneme types */
@@ -26,6 +27,7 @@ const TYPE_LABEL = {
   bl: 'blend',
   se: 'silent e',
   rc: 'r-controlled',
+  dp: 'diphthong',
 };
 
 /**

@@ -28,6 +28,8 @@ const PHONEME_FILES = {
   a: 'a', e: 'e', i: 'i', o: 'o', u: 'u',
   long_a: 'long_a', long_e: 'long_e', long_i: 'long_i',
   long_o: 'long_o', long_u: 'long_u',
+  // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
+  oi: 'oi', ow: 'ow', aw: 'aw',
 };
 
 /**
@@ -47,6 +49,8 @@ const PHONEME_TTS = {
   a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
   // Long vowels
   long_a: 'ay',  long_e: 'ee',  long_i: 'eye',  long_o: 'oh',  long_u: 'you',
+  // Diphthongs
+  oi: 'oy',  ow: 'ow',  aw: 'aw',
 };
 
 /** Sound effect file names */
@@ -115,6 +119,13 @@ class AudioManager {
     let key = grapheme.toLowerCase();
     if (type === 'lv') key = `long_${grapheme.toLowerCase().replace('ee','e').replace('ay','a')}`;
     if (type === 'se') return; // silent-e: no sound
+
+    // Diphthong: normalise oy→oi, ou→ow, au→aw so they share one audio file each
+    if (type === 'dp') {
+      const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
+      key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();
+      return this._playPhonemeAudio(key);
+    }
 
     // Consolidate blend components (fl, sl, etc.) — speak each letter separately
     if (type === 'bl' && grapheme.length === 2) {
@@ -308,6 +319,10 @@ class AudioManager {
       const type     = wordData.types[i];
       let key = grapheme.toLowerCase();
       if (type === 'lv') key = `long_${grapheme.toLowerCase()}`;
+      if (type === 'dp') {
+        const dipMap = { oy: 'oi', ou: 'ow', au: 'aw' };
+        key = dipMap[grapheme.toLowerCase()] ?? grapheme.toLowerCase();
+      }
       if (type === 'se' || this._buffers.has(key)) continue;
       const filename = PHONEME_FILES[key];
       if (filename) {
