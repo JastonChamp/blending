@@ -30,6 +30,25 @@ const PHONEME_FILES = {
   long_o: 'long_o', long_u: 'long_u',
 };
 
+/**
+ * Phonetic text for TTS fallback.
+ * TTS says letter NAMES for single letters (e.g. "bee" for 'b').
+ * This map gives phonetic spellings that TTS will pronounce as the sound.
+ */
+const PHONEME_TTS = {
+  // Consonants – voiced/unvoiced pairs with a schwa where needed
+  b: 'buh',  c: 'kuh',  d: 'duh',  f: 'fff',  g: 'guh',  h: 'huh',
+  j: 'juh',  k: 'kuh',  l: 'lll',  m: 'mmm',  n: 'nnn',  p: 'puh',
+  r: 'rrr',  s: 'sss',  t: 'tuh',  v: 'vvv',  w: 'wuh',  x: 'ks',
+  y: 'yuh',  z: 'zzz',
+  // Digraphs
+  sh: 'shh',  ch: 'chuh',  th: 'thuh',  ng: 'ing',
+  // Short vowels
+  a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
+  // Long vowels
+  long_a: 'ay',  long_e: 'ee',  long_i: 'eye',  long_o: 'oh',  long_u: 'you',
+};
+
 /** Sound effect file names */
 const SFX = {
   correct:  'reveal-sound', // reuse existing MP3
@@ -125,8 +144,9 @@ class AudioManager {
       } catch (_) { /* fall through to TTS */ }
     }
 
-    // TTS fallback
-    return this._speak(key, 0.9);
+    // TTS fallback – use phonetic text so TTS speaks the sound, not the letter name
+    const ttsText = PHONEME_TTS[key] ?? key;
+    return this._speak(ttsText, 0.9);
   }
 
   /**

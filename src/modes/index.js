@@ -4,6 +4,7 @@
  */
 
 import { setupBlend, cleanup as cleanupBlend, getCurrentWord as getBlendWord } from './blend.js';
+import { setupClassicBlend, cleanup as cleanupClassic, getCurrentWord as getClassicWord } from './classicBlend.js';
 import { setupHearChoose, cleanup as cleanupHear, getCurrentWord as getHearWord } from './hearChoose.js';
 import { setupSegment, cleanup as cleanupSegment, getCurrentWord as getSegmentWord } from './segment.js';
 import { setupMissingSound, cleanup as cleanupMissing, getCurrentWord as getMissingWord } from './missingSound.js';
@@ -28,6 +29,14 @@ export const MODES = {
     setup: setupBlend,
     cleanup: cleanupBlend,
     getCurrentWord: getBlendWord,
+  },
+  classicBlend: {
+    key: 'classicBlend',
+    name: 'Listen & Blend',
+    icon: '🔊',
+    setup: setupClassicBlend,
+    cleanup: cleanupClassic,
+    getCurrentWord: getClassicWord,
   },
   hear: {
     key: 'hear',
