@@ -27,6 +27,7 @@
   --c-silent-e:    #94a3b8;
   --c-r-control:   #ec4899;
   --c-diphthong:   #0d9488;
+  --c-suffix:      #d97706;
 
   /* Surfaces */
   --bg:           #f8f7ff;
@@ -139,6 +140,7 @@
   --c-digraph:     #660066;
   --c-blend:       #994400;
   --c-diphthong:   #0a6b62;
+  --c-suffix:      #92400e;
 }
 
 /* ── Dark mode ── */
@@ -602,6 +604,7 @@ input, select, textarea { font-family: inherit; }
 .letter-tile--silent-e    { background: var(--c-silent-e); font-size: var(--font-size-lg); }
 .letter-tile--r-control   { background: var(--c-r-control); }
 .letter-tile--diphthong   { background: var(--c-diphthong); }
+.letter-tile--suffix      { background: var(--c-suffix); font-weight: 900; }
 .letter-tile--revealed    { animation: pop 0.35s var(--ease-bounce); }
 
 /* ── PHONEME ROW ── */
@@ -641,6 +644,7 @@ input, select, textarea { font-family: inherit; }
 .phoneme-symbol--silent-e    { background: var(--c-silent-e); }
 .phoneme-symbol--r-control   { background: var(--c-r-control); }
 .phoneme-symbol--diphthong   { background: var(--c-diphthong); }
+.phoneme-symbol--suffix      { background: var(--c-suffix); font-weight: 900; }
 
 /* Active tile highlight used by Classic Blend mode during sound playback */
 .phoneme-tile.active .phoneme-symbol {

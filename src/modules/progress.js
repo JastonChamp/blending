@@ -29,7 +29,14 @@ class Progress {
     let pool = opts.group ? WORDS : getWordsByLevel(maxLevel);
 
     if (opts.group) {
-      pool = pool.filter(w => w.group === opts.group);
+      // struct-cvc / struct-ccvc are cross-cutting pattern filters over all words
+      if (opts.group === 'struct-cvc') {
+        pool = WORDS.filter(w => w.pattern === 'CVC');
+      } else if (opts.group === 'struct-ccvc') {
+        pool = WORDS.filter(w => w.pattern === 'blend');
+      } else {
+        pool = pool.filter(w => w.group === opts.group);
+      }
     }
 
     if (pool.length === 0) pool = WORDS.slice(0, 20);

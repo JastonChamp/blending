@@ -16,6 +16,7 @@ const TYPE_CLASS = {
   se: 'silent-e',
   rc: 'r-control',
   dp: 'diphthong',
+  sf: 'suffix',
 };
 
 /** Human-readable labels for phoneme types */
@@ -28,6 +29,7 @@ const TYPE_LABEL = {
   se: 'silent e',
   rc: 'r-controlled',
   dp: 'diphthong',
+  sf: 'suffix',
 };
 
 /**

@@ -127,6 +127,11 @@ class AudioManager {
       return this._playPhonemeAudio(key);
     }
 
+    // Suffix tile (-ing, -ed, -er, -est) — speak the morpheme via TTS
+    if (type === 'sf') {
+      return this._speak(grapheme.replace(/^-/, ''), 0.9);
+    }
+
     // Consolidate blend components (fl, sl, etc.) — speak each letter separately
     if (type === 'bl' && grapheme.length === 2) {
       await this._playPhonemeAudio(grapheme[0]);
