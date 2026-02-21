@@ -24,7 +24,9 @@ class Progress {
    */
   getAdaptivePool(count = 10, opts = {}) {
     const maxLevel = opts.maxLevel ?? store.get('difficulty') ?? 1;
-    let pool = getWordsByLevel(maxLevel);
+    // When a specific group is chosen, ignore the level cap so all words in
+    // that group are reachable regardless of the current difficulty setting.
+    let pool = opts.group ? WORDS : getWordsByLevel(maxLevel);
 
     if (opts.group) {
       pool = pool.filter(w => w.group === opts.group);
