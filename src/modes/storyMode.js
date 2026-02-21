@@ -370,8 +370,10 @@ async function _handleWordTap(wordBtn) {
 
   const rawWord = wordBtn.dataset.word;
   const clean   = rawWord.toLowerCase().replace(/[^a-z]/g, '');
-  const hfw     = isHFW(clean);
-  const wordObj = hfw ? null : lookupWord(rawWord);
+  // Check word bank first — a word that can be decoded should never be shown
+  // as a sight word, even if it also appears in the HFW list.
+  const wordObj = lookupWord(rawWord);
+  const hfw     = !wordObj && isHFW(clean);
 
   const panel = _decodePanelEl;
   if (!panel) return;
