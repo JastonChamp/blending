@@ -1,0 +1,586 @@
+/**
+ * PhonicsQuest – App Orchestrator
+ *
+ * Manages screens (home → game → result), mode lifecycle,
+ * settings/dashboard modals, and keyboard shortcuts.
+ */
+
+import { store } from './modules/store.js';
+import { audio } from './modules/audio.js';
+import { gamification } from './modules/gamification.js';
+import { progress } from './modules/progress.js';
+import { speech } from './modules/speech.js';
+import { mascot } from './components/mascot.js';
+import { spinWheel, buildWordAnimation } from './components/wheel.js';
+import { renderDashboard, destroyDashboard } from './components/dashboard.js';
+import { celebrateCorrect, celebrateLevelUp, celebrateStreak, celebrateDailyGoal } from './components/confettiHelper.js';
+import { MODES } from './modes/index.js';
+
+class App {
+  constructor() {
+    /** @type {string} current screen id */
+    this._screen = 'screen-home';
+    /** @type {string} current mode key */
+    this._mode = 'blend';
+    /** @type {import('./data/words.js').Word|null} */
+    this._currentWord = null;
+
+    // Cache DOM elements
+    this._els = {};
+  }
+
+  /** Boot the application */
+  init() {
+    this._cacheElements();
+    this._bindEvents();
+    this._applySettings();
+
+    // Init subsystems
+    gamification.init();
+    mascot.init();
+
+    // Init spin wheel
+    const canvas = document.getElementById('spin-wheel');
+    if (canvas) spinWheel.init(canvas);
+
+    // Show mic button only if speech recognition is supported
+    const micBtn = document.getElementById('btn-mic');
+    if (micBtn && !speech.supported) {
+      micBtn.classList.add('hidden');
+    }
+
+    // Apply saved theme
+    this._applyTheme(store.get('theme') || 'default');
+
+    console.log('[PhonicsQuest] App initialized');
+  }
+
+  /** Cache frequently used DOM elements */
+  _cacheElements() {
+    this._els = {
+      // Screens
+      screenHome:   document.getElementById('screen-home'),
+      screenGame:   document.getElementById('screen-game'),
+      screenResult: document.getElementById('screen-result'),
+
+      // Game elements
+      wordDisplay:    document.getElementById('word-display'),
+      wordEmoji:      document.getElementById('word-emoji'),
+      phonemeRow:     document.getElementById('phoneme-row'),
+      modeInstruction: document.getElementById('mode-instruction'),
+      modeArea:       document.getElementById('mode-area'),
+
+      // Buttons
+      btnCheck: document.getElementById('btn-check'),
+      btnSayIt: document.getElementById('btn-say-it'),
+      btnSkip:  document.getElementById('btn-skip'),
+      btnBack:  document.getElementById('btn-back'),
+      btnNext:  document.getElementById('btn-next'),
+      btnMic:   document.getElementById('btn-mic'),
+
+      // Result
+      resultBadge:   document.getElementById('result-badge'),
+      resultMessage: document.getElementById('result-message'),
+      resultWord:    document.getElementById('result-word-display'),
+      resultXp:      document.getElementById('result-xp'),
+      resultMascot:  document.getElementById('result-mascot'),
+
+      // Speech
+      speechBubble: document.getElementById('speech-bubble'),
+
+      // Toast
+      toastContainer: document.getElementById('toast-container'),
+    };
+  }
+
+  /** Bind all event listeners */
+  _bindEvents() {
+    // Mode cards
+    document.querySelectorAll('.mode-card').forEach(card => {
+      card.addEventListener('click', () => {
+        this._mode = card.dataset.mode;
+        store.set('currentMode', this._mode);
+        this._startGame();
+      });
+    });
+
+    // Spin wheel
+    document.getElementById('spin-btn')?.addEventListener('click', async () => {
+      const btn = document.getElementById('spin-btn');
+      if (!btn || spinWheel.isSpinning) return;
+      btn.disabled = true;
+      try {
+        const group = await spinWheel.spin();
+        store.set('currentGroup', group);
+        audio.playSfx('correct');
+        // Start game in blend mode with that group
+        this._mode = 'blend';
+        setTimeout(() => this._startGame(group), 500);
+      } catch (_) {}
+      btn.disabled = false;
+    });
+
+    // Back button
+    this._els.btnBack?.addEventListener('click', () => {
+      this._cleanupMode();
+      this._showScreen('screen-home');
+      mascot.setHomeState('holdCard');
+    });
+
+    // Next word button
+    this._els.btnNext?.addEventListener('click', () => {
+      this._nextWord();
+    });
+
+    // Say It button
+    this._els.btnSayIt?.addEventListener('click', () => {
+      if (this._currentWord) audio.speakWord(this._currentWord.word);
+    });
+
+    // Skip button
+    this._els.btnSkip?.addEventListener('click', () => {
+      this._cleanupMode();
+      this._nextWord();
+    });
+
+    // Mic button (speech recognition)
+    this._els.btnMic?.addEventListener('click', () => {
+      this._handleSpeechRecognition();
+    });
+
+    // Settings button
+    document.getElementById('settings-btn')?.addEventListener('click', () => {
+      this._openModal('modal-settings');
+    });
+
+    // Dashboard button (PIN-gated)
+    document.getElementById('dashboard-btn')?.addEventListener('click', () => {
+      this._openModal('modal-pin');
+      // Focus first PIN digit
+      setTimeout(() => document.querySelector('.pin-digit')?.focus(), 200);
+    });
+
+    // Modal close buttons
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalId = btn.dataset.close;
+        if (modalId) this._closeModal(modalId);
+      });
+    });
+
+    // Modal overlay click-to-close
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) this._closeModal(overlay.id);
+      });
+    });
+
+    // Settings bindings
+    this._bindSettings();
+
+    // PIN gate
+    this._bindPinGate();
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => this._handleKeyboard(e));
+
+    // Mascot tap (random cheer)
+    document.getElementById('mascot-trigger')?.addEventListener('click', () => {
+      mascot.clap();
+      this._showToast(mascot.getCheer(), 'success');
+      audio.playSfx('pop');
+    });
+  }
+
+  /** Start a game round */
+  _startGame(group) {
+    // Get next word (adaptive)
+    const opts = { maxLevel: store.get('difficulty') || 1 };
+    if (group) opts.group = group;
+    this._currentWord = progress.getNextWord(opts);
+
+    // Preload audio
+    audio.preloadWord(this._currentWord);
+
+    // Switch to game screen
+    this._showScreen('screen-game');
+    mascot.think();
+
+    // Set up the mode
+    const mode = MODES[this._mode];
+    if (!mode) return;
+
+    mode.setup(this._currentWord, {
+      ...this._els,
+      onResult: (correct, responseTime) => this._handleResult(correct, responseTime),
+    });
+  }
+
+  /** Load the next word in the current mode */
+  _nextWord() {
+    this._cleanupMode();
+    this._startGame(store.get('currentGroup'));
+  }
+
+  /** Handle a correct/wrong result from any mode */
+  _handleResult(correct, responseTime) {
+    const word = this._currentWord;
+    if (!word) return;
+
+    // Record progress
+    const isNew = progress.isNewWord(word.id);
+    progress.recordAttempt(word.id, correct, this._mode);
+
+    if (correct) {
+      // Gamification
+      const reward = gamification.recordCorrect(responseTime, isNew);
+
+      // Celebrations
+      mascot.celebrate(reward.levelUp);
+      mascot.setResultState(reward.levelUp ? 'trophy' : 'confetti');
+
+      if (reward.levelUp) {
+        celebrateLevelUp();
+        audio.playSfx('levelUp');
+        this._showToast(`Level ${reward.newLevel}!`, 'success');
+      } else {
+        celebrateCorrect();
+        audio.playSfx('correct');
+      }
+
+      if (reward.dailyComplete) {
+        celebrateDailyGoal();
+        this._showToast('Daily goal complete!', 'success');
+      }
+
+      // Show result screen
+      this._showResultScreen(true, word, reward);
+
+    } else {
+      // Wrong
+      const result = gamification.recordWrong();
+      mascot.encourage();
+      mascot.setResultState('encourage');
+      audio.playSfx('wrong');
+
+      this._showResultScreen(false, word, null);
+
+      if (result.gameOver) {
+        this._showToast('Hearts refilled! Take a break?', 'warning');
+        setTimeout(() => gamification.refillHearts(), 2000);
+      }
+    }
+  }
+
+  /** Show the result screen with appropriate content */
+  _showResultScreen(correct, word, reward) {
+    this._showScreen('screen-result');
+
+    if (correct) {
+      this._els.resultBadge.textContent = '🌟';
+      this._els.resultMessage.textContent = mascot.getCheer();
+      this._els.resultMessage.style.color = 'var(--color-success)';
+      this._els.resultXp.textContent = reward ? `+${reward.xpEarned} XP` : '+10 XP';
+      this._els.resultXp.style.display = '';
+    } else {
+      this._els.resultBadge.textContent = '💪';
+      this._els.resultMessage.textContent = mascot.getEncouragement();
+      this._els.resultMessage.style.color = 'var(--color-error)';
+      this._els.resultXp.style.display = 'none';
+    }
+
+    this._els.resultWord.textContent = word.emoji + ' ' + word.word;
+    this._els.btnNext.focus();
+  }
+
+  /** Switch visible screen with animation */
+  _showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+      if (screen.id === screenId) {
+        screen.classList.remove('exit');
+        screen.classList.add('active');
+      } else if (screen.classList.contains('active')) {
+        screen.classList.remove('active');
+        screen.classList.add('exit');
+        setTimeout(() => screen.classList.remove('exit'), 400);
+      }
+    });
+    this._screen = screenId;
+  }
+
+  /** Cleanup current mode */
+  _cleanupMode() {
+    const mode = MODES[this._mode];
+    mode?.cleanup();
+  }
+
+  /** Handle speech recognition flow */
+  async _handleSpeechRecognition() {
+    if (!this._currentWord || !speech.supported) return;
+    const btn = this._els.btnMic;
+    if (!btn) return;
+
+    if (speech.isListening) {
+      speech.stop();
+      btn.setAttribute('aria-pressed', 'false');
+      return;
+    }
+
+    btn.setAttribute('aria-pressed', 'true');
+
+    const result = await speech.listen(this._currentWord.word);
+
+    btn.setAttribute('aria-pressed', 'false');
+
+    if (!result) {
+      this._showSpeechBubble('I didn\'t hear anything. Try again!');
+      return;
+    }
+
+    if (result.correct) {
+      this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match! Great job!`);
+      // Auto-mark as correct
+      setTimeout(() => this._handleResult(true, 3000), 1200);
+    } else {
+      this._showSpeechBubble(`I heard "${result.heard}" – ${result.score}% match. Try saying "${this._currentWord.word}" more clearly!`);
+    }
+  }
+
+  /** Show speech bubble with result */
+  _showSpeechBubble(text) {
+    const bubble = this._els.speechBubble;
+    if (!bubble) return;
+    bubble.textContent = text;
+    bubble.hidden = false;
+    setTimeout(() => { bubble.hidden = true; }, 4000);
+  }
+
+  // ── Settings ──
+
+  _bindSettings() {
+    // Theme swatches
+    document.querySelectorAll('.theme-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        const theme = swatch.dataset.theme;
+        this._applyTheme(theme);
+        store.set('theme', theme);
+        document.querySelectorAll('.theme-swatch').forEach(s => {
+          s.classList.toggle('active', s.dataset.theme === theme);
+          s.setAttribute('aria-pressed', s.dataset.theme === theme);
+        });
+      });
+    });
+
+    // SFX toggle
+    document.getElementById('sfx-toggle')?.addEventListener('change', (e) => {
+      store.set('sfxEnabled', e.target.checked);
+    });
+
+    // Autoplay toggle
+    document.getElementById('autoplay-toggle')?.addEventListener('change', (e) => {
+      store.set('autoplay', e.target.checked);
+    });
+
+    // Voice speed
+    document.getElementById('voice-speed')?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      store.set('voiceSpeed', val);
+      const display = document.getElementById('voice-speed-display');
+      if (display) display.textContent = `${val}×`;
+    });
+
+    // Difficulty buttons
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const diff = parseInt(btn.dataset.diff);
+        store.set('difficulty', diff);
+        document.querySelectorAll('.diff-btn').forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.diff) === diff);
+          b.setAttribute('aria-pressed', parseInt(b.dataset.diff) === diff);
+        });
+      });
+    });
+
+    // Daily goal slider
+    document.getElementById('goal-range')?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      store.set('dailyGoal', val);
+      const display = document.getElementById('goal-range-display');
+      if (display) display.textContent = val;
+      document.getElementById('goal-total').textContent = val;
+    });
+
+    // Reset progress
+    document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
+      if (confirm('This will erase all progress. Are you sure?')) {
+        store.reset();
+        gamification.init();
+        this._showToast('Progress reset!', 'warning');
+        this._closeModal('modal-settings');
+      }
+    });
+  }
+
+  _applySettings() {
+    // Apply saved settings to UI
+    const sfx = document.getElementById('sfx-toggle');
+    if (sfx) sfx.checked = store.get('sfxEnabled');
+
+    const autoplay = document.getElementById('autoplay-toggle');
+    if (autoplay) autoplay.checked = store.get('autoplay');
+
+    const speed = document.getElementById('voice-speed');
+    if (speed) speed.value = store.get('voiceSpeed');
+    const speedDisplay = document.getElementById('voice-speed-display');
+    if (speedDisplay) speedDisplay.textContent = `${store.get('voiceSpeed')}×`;
+
+    const diff = store.get('difficulty') || 1;
+    document.querySelectorAll('.diff-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.diff) === diff);
+      b.setAttribute('aria-pressed', parseInt(b.dataset.diff) === diff);
+    });
+
+    const goal = store.get('dailyGoal') || 10;
+    const goalRange = document.getElementById('goal-range');
+    if (goalRange) goalRange.value = goal;
+    const goalDisplay = document.getElementById('goal-range-display');
+    if (goalDisplay) goalDisplay.textContent = goal;
+  }
+
+  _applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  // ── PIN Gate ──
+
+  _bindPinGate() {
+    const digits = document.querySelectorAll('.pin-digit');
+    const hint = document.getElementById('pin-hint');
+
+    // Auto-advance PIN inputs
+    digits.forEach((input, i) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value && i < digits.length - 1) {
+          digits[i + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0) {
+          digits[i - 1].focus();
+        }
+      });
+    });
+
+    // Confirm PIN
+    document.getElementById('pin-confirm-btn')?.addEventListener('click', () => {
+      const pin = Array.from(digits).map(d => d.value).join('');
+      if (pin.length < 4) {
+        if (hint) hint.textContent = 'Enter all 4 digits';
+        return;
+      }
+
+      const savedPin = store.get('parentPin');
+
+      if (!savedPin) {
+        // First time: set the PIN
+        store.set('parentPin', pin);
+        if (hint) hint.textContent = '';
+        this._closeModal('modal-pin');
+        this._openDashboard();
+      } else if (pin === savedPin) {
+        // Correct PIN
+        if (hint) hint.textContent = '';
+        this._closeModal('modal-pin');
+        this._openDashboard();
+      } else {
+        // Wrong PIN
+        if (hint) hint.textContent = 'Wrong PIN. Try again.';
+        digits.forEach(d => { d.value = ''; });
+        digits[0].focus();
+      }
+    });
+
+    // Cancel PIN
+    document.getElementById('pin-cancel-btn')?.addEventListener('click', () => {
+      this._closeModal('modal-pin');
+      document.querySelectorAll('.pin-digit').forEach(d => { d.value = ''; });
+    });
+  }
+
+  _openDashboard() {
+    this._openModal('modal-dashboard');
+    const container = document.getElementById('dashboard-content');
+    if (container) renderDashboard(container);
+  }
+
+  // ── Modals ──
+
+  _openModal(id) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    modal.hidden = false;
+
+    // Trap focus
+    const focusable = modal.querySelectorAll('button, input, [tabindex]');
+    if (focusable.length) focusable[0].focus();
+
+    // Escape to close
+    const handler = (e) => {
+      if (e.key === 'Escape') {
+        this._closeModal(id);
+        document.removeEventListener('keydown', handler);
+      }
+    };
+    document.addEventListener('keydown', handler);
+  }
+
+  _closeModal(id) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    modal.hidden = true;
+
+    // Cleanup dashboard chart
+    if (id === 'modal-dashboard') destroyDashboard();
+  }
+
+  // ── Toast ──
+
+  _showToast(message, type = 'info') {
+    const container = this._els.toastContainer;
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3200);
+  }
+
+  // ── Keyboard Shortcuts ──
+
+  _handleKeyboard(e) {
+    // Only when on game screen
+    if (this._screen !== 'screen-game') return;
+
+    switch (e.key) {
+      case ' ':
+      case 'Enter':
+        e.preventDefault();
+        // Trigger primary action (reveal / check)
+        document.getElementById('btn-reveal-next')?.click();
+        break;
+      case 's':
+        this._els.btnSayIt?.click();
+        break;
+      case 'Escape':
+        this._els.btnBack?.click();
+        break;
+      case 'n':
+        if (this._screen === 'screen-result') {
+          this._els.btnNext?.click();
+        }
+        break;
+    }
+  }
+}
+
+export const app = new App();
