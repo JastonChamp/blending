@@ -638,6 +638,14 @@ input, select, textarea { font-family: inherit; }
 .phoneme-symbol--silent-e    { background: var(--c-silent-e); }
 .phoneme-symbol--r-control   { background: var(--c-r-control); }
 
+/* Active tile highlight used by Classic Blend mode during sound playback */
+.phoneme-tile.active .phoneme-symbol {
+  transform: scale(1.2) translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  filter: brightness(1.15);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
 .phoneme-diacritic {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
