@@ -1,15 +1,16 @@
 /**
- * Classic Blend Mode  (teacher demo / "previous" blending mode)
+ * Listen & Blend — Free Mode  (for confident learners, parents & teachers)
  *
- * Shows the whole word immediately with all phoneme tiles visible,
- * then auto-plays each phoneme sound in sequence and finally says
- * the complete blended word — no button-per-sound needed.
+ * Shows ALL phoneme tiles immediately, then plays sounds on demand.
+ * No step-by-step hand-holding — ideal for fluent learners and whole-class
+ * teacher modelling where the goal is fluency and speed.
  *
- * Ideal for whole-class modelling:  teacher presses Play, children listen
- * and join in, then self-assess.
+ * Features:
+ *  • Category selector — pick any word group freely
+ *  • Speed control — Slow / Normal / Fast playback
+ *  • Self-assessment after first play
  *
- * Includes a category selector so the teacher can freely choose which
- * word group to practise (Short A, Digraphs, Blends, etc.).
+ * For step-by-step guided blending use "Blend It!" instead.
  */
 
 import { renderPhonemes, renderWordImage } from '../components/phonemeDisplay.js';
@@ -19,8 +20,12 @@ import { WORD_GROUPS, GROUP_ORDER, STRUCT_GROUP_ORDER, SUFFIX_GROUP_ORDER } from
 
 /** @type {import('../data/words.js').Word|null} */
 let currentWord = null;
-let isPlaying = false;
-let startTime = 0;
+let isPlaying   = false;
+let startTime   = 0;
+let _speed      = 'normal'; // 'slow' | 'normal' | 'fast'
+
+/** Inter-phoneme delay (ms) per speed setting */
+const SPEED_DELAY = { slow: 600, normal: 320, fast: 120 };
 
 /**
  * Set up Classic Blend mode for a word.
@@ -87,6 +92,12 @@ function _buildGroupOptions() {
 // ── Controls rendering ────────────────────────────────────────────────────
 
 function _renderControls(els, word, played = false) {
+  const speedBtns = ['slow', 'normal', 'fast'].map(s => {
+    const label = { slow: '🐢 Slow', normal: '▶ Normal', fast: '⚡ Fast' }[s];
+    const active = _speed === s ? 'speed-btn--active' : '';
+    return `<button class="speed-btn ${active}" data-speed="${s}" aria-label="Set speed to ${s}">${label}</button>`;
+  }).join('');
+
   els.modeArea.innerHTML = `
     <div class="classic-blend-wrap">
 
@@ -96,6 +107,12 @@ function _renderControls(els, word, played = false) {
         <select id="classic-group-select" class="category-select" aria-label="Choose word category">
           ${_buildGroupOptions()}
         </select>
+      </div>
+
+      <!-- Speed control -->
+      <div class="speed-row" role="group" aria-label="Playback speed">
+        <span class="speed-label">Speed:</span>
+        <div class="speed-btns">${speedBtns}</div>
       </div>
 
       <!-- Play buttons -->
@@ -147,6 +164,16 @@ function _renderControls(els, word, played = false) {
   document.getElementById('btn-self-no')?.addEventListener('click', () => {
     els.onResult(false, Date.now() - startTime);
   });
+
+  // Speed buttons
+  els.modeArea.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _speed = btn.dataset.speed;
+      els.modeArea.querySelectorAll('.speed-btn').forEach(b => {
+        b.classList.toggle('speed-btn--active', b.dataset.speed === _speed);
+      });
+    });
+  });
 }
 
 // ── Playback ──────────────────────────────────────────────────────────────
@@ -156,6 +183,7 @@ async function _playSounds(word, els) {
   isPlaying = true;
 
   const tiles = els.phonemeRow.querySelectorAll('.phoneme-tile');
+  const delay = SPEED_DELAY[_speed] ?? 320;
 
   for (let i = 0; i < word.graphemes.length; i++) {
     // Highlight current tile
@@ -163,14 +191,14 @@ async function _playSounds(word, els) {
 
     // Play this phoneme's audio
     await audio.speakPhoneme(word.graphemes[i], word.types[i]);
-    await _delay(300);
+    await _delay(delay);
   }
 
   // Remove highlights
   tiles.forEach(t => t.classList.remove('active'));
 
   // Brief pause then say the full blended word
-  await _delay(300);
+  await _delay(Math.min(delay, 300));
   await audio.speakWord(word.word);
 
   isPlaying = false;
