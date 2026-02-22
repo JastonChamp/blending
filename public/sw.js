@@ -3,7 +3,7 @@
  * Caches app shell + audio assets for full offline support.
  */
 
-const CACHE_NAME = 'phonicsquest-v2';
+const CACHE_NAME = 'phonicsquest-v3';
 const BASE = '/blending/';
 
 // App shell files to pre-cache

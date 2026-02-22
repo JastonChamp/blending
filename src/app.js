@@ -8,6 +8,7 @@
 import { store } from './modules/store.js';
 import { audio } from './modules/audio.js';
 import { gamification } from './modules/gamification.js';
+import { badges } from './modules/badges.js';
 import { progress } from './modules/progress.js';
 import { speech } from './modules/speech.js';
 import { mascot } from './components/mascot.js';
@@ -142,6 +143,8 @@ class App {
       showBrowser();
       this._showScreen('screen-stories');
       mascot.setState('celebrate');
+      // Check badge for first story open
+      badges.onStoriesOpened().forEach(b => badges.notify(b));
     });
 
     // Stories screen back button (→ home)
@@ -284,6 +287,17 @@ class App {
     if (correct) {
       // Gamification
       const reward = gamification.recordCorrect(responseTime, isNew);
+
+      // Badges
+      const newBadges = badges.onCorrect({
+        fast: responseTime < 3000,
+        sessionStreak: gamification.getSessionStats().correct,
+        level: reward.newLevel,
+        dayStreak: store.get('streak'),
+        dailyComplete: reward.dailyComplete,
+        mode: this._mode,
+      });
+      newBadges.forEach(b => badges.notify(b));
 
       // Celebrations
       mascot.celebrate(reward.levelUp);
@@ -464,6 +478,7 @@ class App {
     document.getElementById('reset-progress-btn')?.addEventListener('click', () => {
       if (confirm('This will erase all progress. Are you sure?')) {
         store.reset();
+        badges.reset();
         gamification.init();
         this._showToast('Progress reset!', 'warning');
         this._closeModal('modal-settings');

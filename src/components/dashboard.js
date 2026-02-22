@@ -8,6 +8,7 @@
 import { Chart, registerables } from 'chart.js';
 import { progress } from '../modules/progress.js';
 import { store } from '../modules/store.js';
+import { badges } from '../modules/badges.js';
 import { WORD_GROUPS, GROUP_ORDER, WORDS } from '../data/words.js';
 import { CURRICULUM, getUnlockedStages } from '../data/curriculum.js';
 
@@ -66,6 +67,10 @@ export function renderDashboard(container) {
       </table>
     </div>
 
+    <!-- Badges -->
+    <h3 class="dash-section-title" style="margin-top:24px">Achievements</h3>
+    <div id="badge-grid" class="badge-grid"></div>
+
     <!-- Actions -->
     <div class="dash-actions">
       <button class="btn btn--ghost" id="btn-export-csv">Export CSV</button>
@@ -77,6 +82,7 @@ export function renderDashboard(container) {
   _renderMasteryBars(stats);
   _renderLearningPath(stats);
   _renderWordHistory(stats);
+  _renderBadges();
   _bindActions();
 }
 
@@ -197,6 +203,26 @@ function _renderWordHistory(stats) {
   });
 
   tbody.innerHTML = rows.join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No history yet</td></tr>';
+}
+
+function _renderBadges() {
+  const container = document.getElementById('badge-grid');
+  if (!container) return;
+
+  const all = badges.getAll();
+  const earnedCount = badges.earnedCount;
+  const totalCount  = badges.totalCount;
+
+  container.setAttribute('aria-label', `${earnedCount} of ${totalCount} badges earned`);
+
+  container.innerHTML = all.map(b => `
+    <div class="badge-card ${b.earned ? 'badge-card--earned' : 'badge-card--locked'}"
+         title="${b.desc}"
+         aria-label="${b.name}${b.earned ? ' — earned' : ' — locked'}">
+      <span class="badge-emoji">${b.earned ? b.emoji : '🔒'}</span>
+      <span class="badge-name">${b.name}</span>
+    </div>
+  `).join('');
 }
 
 function _bindActions() {
