@@ -143,6 +143,32 @@
   --c-suffix:      #92400e;
 }
 
+/* ── Dyslexia-friendly mode ── */
+/* Uses Lexend — research-backed for reading ease + reduced letter crowding */
+[data-theme="dyslexia"] {
+  --font-main:        'Lexend', 'Arial', sans-serif;
+  --bg:               #fdf9f0;
+  --surface:          #fff8e8;
+  --surface-2:        #f5edda;
+  --border:           #d6c9b0;
+  --text:             #2b1f0a;
+  --text-muted:       #5c4a28;
+}
+/* Globally increase readability spacing in dyslexia mode */
+[data-theme="dyslexia"] body {
+  letter-spacing: 0.05em;
+  word-spacing:   0.12em;
+  line-height:    1.8;
+}
+[data-theme="dyslexia"] .phoneme-tile,
+[data-theme="dyslexia"] .letter-tile {
+  letter-spacing: 0.08em;
+  font-size:      1.15em;
+}
+[data-theme="dyslexia"] .btn {
+  letter-spacing: 0.04em;
+}
+
 /* ── Dark mode ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="contrast"]) {
@@ -1075,6 +1101,38 @@ input, select, textarea { font-family: inherit; }
 .toast--error   { border-color: var(--color-error); }
 .toast--warning { border-color: var(--color-warning); }
 
+/* Badge toast — JS-driven transition (override CSS animation) */
+.toast--badge {
+  animation: none;
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.35s var(--ease-bounce), transform 0.35s var(--ease-bounce);
+  border-color: #f59e0b;
+  max-width: 260px;
+  gap: var(--space-3);
+}
+.toast--badge.toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.toast-badge-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.toast-badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-sm);
+}
+.toast-badge-text strong {
+  color: #d97706;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* ── 12. MODALS ── */
 .modal-overlay {
   position: fixed;
@@ -1380,6 +1438,49 @@ input, select, textarea { font-family: inherit; }
   flex-wrap: wrap;
   justify-content: center;
   padding-top: var(--space-4);
+}
+
+/* ── Badge Grid (dashboard) ── */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  background: var(--surface);
+  text-align: center;
+  cursor: default;
+  transition: transform 0.15s;
+}
+.badge-card--earned {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  animation: pop 0.4s var(--ease-bounce);
+}
+.badge-card--locked {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+.badge-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.badge-name {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+.badge-card--earned .badge-name {
+  color: #92400e;
 }
 
 /* ── 16. ANIMATIONS ── */

@@ -22,12 +22,24 @@ const PHONEME_FILES = {
   b: 'b', c: 'c', d: 'd', f: 'f', g: 'g', h: 'h', j: 'j', k: 'k',
   l: 'l', m: 'm', n: 'n', p: 'p', r: 'r', s: 's', t: 't', v: 'v',
   w: 'w', x: 'x', y: 'y', z: 'z',
-  // Digraphs
+  // Digraphs — wh/ck/ll/se alias to their base consonant sound
   sh: 'sh', ch: 'ch', th: 'th', ng: 'ng',
-  // Vowels
+  wh: 'w',   // "wh" makes the /w/ sound
+  ck: 'c',   // "ck" makes the /k/ sound
+  ll: 'l',   // "ll" makes the /l/ sound
+  se: 's',   // "se" makes the /s/ sound
+  // Short vowels
   a: 'a', e: 'e', i: 'i', o: 'o', u: 'u',
+  // Long vowels (canonical keys)
   long_a: 'long_a', long_e: 'long_e', long_i: 'long_i',
   long_o: 'long_o', long_u: 'long_u',
+  // Long-vowel spelling aliases — vowel teams map to their base long-vowel audio
+  long_ai: 'long_a',  // ai  → long A sound
+  long_ay: 'long_a',  // ay  → long A sound
+  long_ea: 'long_e',  // ea  → long E sound
+  long_ee: 'long_e',  // ee  → long E sound
+  long_oa: 'long_o',  // oa  → long O sound
+  long_ow: 'long_o',  // ow (long-O words: blow, snow…) → long O sound
   // Diphthongs  (oi covers oi+oy, ow covers ow+ou, aw covers aw+au)
   oi: 'oi', ow: 'ow', aw: 'aw',
 };
@@ -45,10 +57,15 @@ const PHONEME_TTS = {
   y: 'yuh',  z: 'zzz',
   // Digraphs
   sh: 'shh',  ch: 'chuh',  th: 'thuh',  ng: 'ing',
+  wh: 'wuh',  ck: 'kuh',  ll: 'lll',  se: 'sss',
   // Short vowels
   a: 'ah',  e: 'eh',  i: 'ih',  o: 'aw',  u: 'uh',
-  // Long vowels
+  // Long vowels (canonical)
   long_a: 'ay',  long_e: 'ee',  long_i: 'eye',  long_o: 'oh',  long_u: 'you',
+  // Long-vowel spelling aliases
+  long_ai: 'ay',  long_ay: 'ay',
+  long_ea: 'ee',  long_ee: 'ee',
+  long_oa: 'oh',  long_ow: 'oh',
   // Diphthongs
   oi: 'oy',  ow: 'ow',  aw: 'aw',
 };
